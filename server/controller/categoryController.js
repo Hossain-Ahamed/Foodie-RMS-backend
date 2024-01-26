@@ -31,7 +31,7 @@ const addCategory = async (req,res)=>{
                                         res.status(500).json({msg:'Internal Server Error'});
                                         }
     
-
+ 
 }
 
 const allCategory = async (req,res)=>{
@@ -45,6 +45,60 @@ const allCategory = async (req,res)=>{
     
 }
 
-const updateCategory = async (req,res)=>{
-    
-}
+
+// Read operation
+const getCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const category = await categoryModel.findById(categoryId);
+
+        if (!category) {
+            return res.status(404).json({ msg: 'Category not found' });
+        }
+
+        res.status(200).json(category);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
+
+// Update operation
+const updateCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const dataToUpdate = req.body;
+
+        const category = await categoryModel.findByIdAndUpdate(
+            categoryId,
+            { $set: dataToUpdate },
+            { new: true }
+        );
+
+        if (!category) {
+            return res.status(404).json({ msg: 'Category not found' });
+        }
+
+        res.status(200).json(category);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
+
+// Delete operation
+const deleteCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const category = await categoryModel.findByIdAndDelete(categoryId);
+
+        if (!category) {
+            return res.status(404).json({ msg: 'Category not found' });
+        }
+
+        res.status(200).json({ msg: 'Category deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
