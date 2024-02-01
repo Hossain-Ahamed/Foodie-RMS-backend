@@ -1,38 +1,37 @@
 const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
-    {
-        res_id:{
-            type: mongoose.ObjectId,
-             ref: "Restaurants",
-             required: true,
-        },
-        branchID:{
-            type: mongoose.branchID,
-             ref: "Branchs",
-             required: true,
-        },
-
-        title:{
-            type: String,
-            required: true,
-        },
-        img:{
-            type: [String],
-        },
-        active: {
-            type: Boolean,
-            default: true,
-        },
-        description:{
-            type: String,
-        },
-        deleteStatus:{
-            type: String,
-            default: false,
-        },
-
+  {
+    res_id: {
+      type: mongoose.ObjectId,
+      ref: "Restaurants",
+      required: true,
     },
-    { timestamps: true }
+    branchID: {
+      type: mongoose.branchID,
+      ref: "Branchs",
+      required: true,
+    },
+
+    title: {
+      type: String,
+      required: true,
+    },
+    img: {
+      type: [String],
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    description: {
+      type: String,
+    },
+    deleteStatus: {
+      type: String,
+      default: false,
+    },
+  },
+  { timestamps: true }
 );
-module.exports= mongoose.model("Category", categorySchema);
+module.exports = mongoose.model("Category", categorySchema);

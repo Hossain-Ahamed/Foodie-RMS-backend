@@ -1,64 +1,94 @@
-const mongoose =  require("mongoose");
+const mongoose = require("mongoose");
 
-const dishesSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required: true,
+const dishesSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-    slugName:{
-        type: String,
-        lowercase: true,
+    category: {
+      type: String,
+      required: true,
     },
-    R_name:{
-        type: String,
-        required: true
+    R_Id: {
+      type: mongoose.ObjectId,
+      ref: "Restaurants",
+      required: true,
     },
-    B_name:{
-        type: String,
-        required: true
+    B_Id: {
+      type: mongoose.branchID,
+      ref: "Branchs",
+      required: true,
     },
     isActive: {
-        type: Boolean,
-        default: true,
+      type: Boolean,
+      default: true,
     },
-    shortdescription:{
-        type: String,
+    description: {
+      type: String,
     },
-    img:{
-        type: String,
+    supplementary_duty: {
+      type: String,
     },
-    MRP:{
-        type: Number,
-        required: true,
+    img: {
+      type: String,
     },
-    sellingPrice:{
-        type: Number,
+    price: {
+      type: Number,
+      required: true,
     },
-    category_name:{
-        type: String,
-        required: true,
+    preparation_cost: {
+      type: Number,
+      required: true,
     },
-    category_slug:{
-        type: String,
-        lowercase: true,
+    offerPrice: {
+      type: Number,
+      required: true,
     },
-    images:{
-        type:[String],
-        default:[],
+    sales_tax: {
+      type: Number,
     },
-    percentage:{
-        type: Number,
+    options: [
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+        priority: {
+          type: String,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        preparation_cost: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+    addOn: [
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        preparation_cost: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+    deleteStatus: {
+      type: String,
+      default: false,
     },
-    preparationPrice:{
-        type:Number,
-        required:true,
-    },
-    addOn:{
-        type:[String],
-        required:[],
-    }
-
-},
-{timestamps: true}
+  },
+  { timestamps: true }
 );
 module.exports = mongoose.model("dishes", dishesSchema);
