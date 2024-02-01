@@ -21,7 +21,7 @@ const createDishes = async (req, res) => {
       options,
       addOn,
     } = req.body;
-    if (dishesModel.findOne({ title })) {
+    if (dishesModel.findOne({ title:title, branchID:branchID })) {
       return res.status(400).send({
         success: false,
         message: "Dish Already Exists",
@@ -70,15 +70,14 @@ const updateDish = async (req, res) => {
       options,
       addOn,
     } = req.body;
+    const _id = req.params._id;
     // if (!dishesModel.findOne({ title })) {
     //   return res.status(400).send({
     //     success: false,
     //     message: "Dish Doesn't Exists",
     //   });
     // }
-    const dishThatNeedUpdate = await dishesModel.findOne({ title });
-    const dish = await dishesModel.findByIdAndUpdate(
-      dishThatNeedUpdate._id,
+    const dish = await dishesModel.findByIdAndUpdate(_id,
       {
         res_id,
         branchID,
@@ -116,4 +115,10 @@ const deleteDish = async (req, res) => {
       { new: true }
     );
   } catch (err) {}
+};
+
+module.exports = {
+  createDishes,
+  updateDish,
+  deleteDish,
 };

@@ -2,11 +2,12 @@ const categoryModel = require("../model/categoryModel");
 
 const addCategory = async (req,res)=>{
     try{
+        console.log("dektasi");
         const {res_id,branchID,title,img,active,description} = req.body;
         if(!title || !img){
             return res.status(400).json({msg:"Please fill all fields"});
             }else{
-                let catExist = await categoryModel.findOne({title:title
+                let catExist = await categoryModel.findOne({title:title,branchID:branchID
                     });
                     if(catExist)
                     {
