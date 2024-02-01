@@ -2,24 +2,36 @@ const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
     {
-        category_name:{
+        res_id:{
+            type: mongoose.ObjectId,
+             ref: "Restaurants",
+             required: true,
+        },
+        branchID:{
+            type: mongoose.branchID,
+             ref: "Branchs",
+             required: true,
+        },
+
+        title:{
             type: String,
             required: true,
         },
         img:{
-            type: String,
+            type: [String],
         },
-        category_slug:{
-            type: String,
-            lowercase: true,
-        },
-        isActive: {
+        active: {
             type: Boolean,
             default: true,
         },
-        shortdescription:{
+        description:{
             type: String,
         },
+        deleteStatus:{
+            type: String,
+            default: false,
+        },
+
     },
     { timestamps: true }
 );

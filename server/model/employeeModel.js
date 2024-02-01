@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema({
+    res_id:{
+        type: mongoose.ObjectId,
+         ref: "Restaurants",
+         required: true,
+    },
     f_name:{
         type: String,
         required: true
@@ -9,13 +14,15 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    R_name:{
-        type: String,
-        required: true
+    branch_name:{
+        type:String,
+        required:true
+
     },
-    B_name:{
-        type: String,
-        required: true
+    branchID:{
+        type: mongoose.branchID,
+         ref: "Branchs",
+         required: true,
     },
     email:{
         type: String,
@@ -29,11 +36,11 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    nId:{
+    nid:{
         type: String,
         required: true
     },
-    designation:{
+    role:{
         type: String,
         required: true
     },
@@ -41,15 +48,12 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    commentNotes:{
-        type: String,
+
+    profilePhoto:{
+        type: [String],
         required: true
     },
-    profilePicture:{
-        type: String,
-        required: true
-    },
-    streetNo:{
+    streetAddress:{
         type: String,
         required: true
     },
@@ -81,13 +85,26 @@ const employeeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    emergencyNumber:{
+    emergencyPhoneNumber:{
         type: String,
         required: true
     },
     emergencyRelation:{
         type: String,
         required: true
+    },
+    salary_type:{
+        type:String,
+        enum:['Hourly','Daily','Monthly'],
+        required:true,
+    },
+    salary_unit:{
+        type: Number,  //hourly wage or daily rate or monthly salary
+        required:true,
+    },
+    deleteStatus:{
+        type: String,
+        default: false,
     },
 
 },
