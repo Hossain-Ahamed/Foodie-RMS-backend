@@ -101,7 +101,11 @@ const employeeSchema = new mongoose.Schema({
     salary_unit:{
         type: Number,  //hourly wage or daily rate or monthly salary
         required:true,
-    }
+    },
+    deleteStatus:{
+        type: String,
+        default: false,
+    },
 
 },
 { timestamps: true }
