@@ -1,61 +1,61 @@
 const mongoose = require("mongoose");
 
 const restaurantSchema = new mongoose.Schema(
-    {
-        R_name:{
-            type: String,
-            required: true,
-        },
-        R_email:{
-            type: String,
-            required: true,
-        },
-        R_mobile:{
-            type: String,
-            required: true,
-        },
-        Owner_name:{
-            type: String,
-            required: true,
-        },
-        Owner_email:{
-            type: String,
-            required: true,
-        },
-        Owner_mobile:{
-            type: String,
-            required: true,
-        },
-        Owner_streetAddress:{
-            type: String,
-            required: true,
-        },
-        Owner_city:{
-            type: String,
-            required: true,
-        },
-        Owner_stateProvince:{
-            type: String,
-            required: true,
-        },
-        Owner_postalCode:{
-            type: String,
-            required: true,
-        },
-        Owner_country:{
-            type: String,
-            required: true,
-        },
-        img:{
-            type: String,
-            required: true,
-        },
-        deleteStatus:{
-            type: String,
-            default: false,
-        },
+  {
+    res_name: {
+      type: String,
+      required: true,
     },
-    { timestamps: true }
+    res_email: {
+      type: String,
+      required: true,
+    },
+    res_mobile: {
+      type: String,
+      required: true,
+    },
+    res_Owner_Name: {
+      type: String,
+      required: true,
+    },
+    res_Owner_email: {
+      type: String,
+      required: true,
+    },
+    res_Owner_mobile: {
+      type: String,
+      required: true,
+    },
+    res_Owner_streetAddress: {
+      type: String,
+      required: true,
+    },
+    res_Owner_city: {
+      type: String,
+      required: true,
+    },
+    res_Owner_stateProvince: {
+      type: String,
+      required: true,
+    },
+    res_Owner_postalCode: {
+      type: String,
+      required: true,
+    },
+    res_Owner_country: {
+      type: String,
+      required: true,
+    },
+    img: {
+      type: String,
+      required: true,
+    },
+    deleteStatus: {
+      type: String,
+      default: false,
+    },
+  },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Restaurants", restaurantSchema);
