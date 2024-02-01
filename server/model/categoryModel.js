@@ -8,7 +8,7 @@ const categorySchema = new mongoose.Schema(
       required: true,
     },
     branchID: {
-      type: mongoose.branchID,
+      type: mongoose.ObjectId,
       ref: "Branchs",
       required: true,
     },

@@ -2,26 +2,12 @@ const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema(
   {
-    res_id: {
-      type: mongoose.ObjectId,
-      ref: "Restaurants",
-      required: true,
-    },
     f_name: {
       type: String,
       required: true,
     },
     l_name: {
       type: String,
-      required: true,
-    },
-    branch_name: {
-      type: String,
-      required: true,
-    },
-    branchID: {
-      type: mongoose.branchID,
-      ref: "Branchs",
       required: true,
     },
     email: {
@@ -40,17 +26,13 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      required: true,
-    },
     mobile: {
       type: String,
       required: true,
     },
 
     profilePhoto: {
-      type: [String],
+      type: String,
       required: true,
     },
     streetAddress: {
@@ -102,6 +84,24 @@ const employeeSchema = new mongoose.Schema(
       type: Number, //hourly wage or daily rate or monthly salary
       required: true,
     },
+    permitted: [
+      {
+        res_id: {
+          type: mongoose.ObjectId,
+          ref: "Restaurants",
+          required: true,
+        },
+        branchID: {
+          type: mongoose.ObjectId,
+          ref: "Branchs",
+          required: true,
+        },
+        role: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     deleteStatus: {
       type: String,
       default: false,

@@ -2,16 +2,12 @@ const mongoose = require("mongoose");
 
 const branchSchema = new mongoose.Schema(
     {
-        R_Id:{
+        res_id:{
             type: mongoose.ObjectId,
             ref: "Restaurants",
             required: true,
         },
         branch_name:{
-            type: String,
-            required: true,
-        },
-        branchID:{
             type: String,
             required: true,
         },
