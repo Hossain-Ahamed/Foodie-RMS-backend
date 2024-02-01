@@ -4,17 +4,15 @@ const addEmployee = async (req, res) => {
         const {
             f_name,
             l_name,
-            R_name,
-            B_name,
+            permitted,
             email,
             gender,
             DOB,
-            nId,
+            nid,
             designation,
             mobile,
-            commentNotes,
-            profilePicture,
-            streetNo,
+            profilePhoto,
+            streetAddress,
             city,
             stateProvince,
             postalCode,
@@ -22,31 +20,34 @@ const addEmployee = async (req, res) => {
             emergencyAddress,
             emergencyEmail,
             emergencyName,
-            emergencyNumber,
-            emergencyRelation
+            emergencyPhoneNumber,
+            emergencyRelation,
+            salary_type,
+            salary_unit
+
         } = req.body;
 
         if (!f_name || !l_name || !email) {
             return res.status(400).json({ msg: "Please fill all required fields" });
         } else {
-            let employeeExist = await Employee.findOne({ email });
+            let employeeExist = await Employee.findOne({ email: email});
             if (employeeExist) {
                 return res.status(409).json({ msg: `${email} already exists` });
             } else {
                 const newEmployee = new Employee({
                     f_name,
                     l_name,
-                    R_name,
-                    B_name,
+                    permitted,
+    
                     email,
                     gender,
                     DOB,
-                    nId,
+                    nid,
                     designation,
                     mobile,
-                    commentNotes,
-                    profilePicture,
-                    streetNo,
+    
+                    profilePhoto,
+                    streetAddress,
                     city,
                     stateProvince,
                     postalCode,
@@ -54,8 +55,11 @@ const addEmployee = async (req, res) => {
                     emergencyAddress,
                     emergencyEmail,
                     emergencyName,
-                    emergencyNumber,
-                    emergencyRelation
+                    emergencyPhoneNumber,
+                    emergencyRelation,
+                    salary_type,
+                    salary_unit
+
                 });
 
                 const result = await newEmployee.save();
@@ -67,11 +71,21 @@ const addEmployee = async (req, res) => {
         res.status(500).json({ msg: 'Internal Server Error' });
     }
 };
+const allEmployee = async (req,res)=>{
+    try {
+        const employee=await Employee.find({deleteStatus:false});
+        // console.log(categories);
+        res.status(200).json(employee);
+        } catch (error) {
+            return res.status(500).json({ msg: 'Server error' });
+            }
+    
+}
 
 const getEmployeeById = async (req, res) => {
     try {
         const employeeId = req.params.id;
-        const employee = await Employee.findById(employeeId);
+        const employee = await Employee.findById({_id:employeeId , deleteStatus:false});
         
         if (!employee) {
             return res.status(404).json({ msg: 'Employee not found' });
@@ -87,11 +101,61 @@ const getEmployeeById = async (req, res) => {
 const updateEmployeeById = async (req, res) => {
     try {
         const employeeId = req.params.id;
-        const dataToUpdate = req.body;
+        const {
+            f_name,
+            l_name,
+            permitted,
+            email,
+            gender,
+            DOB,
+            nid,
+            designation,
+            mobile,
+            profilePhoto,
+            streetAddress,
+            city,
+            stateProvince,
+            postalCode,
+            country,
+            emergencyAddress,
+            emergencyEmail,
+            emergencyName,
+            emergencyPhoneNumber,
+            emergencyRelation,
+            salary_type,
+            salary_unit
+
+        } = req.body;
 
         const employee = await Employee.findByIdAndUpdate(
             employeeId,
-            { $set: dataToUpdate },
+            {
+                f_name,
+                l_name,
+                permitted,
+
+                email,
+                gender,
+                DOB,
+                nid,
+                designation,
+                mobile,
+
+                profilePhoto,
+                streetAddress,
+                city,
+                stateProvince,
+                postalCode,
+                country,
+                emergencyAddress,
+                emergencyEmail,
+                emergencyName,
+                emergencyPhoneNumber,
+                emergencyRelation,
+                salary_type,
+                salary_unit
+
+            },
             { new: true }
         );
 
@@ -109,7 +173,13 @@ const updateEmployeeById = async (req, res) => {
 const deleteEmployeeById = async (req, res) => {
     try {
         const employeeId = req.params.id;
-        const employee = await Employee.findByIdAndDelete(employeeId);
+        const employee = await Employee.findByIdAndUpdate(
+            employeeId,
+            {
+                deleteStatus:true,
+                },
+            { new: true }
+        );
 
         if (!employee) {
             return res.status(404).json({ msg: 'Employee not found' });
@@ -123,6 +193,7 @@ const deleteEmployeeById = async (req, res) => {
 };
 
 module.exports = {
+    allEmployee,
     addEmployee,
     getEmployeeById,
     updateEmployeeById,
