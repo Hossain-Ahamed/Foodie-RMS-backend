@@ -1,52 +1,37 @@
 const mongoose = require("mongoose");
 
-const restaurantSchema = new mongoose.Schema(
+const branchSchema = new mongoose.Schema(
     {
-        R_name:{
+        R_Id:{
+            type: mongoose.ObjectId,
+            ref: "Restaurants",
+            required: true,
+        },
+        branch_name:{
             type: String,
             required: true,
         },
-        R_email:{
+        branchID:{
             type: String,
             required: true,
         },
-        R_mobile:{
+        streetAddress:{
             type: String,
             required: true,
         },
-        Owner_name:{
+        city:{
             type: String,
             required: true,
         },
-        Owner_email:{
+        stateProvince:{
             type: String,
             required: true,
         },
-        Owner_mobile:{
+        postalCode:{
             type: String,
             required: true,
         },
-        Owner_streetAddress:{
-            type: String,
-            required: true,
-        },
-        Owner_city:{
-            type: String,
-            required: true,
-        },
-        Owner_stateProvince:{
-            type: String,
-            required: true,
-        },
-        Owner_postalCode:{
-            type: String,
-            required: true,
-        },
-        Owner_country:{
-            type: String,
-            required: true,
-        },
-        img:{
+        country:{
             type: String,
             required: true,
         },
@@ -58,4 +43,4 @@ const restaurantSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Restaurants", restaurantSchema);
+module.exports = mongoose.model("Branchs", branchSchema);
