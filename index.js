@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const connectDB = require("./server/config/database");
 const cors = require('cors');
+const AdminRoute = require("./server/route/adminRoute");
+const UserRoute = require("./server/route/userRoute");
 
 
 
@@ -25,6 +27,9 @@ app.use((req, res, next) => {
 });
 
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use("/api/v1/auth",AdminRoute);
+// app.use("/api/v1/auth",UserRoute);
 
 
 
