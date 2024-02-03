@@ -24,7 +24,6 @@ const employeeSchema = new mongoose.Schema(
     },
     nid: {
       type: String,
-      required: true,
     },
     mobile: {
       type: String,
@@ -33,7 +32,6 @@ const employeeSchema = new mongoose.Schema(
 
     profilePhoto: {
       type: String,
-      required: true,
     },
     streetAddress: {
       type: String,
@@ -89,16 +87,13 @@ const employeeSchema = new mongoose.Schema(
         res_id: {
           type: mongoose.ObjectId,
           ref: "Restaurants",
-          required: true,
         },
         branchID: {
           type: mongoose.ObjectId,
           ref: "Branchs",
-          required: true,
         },
         role: {
           type: String,
-          required: true,
         },
       },
     ],

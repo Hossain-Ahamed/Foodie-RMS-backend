@@ -12,14 +12,13 @@ const createBranch = async (req, res) => {
         stateProvince,
         postalCode,
         country,
-        deleteStatus,
       } = req.body;
-      if (branchModel.findOne({ branch_name:branch_name, res_id:res_id })) {
-        return res.status(400).send({
-          success: false,
-          message: "Branch Already Exists",
-        });
-      }
+    //   if (branchModel.findOne({ branch_name:branch_name, res_id:res_id })) {
+    //     return res.status(400).send({
+    //       success: false,
+    //       message: "Branch Already Exists",
+    //     });
+    //   }
   
       const branch = await new branchModel({
         res_id,
@@ -29,7 +28,6 @@ const createBranch = async (req, res) => {
         stateProvince,
         postalCode,
         country,
-        deleteStatus,
       }).save();
       res.status(200).send(true);
     } catch (err) {
@@ -50,7 +48,6 @@ const updateBranch = async (req, res) => {
         stateProvince,
         postalCode,
         country,
-        deleteStatus,
       } = req.body;
       const _id = req.params._id;
       const branch = await branchModel.findByIdAndUpdate(_id,
@@ -62,7 +59,6 @@ const updateBranch = async (req, res) => {
             stateProvince,
             postalCode,
             country,
-            deleteStatus,
         },
         { new: true }
       );

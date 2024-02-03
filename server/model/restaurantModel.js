@@ -48,7 +48,6 @@ const restaurantSchema = new mongoose.Schema(
     },
     img: {
       type: String,
-      required: true,
     },
     deleteStatus: {
       type: String,

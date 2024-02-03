@@ -21,12 +21,12 @@ const createDishes = async (req, res) => {
       options,
       addOn,
     } = req.body;
-    if (dishesModel.findOne({ title:title, branchID:branchID })) {
-      return res.status(400).send({
-        success: false,
-        message: "Dish Already Exists",
-      });
-    }
+    // if (dishesModel.findOne({ title:title, branchID:branchID })) {
+    //   return res.status(400).send({
+    //     success: false,
+    //     message: "Dish Already Exists",
+    //   });
+    // }
 
     const dish = await new dishesModel({
       res_id,
@@ -114,7 +114,11 @@ const deleteDish = async (req, res) => {
       },
       { new: true }
     );
-  } catch (err) {}
+    res.satus(200).send(true);
+  } catch (err) {
+    console.log("Error in deleting the dish : ", err);
+    res.status(400).send(false);
+  }
 };
 
 module.exports = {
