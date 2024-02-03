@@ -3,8 +3,8 @@ const categoryModel = require("../model/categoryModel");
 const addCategory = async (req,res)=>{
     try{
         console.log("dektasi");
-        const {res_id,branchID,title,img,active,description} = req.body;
-        if(!title || !img){
+        const {res_id,branchID,title,img,description} = req.body;
+        if(!title){
             return res.status(400).json({msg:"Please fill all fields"});
             }else{
                 let catExist = await categoryModel.findOne({title:title,branchID:branchID
@@ -19,7 +19,6 @@ const addCategory = async (req,res)=>{
                                     branchID,
                                     title,
                                     img,
-                                    active,
                                     description
                                     })
                                     const result = await newCat.save();
@@ -69,7 +68,7 @@ const getCategoryById = async (req, res) => {
 const updateCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const {res_id,branchID,title,img,active,description} = req.body;
+        const {res_id,branchID,title,img,description} = req.body;
 
         const category = await categoryModel.findByIdAndUpdate(
             categoryId,
@@ -78,7 +77,6 @@ const updateCategory = async (req, res) => {
                 branchID,
                 title,
                 img,
-                active,
                 description
                 },
             { new: true }
