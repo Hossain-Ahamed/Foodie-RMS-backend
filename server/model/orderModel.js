@@ -3,42 +3,65 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
-	restaurantId: { type: String },
-	restaurant: {
-		type: {
-			name: String,
-			contactNumber: String,
-			street: String,
-			shopNo: String,
-			city: String,
-			zipcode: String,
-		},
+  res_id: {
+    type: mongoose.ObjectId,
+    ref: "Restaurants",
+    required: true,
+  },
+  branchID: {
+	type: mongoose.ObjectId,
+	ref: "Branchs",
+	required: true,
+  },
+  user_id: {
+	 type: mongoose.ObjectId, 
+	 ref: "users", 
+	 required: true },
+
+  status: { 
+	type: String 
+},
+  totalAmount: { 
+	type: String 
+},
+  orderItems: [
+    {
+      dishID: { 
+		type: mongoose.ObjectId, 
+	 ref: "dishes", 
+	 required: true 
 	},
-	customerId: { type: String },
-	customer: {
-		type: {
-			firstName: String,
-			lastName: String,
-			contactNumber: String,
-			street: String,
-			apt: String,
-			city: String,
-			zipcode: String,
-		},
+      dishQuantity: { 
+		type: String 
 	},
-	status: { type: String },
-	time: { type: String },
-	totalAmount: { type: String },
-	orderItems: {
-		type: [
-			{
-				dishName: { type: String },
-				dishQuantity: { type: String },
-				dishTotalPrice: { type: Number },
-			},
-		],
+      dishTotalPrice: { 
+		type: Number 
 	},
-	orderNote: { type: String },
+    },
+  ],
+  addOn: [
+	{
+	  name: {
+		type: String,
+		required: true,
+	  },
+	  price: {
+		type: Number,
+		required: true,
+	  }
+	},
+  ],
+  orderNote: { 
+	type: String 
+},
+discount:{
+	type:String,
+},
+vouchar:{
+	type:String,
+},
+
+ 
 });
 
 module.exports = mongoose.model("order", orderSchema);
