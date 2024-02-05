@@ -1,6 +1,6 @@
 const mongoose =  require("mongoose");
 
-const cartSchema = new mongoose.Schema(
+const cartSchemaForTable = new mongoose.Schema(
   {
     res_id: {
       type: mongoose.ObjectId,
@@ -12,9 +12,9 @@ const cartSchema = new mongoose.Schema(
     ref: "Branchs",
     required: true,
     },
-    user_id: {
+    table_id: {
       type: mongoose.ObjectId,
-      ref: "users",
+      ref: "Tables",
       required: true,
     },
     Items: [
@@ -48,4 +48,4 @@ const cartSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports= mongoose.model("CartItem", cartSchema);
+module.exports= mongoose.model("CartItemForTable", cartSchemaForTable);
