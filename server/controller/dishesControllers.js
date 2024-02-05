@@ -77,7 +77,8 @@ const updateDish = async (req, res) => {
     //     message: "Dish Doesn't Exists",
     //   });
     // }
-    const dish = await dishesModel.findByIdAndUpdate(_id,
+    const dish = await dishesModel.findByIdAndUpdate(
+      _id,
       {
         res_id,
         branchID,
