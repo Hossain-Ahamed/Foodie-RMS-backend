@@ -1,4 +1,4 @@
-const Subscription = require("../models/subscription");
+const Subscription = require("../model/subscriptionModel");
 
 // Create a new subscription
 const createSubscription = async (req, res) => {
@@ -70,4 +70,9 @@ const extendSubscription = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+};
+
+module.exports = {
+  createSubscription,
+  extendSubscription,
 };
