@@ -28,7 +28,18 @@ const {
     updateResturant,
     deleteResturent,
     createAccount,
-    } =require("../controller/restaurantController")
+    } =require("../controller/restaurantController");
+
+
+const {
+    createSubscription,
+    extendSubscription,
+  }= require("../controller/subscriptionController");
+
+
+const {
+    createExpense
+  } = require("../controller/expenseController")
 
 
 const router = express.Router();
@@ -77,12 +88,21 @@ router.delete('/admin/delete/dish/:_id', deleteDish);            //Delete An Emp
 
 
 
-
+//Subscription Route
+router.post("/admin/subscription",createSubscription);
+// router.get("/admin/all-subscriptions",getAllSubscriptions);
+router.post( "/admin/extend-subscription/",extendSubscription);
 
 
 //Create Account 
-router.post("/admin/create/account/emplyoee",createUAccount)
-router.post("/admin/create/account/owner",createAccount)
+router.post("/admin/create/account/emplyoee",createUAccount);
+router.post("/admin/create/account/owner",createAccount);
+
+
+//Expense Route
+router.post("/admin/create/expense",createExpense);
+
+
 
 
 module.exports=router;
