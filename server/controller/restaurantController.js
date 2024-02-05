@@ -1,5 +1,6 @@
+const createUserAccount = require("../config/firbase-config.js");
 const resturantModel = require("../model/restaurantModel.js");
-
+const uuid = require("uuid");
 const createResturant = async (req, res) => {
   try {
     const {
@@ -43,6 +44,22 @@ const createResturant = async (req, res) => {
     return res.status(500).json({
       success: false,
     });
+  }
+};
+
+const createAccount = async (req, res) => {
+  try {
+    const email = req.body;
+    const password = uuid.v4();
+    const user = await accountModel.findOne({ email: res_Owner_email });
+    if (!user) {
+      createUserAccount({ email, password });
+      res.status(200).send(true);
+    } else {
+      res.status(409).send(false);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -130,4 +147,5 @@ module.exports = {
   createResturant,
   updateResturant,
   deleteResturent,
+  createAccount,
 };
