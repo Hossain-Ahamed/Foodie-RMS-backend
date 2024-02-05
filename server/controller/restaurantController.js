@@ -17,11 +17,9 @@ const createResturant = async (req, res) => {
       img,
     } = req.body;
     if (!res_name || !res_email || !res_mobile) {
-      return res
-        .status(400)
-        .json({
-          message: "All fields are required Please provide all the details.",
-        });
+      return res.status(400).json({
+        message: "All fields are required Please provide all the details.",
+      });
     } else {
       const newResturant = await resturantModel({
         res_name,
