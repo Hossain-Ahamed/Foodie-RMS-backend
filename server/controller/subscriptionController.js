@@ -3,7 +3,7 @@ const Subscription = require("../model/subscriptionModel");
 // Create a new subscription
 const createSubscription = async (req, res) => {
   try {
-    const { res_id, packageType } = req.body;
+    const { res_id, branchID, packageType } = req.body;
     let startDate = Date.now();
     let endDate;
     switch (packageType) {
@@ -22,11 +22,19 @@ const createSubscription = async (req, res) => {
 
     const newSubscription = new Subscription({
       res_id,
+      branchID,
       packageType,
       startDate,
       endDate,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      previousSubscriptions: [
+        {
+          packageType: packageType,
+          startDate: startDate,
+          endDate: endDate,
+        },
+      ],
     }).save();
     res.status(201).send(true);
   } catch (error) {
@@ -64,6 +72,14 @@ const extendSubscription = async (req, res) => {
     existingSubscription.endDate = newEndDate;
     existingSubscription.packageType = packageType;
     existingSubscription.updatedAt = Date.now();
+    previousSubscriptionsDetails = {
+      packageType: packageType,
+      startDate: existingSubscription.endDate,
+      endDate: newEndDate,
+    };
+    existingSubscription.previousSubscriptions.push(
+      previousSubscriptionsDetails
+    );
     await existingSubscription.save();
     res.status(200).send(true);
   } catch (error) {

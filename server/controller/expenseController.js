@@ -4,6 +4,8 @@ const Expense = require("../model/expenseModel");
 const createExpense = async (req, res) => {
   try {
     const {
+      res_id,
+      branchID,
       category,
       billDate,
       expense,
@@ -17,6 +19,8 @@ const createExpense = async (req, res) => {
     } = req.body;
 
     const newExpense = new Expense({
+      res_id,
+      branchID,
       category,
       billDate: new Date(billDate),
       expense: parseFloat(expense),
