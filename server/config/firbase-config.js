@@ -13,7 +13,7 @@ const createUserAccount = ({ email, password }) => {
       password,
     });
   } catch (error) {
-    console.log("Appwrite serive :: getCurrentUser :: error", error);
+    console.log("Firebase serive :: createUser :: error", error);
   }
 };
 
