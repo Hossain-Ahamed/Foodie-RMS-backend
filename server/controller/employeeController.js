@@ -1,4 +1,6 @@
+const createUserAccount = require("../config/firbase-config");
 const Employee = require("../model/employeeModel");
+const createClient = require("./clientController");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -76,6 +78,24 @@ const allEmployee = async (req, res) => {
     res.status(200).json(employee);
   } catch (error) {
     return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+//create user account
+const createUAccount = async (req, res) => {
+  try {
+    const email = req.body;
+    const password = uuid.v4();
+    const user = await Employee.findOne({ email: email });
+    if (!user) {
+      createUserAccount({ email, password });
+      createClient({ email, password });
+      res.status(200).send(true);
+    } else {
+      res.status(409).send(false);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -196,4 +216,5 @@ module.exports = {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
+  createUAccount,
 };
