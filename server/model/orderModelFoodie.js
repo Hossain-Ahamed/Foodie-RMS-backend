@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const orderSchema = new Schema({
+const orderSchemaForFoodie = new Schema({
   res_id: {
     type: mongoose.ObjectId,
     ref: "Restaurants",
@@ -13,9 +13,9 @@ const orderSchema = new Schema({
 	ref: "Branchs",
 	required: true,
   },
-  user_id: {
+  table_id: {
 	 type: mongoose.ObjectId, 
-	 ref: "users", 
+	 ref: "Tables", 
 	 required: true 
 	},
 
@@ -72,11 +72,6 @@ address: {
 	type: Number,
 	default : 0,
   },
-  shippingCharge:{
-	type :Number ,
-	require:true,
-	default:0,
-  },
   finalPrice:{
 	type :Number ,
 	require:true,
@@ -87,38 +82,13 @@ address: {
 	default: "Payment Pending",
 	enum: ["Payment Pending","Processing","Processed And Ready to Ship", "Shipped","Ready To Delivery", "Delivered","Cancelled"],
   },
-  cash_status: {
-	type: String,
-	default: "Not Paid",
-	enum: ["Not Paid", "Cash Recieved", "Not Refunded", "Refunded"],
-  },
+
   type_of_payment: {
 	type: String,
 	enum: ["Bkash", "Roket", "Nagad", "Card","Cash On Delivery (COD)"],
   },
   transactionId: {
 	type:String,
-  },
-  OTP:{
-	type:String,
-
-  },
-  deliveryPartner: {
-	
-	  _id: {
-		type: mongoose.ObjectId,
-		ref: "admin",
-	  },
-	  name:{
-		type:String
-	  },
-	  phone:{
-		type:String
-	  },
-	  email:{
-		type:String
-	  }
-	
   },
   phone:{
 	type:String,
@@ -140,4 +110,4 @@ address: {
  
 });
 
-module.exports = mongoose.model("ordersfromerestaurant", orderSchema);
+module.exports = mongoose.model("ordersfromfoodie", orderSchemaForFoodie);
