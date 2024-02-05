@@ -6,4 +6,15 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-module.exports = admin;
+const createUserAccount = ({ email, password }) => {
+  try {
+    admin.auth().createUser({
+      email,
+      password,
+    });
+  } catch (error) {
+    console.log("Appwrite serive :: getCurrentUser :: error", error);
+  }
+};
+
+module.exports = createUserAccount;
