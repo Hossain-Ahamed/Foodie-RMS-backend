@@ -6,6 +6,11 @@ const subscriptionSchema = new mongoose.schema({
     ref: "Restaurants",
     required: true,
   },
+  branchID: {
+    type: mongoose.ObjectId,
+    ref: "Branchs",
+    required: true,
+  },
   packageType: {
     type: String,
     required: true,
@@ -30,5 +35,21 @@ const subscriptionSchema = new mongoose.schema({
     type: Number,
     required: true,
   },
+  previousSubscriptions: [
+    {
+      packageType: {
+        type: String,
+        required: true,
+      },
+      startDate: {
+        type: Number,
+        required: true,
+      },
+      endDate: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
 });
 module.exports = mongoose.model("Subscription", subscriptionSchema);

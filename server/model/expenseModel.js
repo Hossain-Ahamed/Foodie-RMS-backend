@@ -1,6 +1,16 @@
 const mongoose = require("mongoose");
 
 const expenseSchema = new mongoose.schema({
+  res_id: {
+    type: mongoose.ObjectId,
+    ref: "Restaurants",
+    required: true,
+  },
+  branchID: {
+    type: mongoose.ObjectId,
+    ref: "Branchs",
+    required: true,
+  },
   category: {
     type: String,
     required: true,
