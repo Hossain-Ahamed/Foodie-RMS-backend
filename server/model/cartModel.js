@@ -2,22 +2,46 @@ const mongoose =  require("mongoose");
 
 const cartSchema = new mongoose.Schema(
   {
+    res_id: {
+      type: mongoose.ObjectId,
+      ref: "Restaurants",
+      required: true,
+    },
+    branchID: {
+    type: mongoose.ObjectId,
+    ref: "Branchs",
+    required: true,
+    },
     user_id: {
       type: mongoose.ObjectId,
       ref: "users",
       required: true,
     },
-    item: [
+    Items: [
       {
-        _id: {
-          type: mongoose.ObjectId,
-          ref: "Products",
-          required: true,
+        dishID: { 
+      type: mongoose.ObjectId, 
+     ref: "dishes", 
+     required: true 
+    },
+        dishQuantity: { 
+      type: String 
+    },
+        dishTotalPrice: { 
+      type: Number 
+    },
+    addOn: [
+      {
+        name: {
+        type: String,
+        required: true,
         },
-        quantity: {
-          type: Number,
-          default: 1,
-        },
+        price: {
+        type: Number,
+        required: true,
+        }
+      },
+      ],
       },
     ],
   },
