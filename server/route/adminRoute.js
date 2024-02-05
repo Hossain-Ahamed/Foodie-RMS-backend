@@ -3,7 +3,8 @@ const {allEmployee,
     addEmployee,
     getEmployeeById,
     updateEmployeeById,
-    deleteEmployeeById} =  require('../controller/employeeController');
+    deleteEmployeeById,
+    createUAccount} =  require('../controller/employeeController');
 
 const {addCategory,
     allCategory,
@@ -25,7 +26,8 @@ const {
     getAllResturants,
     createResturant,
     updateResturant,
-    deleteResturent
+    deleteResturent,
+    createAccount,
     } =require("../controller/restaurantController")
 
 
@@ -72,6 +74,15 @@ router.delete('/admin/delete/branch/:_id', deleteBranch);         //Delete A bra
 router.delete('/admin/delete/categories/:id', deleteCategory);         //Delete A Category By Its ID
 router.delete('/admin/delete/employee/:id', deleteEmployeeById);            //Delete An Employee 
 router.delete('/admin/delete/dish/:_id', deleteDish);            //Delete An Employee 
+
+
+
+
+
+
+//Create Account 
+router.post("/admin/create/account/emplyoee",createUAccount)
+router.post("/admin/create/account/owner",createAccount)
 
 
 module.exports=router;
