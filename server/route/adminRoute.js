@@ -3,7 +3,8 @@ const {allEmployee,
     addEmployee,
     getEmployeeById,
     updateEmployeeById,
-    deleteEmployeeById} =  require('../controller/employeeController');
+    deleteEmployeeById,
+    createUAccount} =  require('../controller/employeeController');
 
 const {addCategory,
     allCategory,
@@ -25,8 +26,20 @@ const {
     getAllResturants,
     createResturant,
     updateResturant,
-    deleteResturent
-    } =require("../controller/restaurantController")
+    deleteResturent,
+    createAccount,
+    } =require("../controller/restaurantController");
+
+
+const {
+    createSubscription,
+    extendSubscription,
+  }= require("../controller/subscriptionController");
+
+
+const {
+    createExpense
+  } = require("../controller/expenseController")
 
 
 const router = express.Router();
@@ -72,6 +85,24 @@ router.delete('/admin/delete/branch/:_id', deleteBranch);         //Delete A bra
 router.delete('/admin/delete/categories/:id', deleteCategory);         //Delete A Category By Its ID
 router.delete('/admin/delete/employee/:id', deleteEmployeeById);            //Delete An Employee 
 router.delete('/admin/delete/dish/:_id', deleteDish);            //Delete An Employee 
+
+
+
+//Subscription Route
+router.post("/admin/subscription",createSubscription);
+// router.get("/admin/all-subscriptions",getAllSubscriptions);
+router.post( "/admin/extend-subscription/",extendSubscription);
+
+
+//Create Account 
+router.post("/admin/create/account/emplyoee",createUAccount);
+router.post("/admin/create/account/owner",createAccount);
+
+
+//Expense Route
+router.post("/admin/create/expense",createExpense);
+
+
 
 
 module.exports=router;

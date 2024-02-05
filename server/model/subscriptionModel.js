@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const subscriptionSchema = new mongoose.schema({
+const subscriptionSchema = new mongoose.Schema({
   res_id: {
     type: mongoose.ObjectId,
     ref: "Restaurants",
