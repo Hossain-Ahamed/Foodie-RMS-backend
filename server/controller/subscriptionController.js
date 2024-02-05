@@ -69,12 +69,13 @@ const extendSubscription = async (req, res) => {
       default:
         return res.status(400).json({ error: "Invalid package type" });
     }
+    let secondaryEndDate = existingSubscription.endDate;
     existingSubscription.endDate = newEndDate;
     existingSubscription.packageType = packageType;
     existingSubscription.updatedAt = Date.now();
     previousSubscriptionsDetails = {
       packageType: packageType,
-      startDate: existingSubscription.endDate,
+      startDate: secondaryEndDate,
       endDate: newEndDate,
     };
     existingSubscription.previousSubscriptions.push(
