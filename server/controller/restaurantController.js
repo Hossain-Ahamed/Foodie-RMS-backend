@@ -52,7 +52,7 @@ const createResturant = async (req, res) => {
 
 const createAccount = async (req, res) => {
   try {
-    const email = req.body;
+    const {email} = req.body;
     const password = uuid.v4();
     const user = await resturantModel.findOne({ res_Owner_email: email });
     if (!user) {

@@ -1,6 +1,7 @@
 const createUserAccount = require("../config/firbase-config");
 const Employee = require("../model/employeeModel");
 const createClient = require("./clientController");
+const uuid = require("uuid");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -84,7 +85,7 @@ const allEmployee = async (req, res) => {
 //create user account
 const createUAccount = async (req, res) => {
   try {
-    const email = req.body;
+    const {email} = req.body;
     const password = uuid.v4();
     const user = await Employee.findOne({ email: email });
     if (!user) {

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const expenseSchema = new mongoose.schema({
+const expenseSchema = new mongoose.Schema({
   res_id: {
     type: mongoose.ObjectId,
     ref: "Restaurants",
@@ -16,7 +16,7 @@ const expenseSchema = new mongoose.schema({
     required: true,
   },
   billDate: {
-    type: Number,
+    type: String,
     required: true,
   },
   expense: {
@@ -38,7 +38,7 @@ const expenseSchema = new mongoose.schema({
   transactions: [
     {
       paymentDate: {
-        type: Number,
+        type: String,
         required: true,
       },
       paymentAmount: {
