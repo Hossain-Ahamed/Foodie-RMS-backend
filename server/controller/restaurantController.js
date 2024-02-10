@@ -20,9 +20,12 @@ const createResturant = async (req, res) => {
       res_Owner_stateProvince,
       res_Owner_postalCode,
       res_Owner_country,
-      img,
       branch,
     } = req.body;
+    const { img } = req.file;
+    upload.single(img);
+    const filename = req.file.filename;
+    const fileUrl = path.join(filename);
     if (!res_name || !res_email || !res_mobile) {
       return res.status(400).json({
         message: "All fields are required Please provide all the details.",
@@ -40,7 +43,7 @@ const createResturant = async (req, res) => {
         res_Owner_stateProvince,
         res_Owner_postalCode,
         res_Owner_country,
-        img,
+        img: fileUrl,
       }).save();
 
       const newBranch = await branchModel({
