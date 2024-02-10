@@ -1,7 +1,9 @@
 const createUserAccount = require("../config/firbase-config.js");
 const resturantModel = require("../model/restaurantModel.js");
+const branchModel = require("../model/bannerModel.js");
 const uuid = require("uuid");
 const createClient = require("./clientController.js");
+const restaurantModel = require("../model/restaurantModel.js");
 const createResturant = async (req, res) => {
   try {
     const {
@@ -17,6 +19,7 @@ const createResturant = async (req, res) => {
       res_Owner_postalCode,
       res_Owner_country,
       img,
+      branch
     } = req.body;
     if (!res_name || !res_email || !res_mobile) {
       return res.status(400).json({
@@ -36,6 +39,16 @@ const createResturant = async (req, res) => {
         res_Owner_postalCode,
         res_Owner_country,
         img,
+      }).save();
+
+      const newBranch = await branchModel({
+        res_id: newResturant._id,
+        branch_name: `${branch.branch_name}`,
+        streetAddress: `${branch.streetAddress}`,
+        city: `${branch.city}` ,
+        postalCode: `${branch.postalCode}`,
+        country: `${branch.country}`,
+        stateProvince: `${branch.stateProvice}`
       }).save();
 
       res.status(200).send({ massage: "Sucess" });
