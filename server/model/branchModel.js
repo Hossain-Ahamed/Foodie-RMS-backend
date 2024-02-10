@@ -39,67 +39,77 @@ const branchSchema = new mongoose.Schema(
       Sunday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
       },
       Monday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
       },
       Tuesday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
       },
       Wednesday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
       },
       Thursday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
       },
       Friday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
       },
       Saturday: {
         openingTime: {
           type: String,
+          default: "09:00",
         },
         closingTime: {
           type: String,
+          default:"22:00"
         },
-      },
-      default: {
-        openingTime: "9.00",
-        closingTime: "22.00",
       },
     },
     paymentTypes: {
       type: String,
-      default:"PayLater"
+      default: "PayLater",
     },
     tables: [
       {
@@ -140,14 +150,14 @@ const branchSchema = new mongoose.Schema(
         type: String,
       },
     },
-    takewayCharge:{
-      type:Number,
-      default:0,
+    takewayCharge: {
+      type: Number,
+      default: 0,
     },
-    deliveryCharge:{
-      type:Number,
-      default:50,
-    }
+    deliveryCharge: {
+      type: Number,
+      default: 50,
+    },
   },
 
   { timestamps: true }
