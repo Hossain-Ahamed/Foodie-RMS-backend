@@ -99,6 +99,7 @@ const branchSchema = new mongoose.Schema(
     },
     paymentTypes: {
       type: String,
+      default:"PayLater"
     },
     tables: [
       {
@@ -139,6 +140,14 @@ const branchSchema = new mongoose.Schema(
         type: String,
       },
     },
+    takewayCharge:{
+      type:Number,
+      default:0,
+    },
+    deliveryCharge:{
+      type:Number,
+      default:50,
+    }
   },
 
   { timestamps: true }
