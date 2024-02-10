@@ -1,9 +1,11 @@
 const createUserAccount = require("../config/firbase-config.js");
-const resturantModel = require("../model/restaurantModel.js");
 const branchModel = require("../model/bannerModel.js");
 const uuid = require("uuid");
 const createClient = require("./clientController.js");
+const { upload } = require("../../multer.js");
+const fs = require("fs");
 const restaurantModel = require("../model/restaurantModel.js");
+
 const createResturant = async (req, res) => {
   try {
     const {
@@ -19,14 +21,14 @@ const createResturant = async (req, res) => {
       res_Owner_postalCode,
       res_Owner_country,
       img,
-      branch
+      branch,
     } = req.body;
     if (!res_name || !res_email || !res_mobile) {
       return res.status(400).json({
         message: "All fields are required Please provide all the details.",
       });
     } else {
-      const newResturant = await resturantModel({
+      const newResturant = await restaurantModel({
         res_name,
         res_email,
         res_mobile,
@@ -45,13 +47,13 @@ const createResturant = async (req, res) => {
         res_id: newResturant._id,
         branch_name: `${branch.branch_name}`,
         streetAddress: `${branch.streetAddress}`,
-        city: `${branch.city}` ,
+        city: `${branch.city}`,
         postalCode: `${branch.postalCode}`,
         country: `${branch.country}`,
-        stateProvince: `${branch.stateProvice}`
+        stateProvince: `${branch.stateProvice}`,
       }).save();
 
-      res.status(200).send({ massage: "Sucess" });
+      const newEmployee = await res.status(200).send({ massage: "Sucess" });
     }
   } catch (error) {
     console.log("Error in creating restaurant", error);
@@ -65,9 +67,9 @@ const createResturant = async (req, res) => {
 
 const createAccount = async (req, res) => {
   try {
-    const {email} = req.body;
+    const { email } = req.body;
     const password = uuid.v4();
-    const user = await resturantModel.findOne({ res_Owner_email: email });
+    const user = await restaurantModel.findOne({ res_Owner_email: email });
     if (!user) {
       createUserAccount({ email, password });
       createClient({ email, password });
@@ -98,7 +100,7 @@ const updateResturant = async (req, res) => {
   } = req.body;
 
   try {
-    let updatedData = await resturantModel.findByIdAndUpdate(
+    let updatedData = await restaurantModel.findByIdAndUpdate(
       req.params.id,
       {
         res_name,
@@ -130,7 +132,7 @@ const updateResturant = async (req, res) => {
 const deleteResturent = async (req, res) => {
   try {
     const id = req.params.id;
-    const resturent = await resturantModel.findByIdAndUpdate(
+    const resturent = await restaurantModel.findByIdAndUpdate(
       id,
       {
         deleteStatus: true,
@@ -151,7 +153,7 @@ const deleteResturent = async (req, res) => {
 
 const getAllResturants = async (req, res) => {
   try {
-    const categories = await resturantModel.find({ deleteStatus: false });
+    const categories = await restaurantModel.find({ deleteStatus: false });
     // console.log(categories);
     res.status(200).json(categories);
   } catch (error) {
