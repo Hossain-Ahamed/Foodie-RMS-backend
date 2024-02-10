@@ -44,6 +44,11 @@ const cartSchema = new mongoose.Schema(
       ],
       },
     ],
+    order_from:{
+      type:String,
+      enum:["ONSHORE","OFFSHORE"],
+      default:"ONSHORE"
+    }
   },
   { timestamps: true }
 );

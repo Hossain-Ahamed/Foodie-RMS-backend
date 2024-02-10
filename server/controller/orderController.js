@@ -1,14 +1,14 @@
-const Order = require('../model/orderModelFoodie');
-const Cart = require('../model/cartModelForTable');
+const Order = require('../model/orderModel');
+const Cart = require('../model/cartModel');
 const Table = require('../model/tableModel');
 const Dish = require('../model/dishesModel');
 
 const createOrderForTable = async (req, res) => {
     try {
-        const { table_id, paymentStatus,vouchar } = req.body;
+        const { user_id, paymentStatus,vouchar } = req.body;
 
         // Check if a cart exists for the given table
-        const cart = await Cart.findOne({ table_id });
+        const cart = await Cart.findOne({ user_id });
 
         if (!cart || cart.Items.length === 0) {
             return res.status(400).json({ msg: 'No items in the cart for the specified table' });
@@ -23,7 +23,7 @@ const createOrderForTable = async (req, res) => {
         const newOrder = new Order({
             res_id: cart.res_id,
             branchID: cart.branchID,
-            table_id,
+            user_id,
             status: paymentStatus === 'Paid' ? 'Processed' : 'Payment Pending',
             totalAmount: totalAmount.toFixed(2),
             Items: cart.Items,
@@ -78,6 +78,64 @@ const calculateFinalPrice = (totalAmount, discountedPrice) => {
     return discountedPrice;
 };
 
+const updateOrder = async (req, res) => {
+    try {
+      const { order_id, newStatus } = req.body;
+  
+      // Check if the order exists
+      const existingOrder = await Order.findById(order_id);
+  
+      if (existingOrder) {
+        // Update order status
+        existingOrder.status = newStatus;
+        await existingOrder.save();
+  
+        return res.status(200).json(existingOrder);
+      } else {
+        return res.status(400).json({ msg: "Order not found" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "Internal Server Error" });
+    }
+  };
+  
+  const readOrder = async (req, res) => {
+    try {
+      const { order_id } = req.body;
+  
+      // Retrieve the order information
+      const existingOrder = await Order.findById(order_id);
+  
+      if (existingOrder) {
+        return res.status(200).json(existingOrder);
+      } else {
+        return res.status(400).json({ msg: "Order not found" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "Internal Server Error" });
+    }
+  };
+  
+  const deleteOrder = async (req, res) => {
+    try {
+      const { order_id } = req.body;
+  
+      // Delete the order
+      await Order.findByIdAndDelete(order_id);
+  
+      return res.status(200).json({ msg: "Order deleted successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: "Internal Server Error" });
+    }
+  };
+  
+
 module.exports = {
     createOrderForTable,
+    updateOrder,
+    deleteOrder,
+    readOrder,
 };
