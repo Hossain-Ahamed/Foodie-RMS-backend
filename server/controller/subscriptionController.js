@@ -2,13 +2,13 @@ const Subscription = require("../model/subscriptionModel");
 const branchModel = require("../model/branchModel");
 const packageModel = require("../model/subcripstionPackages");
 // This is your test secret API key.
-const stripe = require("stripe")(process.env.PK_KEY);
+const stripe = require("stripe")('sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le');
 
 // payment gateway
 const CreatePaymentIntent = async (req, res) => {
   try {
     const { price } = req.body;
-
+    console.log(price, process.env.PK_KEY);
     const ammount = parseInt(price * 100);
 
     // Create a PaymentIntent with the order amount and currency
@@ -26,7 +26,7 @@ const CreatePaymentIntent = async (req, res) => {
       clientSecret: paymentIntent.client_secret,
     });
   } catch (e) {
-    console.log(e);
+    console.log(1,e);
     // Bad Request: Server error or client sent an invalid request
     res
       .status(500)
@@ -37,9 +37,10 @@ const CreatePaymentIntent = async (req, res) => {
 // Create a new subscription
 const createSubscription = async (req, res) => {
   try {
-    const { res_id, branchID, packageType } = req.body;
+    const { res_id, packageType } = req.body;
+    const { branchID } = req.params;
     let startDate = Date.now();
-    const existingSubscription = await Subscription.findById({
+    const existingSubscription = await Subscription.findOne({
       branchID: branchID,
     });
     if (existingSubscription) {
@@ -59,7 +60,7 @@ const createSubscription = async (req, res) => {
       default:
         return res.status(400).json({ error: "Invalid package type" });
     }
-    const res_Id_needed = await branchModel.findById({ _id: branchID });
+    const res_Id_needed = await branchModel.findOne({ _id: branchID });
 
     const newSubscription = new Subscription({
       res_id: res_Id_needed.res_id,
@@ -75,7 +76,7 @@ const createSubscription = async (req, res) => {
           startDate: startDate,
           endDate: endDate,
           price: 0,
-          transactionID: "agdjhaga",
+          transactionID: "0000000000000000000",
         },
       ],
     }).save();
@@ -91,9 +92,9 @@ const createSubscription = async (req, res) => {
 const getPaymentDetails = async (req, res) => {
   try {
     const { branchID } = req.params;
-    const existingSubscription = await Subscription.findById(branchID);
+    const existingSubscription = await Subscription.findOne({branchID: branchID});
     const packages = await packageModel.findOne({
-      name: existingSubscription.packageType,
+      packageType: existingSubscription.packageType,
     });
     if (!existingSubscription) {
       return res.status(404).json({ error: "No such Branch ID" });
@@ -105,7 +106,7 @@ const getPaymentDetails = async (req, res) => {
         branchID: existingSubscription.branchID,
         packageType: existingSubscription.packageType,
       },
-      price: packages.finalPrice,
+      price: parseFloat(packages.finalPrice),
     };
     res.status(200).json(Data);
   } catch (error) {

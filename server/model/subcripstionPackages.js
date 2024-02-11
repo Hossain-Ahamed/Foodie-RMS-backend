@@ -10,16 +10,15 @@ const subscriptionPackagesSchema =  new mongoose.Schema({
         require:true
     },
     finalPrice:{
-        type:String,
+        type:Number,
         require:true
     },
     cutPrice:{
-        type:String,
-        require:true
+        type:Number,
     }
 
 
 })
 
 
-module.exports =mongoose.model('subscriptionPackages',subscriptionPackagesSchema)
+module.exports = mongoose.model('subscriptionPackages',subscriptionPackagesSchema)
