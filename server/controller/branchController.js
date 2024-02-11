@@ -106,7 +106,7 @@ const getAllBranch = async (req, res) => {
         },
       },
       {
-        $sort: { "subscriptions.endDate": -1 }, // Sort by subscription end date in descending order
+        $sort: { "subscriptions.endDate": 1 }, // Sort by subscription end date in descending order
       },
     ]);
     const transformedData = data.map((branch) => {
@@ -117,17 +117,18 @@ const getAllBranch = async (req, res) => {
         res_name: branch.restaurant[0].res_name,
         branch_name: branch.branch_name,
         branchID: branch._id,
+        isActive : subscription.isActive,
         subscriptionStart: new Date(subscription.startDate).toISOString(),
         subscriptionEnd: new Date(subscription.endDate).toISOString(),
         amount: subscription.previousSubscriptions[0].price,
-        payment_time: new Date(subscription.previousSubscriptions[0].endDate).toISOString(),
+        payment_time: new Date(subscription.previousSubscriptions[0].payment_time).toISOString(),
         transaction_id: subscription.previousSubscriptions[0].transactionID,
         payment_method: "card", // Assuming a default value, modify as needed
         payment_status: subscription.previousSubscriptions[0].paymentStatus ? "Paid" : "Not Paid",
       };
     });
 
-    res.status(200).json(transformedData.reverse());
+    res.status(200).json(transformedData);
   } catch (error) {
     responseError(res, 500, error);
   }
