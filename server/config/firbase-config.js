@@ -6,14 +6,11 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const createUserAccount = ({ email, password ,phoneNumber, displayName}) => {
+const createUserAccount = ({ email, password}) => {
   try {
    const create = admin.auth().createUser({
       email,
       password,
-      phoneNumber,
-      displayName,
-
     });
   return create;
   } catch (error) {
@@ -21,4 +18,29 @@ const createUserAccount = ({ email, password ,phoneNumber, displayName}) => {
   }
 };
 
-module.exports = createUserAccount;
+const deleteUser = ({uid})=>{
+  try {
+    const deleteData = admin.auth().deleteUser(uid);
+   return deleteData;
+   } catch (error) {
+     console.log("Firebase serive :: createUser :: error", error);
+   }
+}
+
+
+const updatePassword = ({uid, password})=>{
+  try {
+    const updatePass = admin.auth().updateUser(uid, {
+      password: password,
+    })
+   return updatePass;
+   } catch (error) {
+     console.log("Firebase serive :: createUser :: error", error);
+   }
+}
+
+module.exports = {
+  createUserAccount,
+  deleteUser,
+  updatePassword
+};
