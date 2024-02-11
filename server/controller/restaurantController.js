@@ -1,5 +1,5 @@
 const createUserAccount = require("../config/firbase-config.js");
-const branchModel = require("../model/bannerModel.js");
+const branchModel = require("../model/branchModel.js");
 const uuid = require("uuid");
 const createClient = require("./clientController.js");
 const { upload } = require("../../multer.js");
@@ -20,13 +20,14 @@ const createResturant = async (req, res) => {
       res_Owner_stateProvince,
       res_Owner_postalCode,
       res_Owner_country,
-      branch,
+      branches,
+      img
     } = req.body;
     console.log(res_name,req.body)
-    const { img } = req.file;
-    upload.single(img);
-    const filename = req.file.filename;
-    const fileUrl = path.join(filename);
+    // const { img } = req.file;
+    // upload.single(img);
+    // const filename = req.file.filename;
+    // const fileUrl = path.join(filename);
     if (!res_name || !res_email || !res_mobile) {
       return res.status(400).json({
         message: "All fields are required Please provide all the details.",
@@ -44,17 +45,18 @@ const createResturant = async (req, res) => {
         res_Owner_stateProvince,
         res_Owner_postalCode,
         res_Owner_country,
-        img: fileUrl,
+        // img: fileUrl,
+        img
       }).save();
-
+      const branchData = branches[0]
       const newBranch = await branchModel({
         res_id: newResturant._id,
-        branch_name: branch.branch_name,
-        streetAddress: branch.streetAddress,
-        city: branch.city,
-        postalCode: branch.postalCode,
-        country: branch.country,
-        stateProvince: branch.stateProvice,
+        branch_name: branchData.name,
+        streetAddress: branchData.streetAddress,
+        city: branchData.city,
+        postalCode: branchData.postalCode,
+        country: branchData.country,
+        stateProvince: branchData.stateProvince,
       }).save();
 
       res.status(200).send({branchID : newBranch?._id});
