@@ -1,13 +1,17 @@
 const subscriptionPackagesModel = require("../model/subcripstionPackages");
 
-const  getAllSubscriptionPackage = (req, res) => {
+const  getAllSubscriptionPackage = async(req, res) => {
     try{
-        const  data= subscriptionPackagesModel.find();
-        return res.status(200).send(data);
+
+        const  data= await subscriptionPackagesModel.find();
+        // console.log(data)
+         res.status(200).send(data);
+        // console.log(object)
+      
 
     }catch(e){
         console.log('Error in getting all Subscription Packages', e);
-        return res.status(500).json({"error": "Internal Server Error"});
+         res.status(500).json({"error": "Internal Server Error"});
     }
 }
 

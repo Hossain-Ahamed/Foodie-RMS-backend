@@ -22,6 +22,7 @@ const createResturant = async (req, res) => {
       res_Owner_country,
       branch,
     } = req.body;
+    console.log(res_name,req.body)
     const { img } = req.file;
     upload.single(img);
     const filename = req.file.filename;
@@ -48,20 +49,20 @@ const createResturant = async (req, res) => {
 
       const newBranch = await branchModel({
         res_id: newResturant._id,
-        branch_name: `${branch.branch_name}`,
-        streetAddress: `${branch.streetAddress}`,
-        city: `${branch.city}`,
-        postalCode: `${branch.postalCode}`,
-        country: `${branch.country}`,
-        stateProvince: `${branch.stateProvice}`,
+        branch_name: branch.branch_name,
+        streetAddress: branch.streetAddress,
+        city: branch.city,
+        postalCode: branch.postalCode,
+        country: branch.country,
+        stateProvince: branch.stateProvice,
       }).save();
 
-      const newEmployee = await res.status(200).send({ massage: "Sucess" });
+      res.status(200).send({branchID : newBranch?._id});
     }
   } catch (error) {
     console.log("Error in creating restaurant", error);
     return res.status(500).json({
-      success: false,
+      message: "error occured while creating",
     });
   }
 };

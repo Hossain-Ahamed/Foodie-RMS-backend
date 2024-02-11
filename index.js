@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const express = require("express");
 const app = express();
+app.use(express.json());
 const connectDB = require("./server/config/database");
 const cors = require("cors");
 const AdminRoute = require("./server/route/adminRoute");
@@ -12,7 +13,14 @@ const port = process.env.PORT || 5000;
 connectDB();
 
 const corsOptions = {
-  origin: ["*"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://192.168.0.102:5173/",
+    "http://192.168.0.102:5174/",
+    "http://192.168.0.102:5175/",
+    "*"],
   credentials: true,
 };
 
@@ -27,10 +35,10 @@ app.use((req, res, next) => {
 });
 
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use("/", express.static("uploads"));
+
+// app.use("/", express.static("uploads"));
 app.use("/api/v1/auth", AdminRoute);
-// app.use("/api/v1/auth",UserRoute);
+app.use("/api/v1/auth",UserRoute);
 
 app.listen(port, () => {
   console.log(`Server is working on http://localhost:${port}`);
