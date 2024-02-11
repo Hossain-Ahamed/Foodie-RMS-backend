@@ -2,7 +2,9 @@ const Subscription = require("../model/subscriptionModel");
 const branchModel = require("../model/branchModel");
 const packageModel = require("../model/subcripstionPackages");
 // This is your test secret API key.
-const stripe = require("stripe")('sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le');
+const stripe = require("stripe")(
+  "sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le"
+);
 
 // payment gateway
 const CreatePaymentIntent = async (req, res) => {
@@ -26,7 +28,7 @@ const CreatePaymentIntent = async (req, res) => {
       clientSecret: paymentIntent.client_secret,
     });
   } catch (e) {
-    console.log(1,e);
+    console.log(1, e);
     // Bad Request: Server error or client sent an invalid request
     res
       .status(500)
@@ -92,7 +94,9 @@ const createSubscription = async (req, res) => {
 const getPaymentDetails = async (req, res) => {
   try {
     const { branchID } = req.params;
-    const existingSubscription = await Subscription.findOne({branchID: branchID});
+    const existingSubscription = await Subscription.findOne({
+      branchID: branchID,
+    });
     const packages = await packageModel.findOne({
       packageType: existingSubscription.packageType,
     });
@@ -137,20 +141,34 @@ const updatePackageAfterPayment = async (req, res) => {
     default:
       return res.status(400).json({ error: "Invalid package type" });
   }
-  existingSubscription.startDate = startdate;
-  existingSubscription.endDate = enddate;
-  existingSubscription.isActive = true;
-  existingSubscription.previousSubscriptions[0].startDate = startdate;
-  existingSubscription.previousSubscriptions[0].endDate = enddate;
-  existingSubscription.previousSubscriptions[0].price = price;
-  existingSubscription.previousSubscriptions[0].transactionID = transactionID;
-  existingSubscription.previousSubscriptions[0].paymentStatus = true;
+  // existingSubscription.startDate = startdate;
+  // existingSubscription.endDate = enddate;
+  // existingSubscription.isActive = true;
+  // existingSubscription.previousSubscriptions[0].startDate = startdate;
+  // existingSubscription.previousSubscriptions[0].endDate = enddate;
+  // existingSubscription.previousSubscriptions[0].price = price;
+  // existingSubscription.previousSubscriptions[0].transactionID = transactionID;
+  // existingSubscription.previousSubscriptions[0].paymentStatus = true;
+  const subscriptionUpdate = await Subscription.findByIdAndUpdate(subscriptionID, {
+    startDate: startdate,
+    endDate: enddate,
+    isActive: true,
+    previousSubscriptions: [
+      {
+        startDate: startdate,
+        endDate: enddate,
+        price: price,
+        paymentStatus: true,
+        transactionID: transactionID,
+      },
+    ],
+  });
 };
 
 //when user expend their subscription
 const extendSubscription = async (req, res) => {
   try {
-    const { subscriptionID, packageType } = req.body;
+    const { subscriptionID, packageType, transactionID, price } = req.body;
 
     const existingSubscription = await Subscription.findById(subscriptionID);
     if (!existingSubscription) {
@@ -181,6 +199,9 @@ const extendSubscription = async (req, res) => {
       packageType: packageType,
       startDate: secondaryEndDate,
       endDate: newEndDate,
+      price: price,
+      paymentStatus: true,
+      transactionID: transactionID,
     };
     existingSubscription.previousSubscriptions.push(
       previousSubscriptionsDetails
