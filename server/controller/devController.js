@@ -72,15 +72,17 @@ const CreateDev = async (req, res) => {
   }
 };
 
-const devFindById = async (req, res) => {
+const devFindByUID = async (req, res) => {
   try {
-    const { id } = req.params;
-    const data = await devModel.findOne({ uid: id }).select("-password");
+    const { uid } = req.params;
+    const data = await devModel.findOne({ uid: uid }).select("-password");
     res.status(200).send(data);
   } catch (error) {
     responseError(res, 500, error);
   }
 };
+
+
 const getDevProfile = async (req, res) => {
   try {
     const { email } = req.params;
@@ -94,8 +96,21 @@ const getDevProfile = async (req, res) => {
   }
 };
 
+const changePassword = async(req,res)=>{
+  try {
+    const { email ,} = req.params;
+    if (!email) {
+      responseError(res, 404, {}, "No data is found because of no email");
+    }
+    const data = await devModel.findOne({ email: email }).select("-password");
+    res.status(200).send(data);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+}
+
 module.exports = {
-  devFindById,
+  devFindByUID,
   CreateDev,
   getAllDev,
   getDevProfile,

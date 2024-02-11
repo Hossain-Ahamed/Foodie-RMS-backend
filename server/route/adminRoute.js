@@ -44,7 +44,7 @@ const {
 } = require("../controller/subscriptionController");
 
 const { createExpense } = require("../controller/expenseController");
-const { CreateDev, devFindById, getDevProfile } = require("../controller/devController");
+const { CreateDev, devFindByUID, getDevProfile, getAllDev } = require("../controller/devController");
 
 const router = express.Router();
 // http://localhost:5000/admin/login
@@ -94,8 +94,8 @@ router.post("/admin/create/account/owner", createAccount);
 
 
 router.post("/dev/create",CreateDev);
-
-router.get("/dev/:id",devFindById);
+router.get("/all-dev-profile",getAllDev)
+router.get("/dev/:uid",devFindByUID);
 router.get("/get-dev-profile/:email",getDevProfile);
 
 //Expense Route
