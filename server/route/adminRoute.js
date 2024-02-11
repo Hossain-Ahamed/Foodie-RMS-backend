@@ -55,7 +55,7 @@ router.post("/admin/create/categories", addCategory); // Add a new category to t
 router.post("/admin/create/employee", addEmployee); // Create a new employee in the database
 router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
-router.post("/subscription-payment/:branchID", getPaymentDetails);
+router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
 router.get("/admin/read/categories", allCategory); // Get all available Categories
@@ -65,7 +65,7 @@ router.get("/admin/read/employee", allEmployee); // Get all employees from the d
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
 router.get("/admin/readbyid/employee/:id", getEmployeeById); // Get Employee By Id
-router.get("/enlisted-payment", updatePackageAfterPayment);
+router.post("/enlisted-payment", updatePackageAfterPayment);
 
 //For  Update => Admin or Super User Access (Admin can only update his own profile)
 router.put("/admin/update/restaurant/:id", updateResturant); //Update restaurant By ID
@@ -82,9 +82,10 @@ router.delete("/admin/delete/employee/:id", deleteEmployeeById); //Delete An Emp
 router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 
 //Subscription Route
-router.post("/admin/subscription", createSubscription);
+// router.post("/admin/subscription", createSubscription);
 // router.get("/admin/all-subscriptions",getAllSubscriptions);
 router.post("/admin/extend-subscription/", extendSubscription);
+router.patch('/payment-package/branch/:branchID', createSubscription)
 
 //Create Account
 router.post("/admin/create/account/emplyoee", createUAccount);

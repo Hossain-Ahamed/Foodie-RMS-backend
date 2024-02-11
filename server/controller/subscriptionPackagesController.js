@@ -1,9 +1,9 @@
 const subscriptionPackagesModel = require("../model/subcripstionPackages");
 
-const  getAllSubscriptionPackage = (req, res) => {
+const  getAllSubscriptionPackage = async(req, res) => {
     try{
-        const  data= subscriptionPackagesModel.find();
-        return res.status(200).send(data);
+        const data= await subscriptionPackagesModel.find();
+         res.status(200).send(data);
 
     }catch(e){
         console.log('Error in getting all Subscription Packages', e);
@@ -30,10 +30,10 @@ const addNewSubscriptionPackage = async (req, res) => {
       });
       try {
         const savePackage = await newPackage.save();
-        return res.status(201).send(savePackage);
+         res.status(201).send(savePackage);
       } catch (e) {
         console.log("Error in adding New Subscription Package", e);
-        return res.status(500).json({ error: "Internal Server Error" });
+         res.status(500).json({ error: "Internal Server Error" });
       }
     }
   }
@@ -53,10 +53,10 @@ const updateSubscriptionPackage = async (req, res) => {
         },
         { new: true }
       )
-      .exec(); //return the updated document not the original one
-    return res.status(200).send(updatedPackage);
+      .exec(); // the updated document not the original one
+     res.status(200).send(updatedPackage);
   } catch (e) {
-    return res.status(400).json({ error: "Bad Request" });
+     res.status(400).json({ error: "Bad Request" });
   }
 };
 
