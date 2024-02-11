@@ -22,6 +22,7 @@ const createResturant = async (req, res) => {
       res_Owner_country,
       branch,
     } = req.body;
+    console.log(res_name,req.body)
     const { img } = req.file;
     upload.single(img);
     const filename = req.file.filename;

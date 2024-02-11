@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const express = require("express");
 const app = express();
+app.use(express.json());
 const connectDB = require("./server/config/database");
 const cors = require("cors");
 const AdminRoute = require("./server/route/adminRoute");
@@ -34,7 +35,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors(corsOptions));
-app.use(express.json());
+
 // app.use("/", express.static("uploads"));
 app.use("/api/v1/auth", AdminRoute);
 app.use("/api/v1/auth",UserRoute);
