@@ -5,7 +5,7 @@ const {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
-  createUAccount,
+  // createUAccount,
 } = require("../controller/employeeController");
 
 const {
@@ -32,7 +32,7 @@ const {
   createResturant,
   updateResturant,
   deleteResturent,
-  createAccount,
+  // createAccount,
 } = require("../controller/restaurantController");
 
 const {
@@ -89,8 +89,8 @@ router.post("/admin/extend-subscription/", extendSubscription);
 router.patch('/payment-package/branch/:branchID', createSubscription)
 
 //Create Account
-router.post("/admin/create/account/emplyoee", createUAccount);
-router.post("/admin/create/account/owner", createAccount);
+// router.post("/admin/create/account/emplyoee", createUAccount);
+// router.post("/admin/create/account/owner", createAccount);
 
 
 router.post("/dev/create",CreateDev);

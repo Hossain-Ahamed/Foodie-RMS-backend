@@ -1,4 +1,4 @@
-const createUserAccount = require("../config/firbase-config.js");
+// const {createUserAccount} = require("../config/firbase-config.js");
 const branchModel = require("../model/branchModel.js");
 const uuid = require("uuid");
 const createClient = require("./clientController.js");
@@ -172,5 +172,5 @@ module.exports = {
   createResturant,
   updateResturant,
   deleteResturent,
-  createAccount,
+  // createAccount,
 };

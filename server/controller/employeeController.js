@@ -1,4 +1,4 @@
-const createUserAccount = require("../config/firbase-config");
+// const {createUserAccount} = require("../config/firbase-config");
 const Employee = require("../model/employeeModel");
 const createClient = require("./clientController");
 const uuid = require("uuid");
@@ -217,5 +217,5 @@ module.exports = {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
-  createUAccount,
+  // createUAccount,
 };
