@@ -1,6 +1,10 @@
 const Subscription = require("../model/subscriptionModel");
 const branchModel = require("../model/branchModel");
+const { createUserAccount } = require("../config/firbase-config.js");
+const restaurantModel = require("../model/restaurantModel");
 const packageModel = require("../model/subcripstionPackages");
+const createClient = require("./clientController.js");
+const uuid = require("uuid");
 // This is your test secret API key.
 const stripe = require("stripe")(
   "sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le"
@@ -149,20 +153,33 @@ const updatePackageAfterPayment = async (req, res) => {
   // existingSubscription.previousSubscriptions[0].price = price;
   // existingSubscription.previousSubscriptions[0].transactionID = transactionID;
   // existingSubscription.previousSubscriptions[0].paymentStatus = true;
-  const subscriptionUpdate = await Subscription.findByIdAndUpdate(subscriptionID, {
-    startDate: startdate,
-    endDate: enddate,
-    isActive: true,
-    previousSubscriptions: [
-      {
-        startDate: startdate,
-        endDate: enddate,
-        price: price,
-        paymentStatus: true,
-        transactionID: transactionID,
-      },
-    ],
-  });
+  const subscriptionUpdate = await Subscription.findByIdAndUpdate(
+    subscriptionID,
+    {
+      startDate: startdate,
+      endDate: enddate,
+      isActive: true,
+      previousSubscriptions: [
+        {
+          startDate: startdate,
+          endDate: enddate,
+          price: price,
+          paymentStatus: true,
+          transactionID: transactionID,
+        },
+      ],
+    }
+  );
+  const existingRestaurant = await restaurantModel.findById(
+    existingSubscription.res_id
+  );
+  if (!existingRestaurant) {
+    return res.status(404).json({ error: "Restaurant not found" });
+  }
+  const password = uuid.v4();
+  const email = existingRestaurant.res_Owner_email;
+  createUserAccount({ email, password });
+  createClient({ email, password });
 };
 
 //when user expend their subscription
