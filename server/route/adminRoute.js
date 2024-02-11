@@ -63,7 +63,7 @@ router.get("/admin/read/restaurant", getAllResturants); // Get all available res
 router.get("/admin/read/categories", allCategory); // Get all available Categories
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
-router.get("/admin/all-branch",getAllBranch);
+router.get("/all-branch-payment-wise-list-for-dev-admins",getAllBranch);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID

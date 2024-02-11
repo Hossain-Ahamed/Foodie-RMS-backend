@@ -40,6 +40,9 @@ const subscriptionSchema = new mongoose.Schema({
       endDate: {
         type: Number,
       },
+      payment_time:{
+        type:Number,
+      },
       price: {
         type: Number,
       },
