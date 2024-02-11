@@ -10,11 +10,11 @@ const subscriptionPackagesSchema =  new mongoose.Schema({
         require:true
     },
     finalPrice:{
-        type:Number,
+        type:String,
         require:true
     },
     cutPrice:{
-        type:Number,
+        type:String,
         require:true
     }
 
