@@ -6,12 +6,16 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const createUserAccount = ({ email, password }) => {
+const createUserAccount = ({ email, password ,phoneNumber, displayName}) => {
   try {
-    admin.auth().createUser({
+   const create = admin.auth().createUser({
       email,
       password,
+      phoneNumber,
+      displayName,
+
     });
+  return create;
   } catch (error) {
     console.log("Firebase serive :: createUser :: error", error);
   }

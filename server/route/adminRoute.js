@@ -44,6 +44,7 @@ const {
 } = require("../controller/subscriptionController");
 
 const { createExpense } = require("../controller/expenseController");
+const { CreateDev, devFindById, getDevProfile } = require("../controller/devController");
 
 const router = express.Router();
 // http://localhost:5000/admin/login
@@ -90,6 +91,12 @@ router.patch('/payment-package/branch/:branchID', createSubscription)
 //Create Account
 router.post("/admin/create/account/emplyoee", createUAccount);
 router.post("/admin/create/account/owner", createAccount);
+
+
+router.post("/dev/create",CreateDev);
+
+router.get("/dev/:id",devFindById);
+router.get("/get-dev-profile/:email",getDevProfile);
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);

@@ -6,6 +6,7 @@ const connectDB = require("./server/config/database");
 const cors = require("cors");
 const AdminRoute = require("./server/route/adminRoute");
 const UserRoute = require("./server/route/userRoute");
+const { responseError } = require("./server/utils/utility");
 
 dotenv.config({ path: "./config.env" });
 const port = process.env.PORT || 5000;
@@ -46,4 +47,5 @@ app.listen(port, () => {
 
 app.get("/", (req, res) => {
   res.send("gogoshop server is running");
+  // responseError(res,500);
 });
