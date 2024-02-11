@@ -4,12 +4,10 @@ const subscriptionSchema = new mongoose.Schema({
   res_id: {
     type: mongoose.ObjectId,
     ref: "Restaurants",
-    required: true,
   },
   branchID: {
     type: mongoose.ObjectId,
     ref: "Branchs",
-    required: true,
   },
   packageType: {
     type: String,
@@ -17,37 +15,40 @@ const subscriptionSchema = new mongoose.Schema({
   },
   startDate: {
     type: Number,
-    required: true,
   },
   endDate: {
     type: Number,
-    required: true,
   },
   isActive: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   createdAt: {
     type: Number,
-    required: true,
   },
   updatedAt: {
     type: Number,
-    required: true,
   },
   previousSubscriptions: [
     {
       packageType: {
         type: String,
-        required: true,
       },
       startDate: {
         type: Number,
-        required: true,
       },
       endDate: {
         type: Number,
-        required: true,
+      },
+      price: {
+        type: Number,
+      },
+      paymentStatus: {
+        type: Boolean,
+        default: false,
+      },
+      transactionID: {
+        type: String,
       },
     },
   ],

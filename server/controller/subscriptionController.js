@@ -1,37 +1,37 @@
 const Subscription = require("../model/subscriptionModel");
-
-
-
+const branchModel = require("../model/branchModel");
+const packageModel = require("../model/subcripstionPackages");
 // This is your test secret API key.
-const stripe = require("stripe")(process.env.PK_KEY);   
+const stripe = require("stripe")(process.env.PK_KEY);
 
-// payment gateway 
+// payment gateway
 const CreatePaymentIntent = async (req, res) => {
-    try {
-        const { price } = req.body;
+  try {
+    const { price } = req.body;
 
-        const ammount = parseInt(price * 100);
+    const ammount = parseInt(price * 100);
 
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: ammount,
+      currency: "usd",
 
-        // Create a PaymentIntent with the order amount and currency
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: ammount,
-            currency: "usd",
+      // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
 
-            // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
-
-        res.send({
-            clientSecret: paymentIntent.client_secret,
-        });
-    } catch (e) {
-        console.log(e);
-        // Bad Request: Server error or client sent an invalid request
-        res.status(500).send({ message: "Bad Request: Server error or invalid request" });
-    }
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (e) {
+    console.log(e);
+    // Bad Request: Server error or client sent an invalid request
+    res
+      .status(500)
+      .send({ message: "Bad Request: Server error or invalid request" });
+  }
 };
 
 // Create a new subscription
@@ -39,23 +39,30 @@ const createSubscription = async (req, res) => {
   try {
     const { res_id, branchID, packageType } = req.body;
     let startDate = Date.now();
+    const existingSubscription = await Subscription.findById({
+      branchID: branchID,
+    });
+    if (existingSubscription) {
+      return res.status(400).json({ error: "Subscription already exist" });
+    }
     let endDate;
     switch (packageType) {
-      case "3 month":
+      case "Starter":
         endDate = startDate + 3 * 30 * 24 * 60 * 60 * 1000;
         break;
-      case "6 month":
+      case "Pro":
         endDate = startDate + 6 * 30 * 24 * 60 * 60 * 1000;
         break;
-      case "12 month":
+      case "Enterprise":
         endDate = startDate + 12 * 30 * 24 * 60 * 60 * 1000;
         break;
       default:
         return res.status(400).json({ error: "Invalid package type" });
     }
+    const res_Id_needed = await branchModel.findById({ _id: branchID });
 
     const newSubscription = new Subscription({
-      res_id,
+      res_id: res_Id_needed.res_id,
       branchID,
       packageType,
       startDate,
@@ -67,6 +74,8 @@ const createSubscription = async (req, res) => {
           packageType: packageType,
           startDate: startDate,
           endDate: endDate,
+          price: 0,
+          transactionID: "agdjhaga",
         },
       ],
     }).save();
@@ -77,26 +86,86 @@ const createSubscription = async (req, res) => {
   }
 };
 
+//give subscription payment Details
+
+const getPaymentDetails = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    const existingSubscription = await Subscription.findById(branchID);
+    const packages = await packageModel.findOne({
+      name: existingSubscription.packageType,
+    });
+    if (!existingSubscription) {
+      return res.status(404).json({ error: "No such Branch ID" });
+    }
+    const Data = {
+      Details: {
+        _id: existingSubscription._id,
+        res_id: existingSubscription.res_id,
+        branchID: existingSubscription.branchID,
+        packageType: existingSubscription.packageType,
+      },
+      price: packages.finalPrice,
+    };
+    res.status(200).json(Data);
+  } catch (error) {
+    console.log("Error in getting Payment details", error);
+  }
+};
+
+//update packages data after payment
+
+const updatePackageAfterPayment = async (req, res) => {
+  const { subscriptionID, packageType, transactionID, price } = req.body;
+  const existingSubscription = await Subscription.findById(subscriptionID);
+  if (!existingSubscription) {
+    return res.status(404).json({ error: "Subscription not found" });
+  }
+  let startdate = Date.now();
+  let enddate;
+  switch (packageType) {
+    case "Starter":
+      enddate = startdate + 3 * 30 * 24 * 60 * 60 * 1000;
+      break;
+    case "Pro":
+      enddate = startdate + 6 * 30 * 24 * 60 * 60 * 1000;
+      break;
+    case "Enterprise":
+      enddate = startdate + 12 * 30 * 24 * 60 * 60 * 1000;
+      break;
+    default:
+      return res.status(400).json({ error: "Invalid package type" });
+  }
+  existingSubscription.startDate = startdate;
+  existingSubscription.endDate = enddate;
+  existingSubscription.isActive = true;
+  existingSubscription.previousSubscriptions[0].startDate = startdate;
+  existingSubscription.previousSubscriptions[0].endDate = enddate;
+  existingSubscription.previousSubscriptions[0].price = price;
+  existingSubscription.previousSubscriptions[0].transactionID = transactionID;
+  existingSubscription.previousSubscriptions[0].paymentStatus = true;
+};
+
 //when user expend their subscription
 const extendSubscription = async (req, res) => {
   try {
-    const { subscriptionId, packageType } = req.body;
+    const { subscriptionID, packageType } = req.body;
 
-    const existingSubscription = await Subscription.findById(subscriptionId);
+    const existingSubscription = await Subscription.findById(subscriptionID);
     if (!existingSubscription) {
       return res.status(404).json({ error: "Subscription not found" });
     }
     let newEndDate;
     switch (packageType) {
-      case "3 month":
+      case "Starter":
         newEndDate =
           existingSubscription.endDate + 3 * 30 * 24 * 60 * 60 * 1000;
         break;
-      case "6 month":
+      case "Pro":
         newEndDate =
           existingSubscription.endDate + 6 * 30 * 24 * 60 * 60 * 1000;
         break;
-      case "12 month":
+      case "Enterprise":
         newEndDate =
           existingSubscription.endDate + 12 * 30 * 24 * 60 * 60 * 1000;
         break;
@@ -126,4 +195,7 @@ const extendSubscription = async (req, res) => {
 module.exports = {
   createSubscription,
   extendSubscription,
+  CreatePaymentIntent,
+  getPaymentDetails,
+  updatePackageAfterPayment,
 };
