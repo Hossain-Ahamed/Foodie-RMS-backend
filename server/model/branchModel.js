@@ -163,4 +163,4 @@ const branchSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Branchs", branchSchema);
+module.exports = mongoose.model("Branches", branchSchema);
