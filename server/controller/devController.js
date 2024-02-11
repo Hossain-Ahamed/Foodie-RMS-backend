@@ -1,4 +1,5 @@
-const createUserAccount = require("../config/firbase-config");
+
+const { createUserAccount } = require("../config/firbase-config");
 const devModel = require("../model/devModel");
 const { responseError } = require("../utils/utility");
 const uuid = require("uuid");
@@ -39,72 +40,78 @@ const CreateDev = async (req, res) => {
     // console.log(req.body);
 
     const password = uuid.v4().slice(0, 8);
-    createUserAccount({email,displayName: f_name + " " + l_name,phoneNumber: mobile,password : password})
-    .then(async data=>{
-        const Createdev = await devModel({
-            uid:data.uid,
-      f_name,
-      l_name,
-      email,
-      mobile,
-      gender,
-      password,
-      DOB,
-      nid,
-      role,
-      commentNotes,
-      streetAddress,
-      city,
-      stateProvince,
-      postalCode,
-      country,
-      emergencyName,
-      emergencyRelation,
-      emergencyPhoneNumber,
-      emergencyEmail,
-      emergencyAddress,
-      profilePhoto,
-    }).save();
-    res.status(200).send(true);
-        
-    })
-
-    
+    createUserAccount({ email, password: password }).then(async (data) => {
+      const Createdev = await devModel({
+        uid: data.uid,
+        f_name,
+        l_name,
+        email,
+        mobile,
+        gender,
+        password,
+        DOB,
+        nid,
+        role,
+        commentNotes,
+        streetAddress,
+        city,
+        stateProvince,
+        postalCode,
+        country,
+        emergencyName,
+        emergencyRelation,
+        emergencyPhoneNumber,
+        emergencyEmail,
+        emergencyAddress,
+        profilePhoto,
+      }).save();
+      res.status(200).send(true);
+    });
   } catch (error) {
     responseError(res, 500, error);
   }
 };
 
-const devFindById = async(req,res)=>{
-    try {
-        const {id} = req.params;
-        const data = await devModel.findOne({uid:id}).select("-password");
-        res.status(200).send(data);
-    } catch (error) {
-        responseError(res, 500, error);
+const devFindByUID = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const data = await devModel.findOne({ uid: uid }).select("-password");
+    res.status(200).send(data);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+
+const getDevProfile = async (req, res) => {
+  try {
+    const { email } = req.params;
+    if (!email) {
+      responseError(res, 404, {}, "No data is found because of no email");
     }
-    
+    const data = await devModel.findOne({ email: email }).select("-password");
+    res.status(200).send(data);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
 
-}
-const getDevProfile = async(req,res)=>{
-    try {
-        const {email} = req.params;
-        if(!email){
-            responseError(res, 404, {}, "No data is found because of no email");
-        }
-        const data = await devModel.findOne({email:email}).select("-password");
-        res.status(200).send(data);
-    } catch (error) {
-        responseError(res, 500, error);
+const changePassword = async(req,res)=>{
+  try {
+    const { email ,} = req.params;
+    if (!email) {
+      responseError(res, 404, {}, "No data is found because of no email");
     }
-    
-
+    const data = await devModel.findOne({ email: email }).select("-password");
+    res.status(200).send(data);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
 }
-
 
 module.exports = {
-    devFindById,
-    CreateDev,
-    getAllDev,
-    getDevProfile
-}
+  devFindByUID,
+  CreateDev,
+  getAllDev,
+  getDevProfile,
+};

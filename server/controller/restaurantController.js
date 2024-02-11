@@ -1,4 +1,4 @@
-const createUserAccount = require("../config/firbase-config.js");
+// const {createUserAccount} = require("../config/firbase-config.js");
 const branchModel = require("../model/branchModel.js");
 const uuid = require("uuid");
 const createClient = require("./clientController.js");
@@ -71,22 +71,22 @@ const createResturant = async (req, res) => {
 
 //create user account
 
-const createAccount = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const password = uuid.v4();
-    const user = await restaurantModel.findOne({ res_Owner_email: email });
-    if (!user) {
-      createUserAccount({ email, password });
-      createClient({ email, password });
-      res.status(200).send(true);
-    } else {
-      res.status(409).send(false);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
+// const createAccount = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+//     const password = uuid.v4();
+//     const user = await restaurantModel.findOne({ res_Owner_email: email });
+//     if (!user) {
+//       createUserAccount({ email, password });
+//       createClient({ email, password });
+//       res.status(200).send(true);
+//     } else {
+//       res.status(409).send(false);
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 const updateResturant = async (req, res) => {
   const id = req.params.id;
@@ -172,5 +172,5 @@ module.exports = {
   createResturant,
   updateResturant,
   deleteResturent,
-  createAccount,
+  // createAccount,
 };
