@@ -25,6 +25,7 @@ const {
   createBranch,
   updateBranch,
   deleteBranch,
+  getAllBranch,
 } = require("../controller/branchController");
 
 const {
@@ -62,6 +63,7 @@ router.get("/admin/read/restaurant", getAllResturants); // Get all available res
 router.get("/admin/read/categories", allCategory); // Get all available Categories
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
+router.get("/admin/all-branch",getAllBranch);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
@@ -100,5 +102,7 @@ router.get("/get-dev-profile/:email",getDevProfile);
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);
+
+
 
 module.exports = router;
