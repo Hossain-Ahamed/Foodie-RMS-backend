@@ -73,15 +73,7 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       
     },
-    salary_type: {
-      type: String,
-      enum: ["Hourly", "Daily", "Monthly"],
-      
-    },
-    salary_unit: {
-      type: Number, //hourly wage or daily rate or monthly salary
-      
-    },
+    
     permitted: [
       {
         res_id: {
@@ -94,6 +86,15 @@ const employeeSchema = new mongoose.Schema(
         },
         role: {
           type: String,
+        },
+        salary_type: {
+          type: String,
+          enum: ["Hourly", "Daily", "Monthly"],
+          
+        },
+        salary_unit: {
+          type: Number, //hourly wage or daily rate or monthly salary
+          
         },
       },
     ],

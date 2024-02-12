@@ -5,6 +5,7 @@ const createClient = require("./clientController");
 const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
 const branchModel = require("../model/branchModel");
+const restaurantModel = require("../model/restaurantModel");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -85,37 +86,62 @@ const allEmployee = async (req, res) => {
   }
 };
 
-//create user account
-const createUAccount = async (req, res) => {
+const addExistingEmployee = async (req, res) => {
   try {
-    const { email } = req.body;
-    const password = uuid.v4();
-    const user = await Employee.findOne({ email: email });
-    if (!user) {
-      createUserAccount({ email, password });
-      createClient({ email, password });
-      res.status(200).send(true);
+    const { res_id, branchID, employeeID } = req.params;
+    const existingEmployee = await Employee.findOne({
+      _id: employeeID,
+      "permitted.res_id": res_id,
+      "permitted.branchID": branchID,
+    }).select("f_name");
+   
+    if (!existingEmployee) {
+     //todo
+     // add employyes profile permitted with salary and all
     } else {
-      res.status(409).send(false);
+      res.status(409).json({ message: "Already Enlisted employee" });
     }
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ msg: "Server error" });
   }
 };
 
 const getEmployeeById = async (req, res) => {
   try {
-    const employeeId = req.params.id;
+    const { res_id, employeeId } = req.params;
+
     const employee = await Employee.findById({
       _id: employeeId,
       deleteStatus: false,
+    }).select("-permitted");
+    const allBranches_beforeRename = await branchModel
+      .find({ res_id: res_id })
+      .select("_id branch_name");
+
+    const allBranches = allBranches_beforeRename.map((i) => {
+      return {
+        branchID: i?._id,
+        branch_name: i?.branch_name,
+      };
     });
+
+    const RestaurantData = await restaurantModel
+      .findById({ _id: res_id })
+      .select("_id res_name img");
 
     if (!employee) {
       return res.status(404).json({ msg: "Employee not found" });
     }
 
-    res.status(200).json(employee);
+    res.status(200).json({
+      employeeData: employee,
+      restaurantData: {
+        _id: RestaurantData?._id,
+        res_name: RestaurantData?.res_name,
+        img: RestaurantData?.img,
+        branches: allBranches,
+      },
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: "Internal Server Error" });
@@ -226,7 +252,7 @@ const SearchEmployee = async (req, res) => {
 
 const allEmployeeForBranch = async (req, res) => {
   try {
-    const { res_id ,branchID} = req.params;
+    const { res_id, branchID } = req.params;
     const employees = await Employee.find({
       "permitted.res_id": res_id,
       "permitted.branchID": branchID,
@@ -235,39 +261,46 @@ const allEmployeeForBranch = async (req, res) => {
     if (!employees || employees.length === 0) {
       responseError(res, 404, "No Employee Found");
     } else {
-      const formattedEmployees = await Promise.all(employees.map(async employee => {
-        const {
-          f_name,
-          l_name,
-          email,
-          profilePhoto,
-          nid,
-          _id,
-          mobile,
-          permitted,
-        } = employee;
-        const matchedPermitted = permitted.find(
-          (p) => p.res_id.toString() === res_id
-        );
-        const formattedPermitted = matchedPermitted
-          ? { branchID: matchedPermitted.branchID, role: matchedPermitted.role }
-          : null;
-        const data = await branchModel.findById(formattedPermitted.branchID).select('branch_name');
+      const formattedEmployees = await Promise.all(
+        employees.map(async (employee) => {
+          const {
+            f_name,
+            l_name,
+            email,
+            profilePhoto,
+            nid,
+            _id,
+            mobile,
+            permitted,
+          } = employee;
+          const matchedPermitted = permitted.find(
+            (p) => p.res_id.toString() === res_id
+          );
+          const formattedPermitted = matchedPermitted
+            ? {
+                branchID: matchedPermitted.branchID,
+                role: matchedPermitted.role,
+              }
+            : null;
+          const data = await branchModel
+            .findById(formattedPermitted.branchID)
+            .select("branch_name");
 
-        const returnData = {
-          f_name,
-          l_name,
-          email,
-          profilePhoto,
-          nid,
-          _id,
-          mobile,
-          role: formattedPermitted?.role,
-          branchID: formattedPermitted?.branchID,
-          branchName: data?.branch_name,
-        };
-        return returnData;
-      }));
+          const returnData = {
+            f_name,
+            l_name,
+            email,
+            profilePhoto,
+            nid,
+            _id,
+            mobile,
+            role: formattedPermitted?.role,
+            branchID: formattedPermitted?.branchID,
+            branchName: data?.branch_name,
+          };
+          return returnData;
+        })
+      );
       res.status(200).send(formattedEmployees);
     }
   } catch (error) {
@@ -285,46 +318,52 @@ const allEmployeeForRestaurent = async (req, res) => {
     if (!employees || employees.length === 0) {
       responseError(res, 404, "No Employee Found");
     } else {
-      const formattedEmployees = await Promise.all(employees.map(async employee => {
-        const {
-          f_name,
-          l_name,
-          email,
-          profilePhoto,
-          nid,
-          _id,
-          mobile,
-          permitted,
-        } = employee;
-        const matchedPermitted = permitted.find(
-          (p) => p.res_id.toString() === res_id
-        );
-        const formattedPermitted = matchedPermitted
-          ? { branchID: matchedPermitted.branchID, role: matchedPermitted.role }
-          : null;
-        const data = await branchModel.findById(formattedPermitted.branchID).select('branch_name');
+      const formattedEmployees = await Promise.all(
+        employees.map(async (employee) => {
+          const {
+            f_name,
+            l_name,
+            email,
+            profilePhoto,
+            nid,
+            _id,
+            mobile,
+            permitted,
+          } = employee;
+          const matchedPermitted = permitted.find(
+            (p) => p.res_id.toString() === res_id
+          );
+          const formattedPermitted = matchedPermitted
+            ? {
+                branchID: matchedPermitted.branchID,
+                role: matchedPermitted.role,
+              }
+            : null;
+          const data = await branchModel
+            .findById(formattedPermitted.branchID)
+            .select("branch_name");
 
-        const returnData = {
-          f_name,
-          l_name,
-          email,
-          profilePhoto,
-          nid,
-          _id,
-          mobile,
-          role: formattedPermitted?.role,
-          branchID: formattedPermitted?.branchID,
-          branchName: data?.branch_name,
-        };
-        return returnData;
-      }));
+          const returnData = {
+            f_name,
+            l_name,
+            email,
+            profilePhoto,
+            nid,
+            _id,
+            mobile,
+            role: formattedPermitted?.role,
+            branchID: formattedPermitted?.branchID,
+            branchName: data?.branch_name,
+          };
+          return returnData;
+        })
+      );
       res.status(200).send(formattedEmployees);
     }
   } catch (error) {
     responseError(res, 500, error);
   }
 };
-
 
 const employeeRole = async (req, res) => {
   try {
@@ -513,5 +552,5 @@ module.exports = {
   updateEmployeeById,
   deleteEmployeeById,
   employeeLogin,
-  // createUAccount,
+  addExistingEmployee,
 };

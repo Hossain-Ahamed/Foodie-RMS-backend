@@ -9,6 +9,7 @@ const {
   allEmployeeForRestaurent,
   allEmployeeForBranch,
   employeeRole,
+  addExistingEmployee,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -79,7 +80,8 @@ router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
-router.get("/admin/readbyid/employee/:id", getEmployeeById); // Get Employee By Id
+router.get("/restaurant/:res_id/existing-employee-data/:employeeId", getEmployeeById); // Get Employee By Id
+router.post("/add-an-employee-to-my-restaurant/:res_id/:branchID/employee/:employeeID",addExistingEmployee)
 router.post("/enlisted-payment", updatePackageAfterPayment);
 
 //For  Update => Admin or Super User Access (Admin can only update his own profile)
@@ -107,7 +109,7 @@ router.patch("/payment-package/branch/:branchID", createSubscription);
 // router.post("/admin/create/account/owner", createAccount);
 
 //Search Employee
-router.post("/search/employee", SearchEmployee);
+router.post("/search-employee-to-add", SearchEmployee);
 
 //
 router.get("/get-rms-employee-profile/:email", employeeRole);
