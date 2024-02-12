@@ -4,6 +4,7 @@ const uuid = require("uuid");
 const createClient = require("./clientController.js");
 const { upload } = require("../../multer.js");
 const fs = require("fs");
+const employeeModel = require("../model/employeeModel.js");
 const restaurantModel = require("../model/restaurantModel.js");
 
 const createResturant = async (req, res) => {
@@ -21,9 +22,9 @@ const createResturant = async (req, res) => {
       res_Owner_postalCode,
       res_Owner_country,
       branches,
-      img
+      img,
     } = req.body;
-    console.log(res_name,req.body)
+    console.log(res_name, req.body);
     // const { img } = req.file;
     // upload.single(img);
     // const filename = req.file.filename;
@@ -46,9 +47,9 @@ const createResturant = async (req, res) => {
         res_Owner_postalCode,
         res_Owner_country,
         // img: fileUrl,
-        img
+        img,
       }).save();
-      const branchData = branches[0]
+      const branchData = branches[0];
       const newBranch = await branchModel({
         res_id: newResturant._id,
         branch_name: branchData.name,
@@ -58,8 +59,24 @@ const createResturant = async (req, res) => {
         country: branchData.country,
         stateProvince: branchData.stateProvince,
       }).save();
-
-      res.status(200).send({branchID : newBranch?._id});
+      const newEmployee = await employeeModel({
+        f_name: res_Owner_Name,
+        email: res_Owner_email,
+        mobile: res_Owner_mobile,
+        streetAddress: res_Owner_streetAddress,
+        city: res_Owner_city,
+        stateProvince: res_Owner_stateProvince,
+        postalCode: res_Owner_postalCode,
+        country: res_Owner_country,
+        permited: [
+          {
+            res_id: newResturant._id,
+            branchID: newBranch._id,
+            role: "Super-Admin",
+          },
+        ],
+      }).save();
+      res.status(200).send({ branchID: newBranch?._id });
     }
   } catch (error) {
     console.log("Error in creating restaurant", error);
