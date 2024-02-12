@@ -68,7 +68,7 @@ const createResturant = async (req, res) => {
         stateProvince: res_Owner_stateProvince,
         postalCode: res_Owner_postalCode,
         country: res_Owner_country,
-        permited: [
+        permitted: [
           {
             res_id: newResturant._id,
             branchID: newBranch._id,
@@ -183,8 +183,19 @@ const getAllResturants = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
+const getAllResturantsForDev = async (req, res) => {
+  try {
+    const restaurantList = await restaurantModel
+      .find({ deleteStatus: false })
+      .select(_id, img, res_name);
+    res.status(200).json(restaurantList);
+  } catch (error) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
 
 module.exports = {
+  getAllResturantsForDev,
   getAllResturants,
   createResturant,
   updateResturant,

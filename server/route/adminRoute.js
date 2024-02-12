@@ -33,6 +33,7 @@ const {
 } = require("../controller/branchController");
 
 const {
+  getAllResturantsForDev,
   getAllResturants,
   createResturant,
   updateResturant,
@@ -49,7 +50,12 @@ const {
 } = require("../controller/subscriptionController");
 
 const { createExpense } = require("../controller/expenseController");
-const { CreateDev, devFindByUID, getDevProfile, getAllDev } = require("../controller/devController");
+const {
+  CreateDev,
+  devFindByUID,
+  getDevProfile,
+  getAllDev,
+} = require("../controller/devController");
 
 const router = express.Router();
 // http://localhost:5000/admin/login
@@ -67,7 +73,7 @@ router.get("/admin/read/restaurant", getAllResturants); // Get all available res
 router.get("/admin/read/categories", allCategory); // Get all available Categories
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
-router.get("/all-branch-payment-wise-list-for-dev-admins",getAllBranch);
+router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
@@ -92,18 +98,14 @@ router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 // router.post("/admin/subscription", createSubscription);
 // router.get("/admin/all-subscriptions",getAllSubscriptions);
 router.post("/admin/extend-subscription/", extendSubscription);
-router.patch('/payment-package/branch/:branchID', createSubscription)
+router.patch("/payment-package/branch/:branchID", createSubscription);
 
 //Create Account
 // router.post("/admin/create/account/emplyoee", createUAccount);
 // router.post("/admin/create/account/owner", createAccount);
 
-
-
 //Search Employee
 router.post("/search/employee", SearchEmployee);
-router.get("/restaurant/:res_id/all-employee-list",allEmployeeForRestaurent);
-router.get("/restaurant/:res_id/branch/:branchID/all-employee-list",allEmployeeForBranch);
 
 
 //
@@ -115,9 +117,12 @@ router.get("/all-dev-profile",getAllDev)
 router.get("/dev/:uid",devFindByUID);
 router.get("/get-dev-profile/:email",getDevProfile);
 
+router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
+router.get("/restaurant/:res_id/branch/:branchID/all-employee-list",allEmployeeForBranch);
+router.get("/all-restaurant-dev", getAllResturantsForDev);
+
+
 //Expense Route
 router.post("/admin/create/expense", createExpense);
-
-
 
 module.exports = router;
