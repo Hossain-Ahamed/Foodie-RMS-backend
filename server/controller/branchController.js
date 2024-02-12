@@ -1,4 +1,5 @@
 const branchModel = require("../model/branchModel");
+const restaurantModel = require("../model/restaurantModel");
 const { responseError } = require("../utils/utility");
 
 // create branch
@@ -168,16 +169,19 @@ const addTables = async (req, res) => {
 const getAllBranchForDev = async (req, res) => {
   try {
     const { res_id } = req.params;
+    const resDetails = await restaurantModel.findOne({ res_id });
     const branchList = await branchModel
       .find({
         res_id: res_id,
         deleteStatus: false,
       })
       .select(
-        "res_id _id branch_name streetAddress city stateProvince country paymentTypes"
-      )
-      .populate("res_id");
-    res.status(200).send(branchList);
+        "_id branch_name streetAddress city stateProvince country paymentTypes"
+      );
+    res.status(200).send({
+      restaurantDetails: resDetails,
+      branches: branchList,
+    });
   } catch (error) {
     return res.status(500).json({ msg: "Server error" });
   }
