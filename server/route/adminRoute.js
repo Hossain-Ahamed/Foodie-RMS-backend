@@ -121,7 +121,7 @@ router.get("/get-dev-profile/:email",getDevProfile);
 router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
 router.get("/restaurant/:res_id/branch/:branchID/all-employee-list",allEmployeeForBranch);
 router.get("/all-restaurant-dev", getAllResturantsForDev);
-router.get("/restaurant-all-branches",getAllBranchForDev);
+router.get("/restaurant-all-branches/:res_id",getAllBranchForDev);
 
 
 //Expense Route
