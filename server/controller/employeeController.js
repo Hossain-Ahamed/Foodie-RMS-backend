@@ -245,10 +245,12 @@ const allEmployeeForBranch = async (req, res) => {
           mobile,
           permitted,
         } = employee;
-        const formattedPermitted = permitted.map(({ branchID, role }) => ({
-          branchID,
-          role,
-        }));
+        const matchedPermitted = permitted.find(
+          (p) => p.res_id.toString() === res_id
+        );
+        const formattedPermitted = matchedPermitted
+          ? { branchID: matchedPermitted.branchID, role: matchedPermitted.role }
+          : null;
         return {
           f_name,
           l_name,
@@ -290,10 +292,12 @@ const allEmployeeForRestaurent = async (req, res) => {
           mobile,
           permitted,
         } = employee;
-        const formattedPermitted = permitted.map(({ branchID, role }) => ({
-          branchID,
-          role,
-        }));
+        const matchedPermitted = permitted.find(
+          (p) => p.res_id.toString() === res_id
+        );
+        const formattedPermitted = matchedPermitted
+          ? { branchID: matchedPermitted.branchID, role: matchedPermitted.role }
+          : null;
         return {
           f_name,
           l_name,
