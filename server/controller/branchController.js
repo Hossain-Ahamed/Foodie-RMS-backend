@@ -83,7 +83,7 @@ const deleteBranch = async (req, res) => {
       },
       { new: true }
     );
-  } catch (err) {}
+  } catch (err) { }
 };
 const getAllBranch = async (req, res) => {
   try {
@@ -203,7 +203,7 @@ const singleBranchDataForDev = async (req, res) => {
     if (data && transactionData) {
       res.status(200).send({
         branchDetails: data,
-        transactionDetails: transactionData,
+        transactionData,
       });
     }
   } catch (error) {
