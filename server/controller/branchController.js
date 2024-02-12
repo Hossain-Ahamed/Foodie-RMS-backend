@@ -134,7 +134,25 @@ const getAllBranch = async (req, res) => {
   }
 };
 
+const addTables = async(req,res)=>{
+  try {
+    const{branchID}=req.params;
+    const {number, capacity ,location} = req.body;
+    const branch =  await branchModel.findById({_id:branchID});
+    if(!branch){
+      responseError(res, 404, error);
+    }else{
+      const qrCodeData = "/restaurant/ "+branch.res_id +"/branch/"+branch._id+"?table="+number;
+      const createTable = branchModel.findByIdAndUpdate(branch._id,{tables:[number,capacity,location,qrCodeData]},{new:true});
+      res.status(200).send(createTable);
+    }
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+}
+
 module.exports = {
+  addTables,
   getAllBranch,
   createBranch,
   updateBranch,
