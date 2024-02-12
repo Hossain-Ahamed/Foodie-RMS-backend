@@ -1,5 +1,6 @@
 // const {createUserAccount} = require("../config/firbase-config");
 const Employee = require("../model/employeeModel");
+const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
 const uuid = require("uuid");
 const addEmployee = async (req, res) => {
@@ -213,13 +214,51 @@ const deleteEmployeeById = async (req, res) => {
 const SearchEmployee = async(req,res)=>{
   try {
     const data = req.body;
+    const searchData = await Employee.find(data); 
     console.log(data);
+    res.status(200).send(searchData);
   } catch (error) {
+    responseError(res, 500, error);
+  }
+}
+
+const allEmployeeForBranch = async (req,res)=>{
+  try {
+    const {res_id,branchID}= req.params;
+    // console.log("res id : ",res_id,"\n branch ID : ",
+
+    const employee = await Employee.find({res_id:res_id,branchID:branchID});
+    if(!employee){
+      return responseError(res,404,"No Employee Found");
+    }else{
+      res.status(200).send(employee);
+    }
     
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+}
+
+const allEmployeeForRestaurent = async (req,res)=>{
+  try {
+    const {res_id}= req.params;
+    // console.log("res id : ",res_id,"\n branch ID : ",
+
+    const employee = await Employee.find({res_id:res_id});
+    if(!employee){
+      return responseError(res,404,"No Employee Found");
+    }else{
+      res.status(200).send(employee);
+    }
+    
+  } catch (error) {
+    responseError(res, 500, error);
   }
 }
 
 module.exports = {
+  allEmployeeForRestaurent,
+  allEmployeeForBranch,
   SearchEmployee,
   allEmployee,
   addEmployee,
