@@ -181,28 +181,13 @@ const updatePackageAfterPayment = async (req, res) => {
   }
   const password = uuid.v4().slice(0,8);
   const email = existingRestaurant.res_Owner_email;
+  const name = existingRestaurant.res_Owner_Name;
 
-  createUserAccount({ email, password })
+  createUserAccount({ name,email, password })
   .then(res=>{
          console.log(res?.uid)
   })
   .catch(e=>console.log(e));
-
-  try {
-    await sendMail({
-      email: email,
-      subject: "Receive your password",
-      message: `Hello ${existingRestaurant.res_Owner_Name}, this is your email: ${email} and password: ${password} for log in`,
-    });
-    res.status(201).json({
-      success: true,
-      message: `please check your email:- ${email}`,
-    });
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 500));
-  }
-
-
   createClient({ email, password });
 };
 
