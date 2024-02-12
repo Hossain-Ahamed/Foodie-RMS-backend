@@ -1,5 +1,6 @@
 const branchModel = require("../model/branchModel");
 const restaurantModel = require("../model/restaurantModel");
+const subscriptionModel = require("../model/subscriptionModel");
 const { responseError } = require("../utils/utility");
 
 // create branch
@@ -169,7 +170,7 @@ const addTables = async (req, res) => {
 const getAllBranchForDev = async (req, res) => {
   try {
     const { res_id } = req.params;
-    const resDetails = await restaurantModel.findById({_id: res_id});
+    const resDetails = await restaurantModel.findById({ _id: res_id });
     const branchList = await branchModel
       .find({
         res_id: res_id,
@@ -177,12 +178,34 @@ const getAllBranchForDev = async (req, res) => {
       })
       .select(
         "_id branch_name streetAddress city stateProvince country paymentTypes"
-      )
-      
+      );
+
     res.status(200).send({
       restaurantDetails: resDetails,
       branches: branchList,
     });
+  } catch (error) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+const singleBranchDataForDev = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    const data = await branchModel
+      .findById(branchID)
+      .select(
+        "branch_name streetAddress city stateProvince country paymentTypes"
+      );
+    const transactionData = await subscriptionModel
+      .findOne({ branchID: branchID })
+      .select("previousSubscriptions");
+    if (data && transactionData) {
+      res.status(200).send({
+        branchDetails: data,
+        transactionDetails: transactionData,
+      });
+    }
   } catch (error) {
     return res.status(500).json({ msg: "Server error" });
   }
@@ -195,4 +218,5 @@ module.exports = {
   updateBranch,
   deleteBranch,
   getAllBranchForDev,
+  singleBranchDataForDev,
 };

@@ -31,6 +31,7 @@ const {
   deleteBranch,
   getAllBranch,
   getAllBranchForDev,
+  singleBranchDataForDev,
 } = require("../controller/branchController");
 
 const {
@@ -108,21 +109,22 @@ router.patch("/payment-package/branch/:branchID", createSubscription);
 //Search Employee
 router.post("/search/employee", SearchEmployee);
 
-
 //
-router.get("/get-rms-employee-profile/:email",employeeRole);
+router.get("/get-rms-employee-profile/:email", employeeRole);
 
-
-router.post("/dev/create",CreateDev);
-router.get("/all-dev-profile",getAllDev)
-router.get("/dev/:uid",devFindByUID);
-router.get("/get-dev-profile/:email",getDevProfile);
+router.post("/dev/create", CreateDev);
+router.get("/all-dev-profile", getAllDev);
+router.get("/dev/:uid", devFindByUID);
+router.get("/get-dev-profile/:email", getDevProfile);
 
 router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
-router.get("/restaurant/:res_id/branch/:branchID/all-employee-list",allEmployeeForBranch);
+router.get(
+  "/restaurant/:res_id/branch/:branchID/all-employee-list",
+  allEmployeeForBranch
+);
 router.get("/all-restaurant-dev", getAllResturantsForDev);
-router.get("/restaurant-all-branches/:res_id",getAllBranchForDev);
-
+router.get("/restaurant-all-branches/:res_id", getAllBranchForDev);
+router.get("/restaurant/branch/:branchID", singleBranchDataForDev);
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);
