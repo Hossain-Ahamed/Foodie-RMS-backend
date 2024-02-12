@@ -3,6 +3,7 @@ const Employee = require("../model/employeeModel");
 const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
 const uuid = require("uuid");
+const  JWT = require("jsonwebtoken");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -256,7 +257,142 @@ const allEmployeeForRestaurent = async (req,res)=>{
   }
 }
 
+const employeeRole = async (req,res)=>{
+  try {
+    const {email} = req.params;
+    if(!email){
+      responseError(res, 401, "email not found");
+    }else{
+      const checkEmail = await Employee.aggregate([
+        {
+          $match: { email: email },
+        },
+        {
+          $lookup: {
+            from: "branches",
+            localField: "permitted.branchID",
+            foreignField: "_id",
+            as: "branches"
+          }
+        },
+        {
+          $unwind: "$branches"
+        },
+        {
+          $lookup: {
+            from: "restaurants",
+            localField: "permitted.res_id",
+            foreignField: "_id",
+            as: "restaurants"
+          }
+        },
+        {
+          $unwind: "$restaurants"
+        },
+        {
+          $project: {
+            _id: 1,
+            f_name: 1,
+            l_name: 1,
+            email: 1,
+            gender: 1,
+            DOB: 1,
+            nid: 1,
+            mobile: 1,
+            commentNotes: 1,
+            profilePhoto: 1,
+            streetAddress: 1,
+            city: 1,
+            stateProvince: 1,
+            postalCode: 1,
+            country: 1,
+            emergencyAddress: 1,
+            emergencyEmail: 1,
+            emergencyName: 1,
+            emergencyPhoneNumber: 1,
+            emergencyRelation: 1,
+            "permitted.res_img": "$restaurants.img",
+            "permitted.res_name": "$restaurants.res_name",
+            "permitted.res_id": "$restaurants._id",
+            "permitted.branch_name": "$branches.branch_name",
+            "permitted.branchID": "$branches._id",
+            "permitted.role": 1
+          }
+        },
+        {
+          $group: {
+            _id: "$_id",
+            f_name: { $first: "$f_name" },
+            l_name: { $first: "$l_name" },
+            email: { $first: "$email" },
+            gender: { $first: "$gender" },
+            DOB: { $first: "$DOB" },
+            nid: { $first: "$nid" },
+            mobile: { $first: "$mobile" },
+            commentNotes: { $first: "$commentNotes" },
+            profilePhoto: { $first: "$profilePhoto" },
+            streetAddress: { $first: "$streetAddress" },
+            city: { $first: "$city" },
+            stateProvince: { $first: "$stateProvince" },
+            postalCode: { $first: "$postalCode" },
+            country: { $first: "$country" },
+            emergencyAddress: { $first: "$emergencyAddress" },
+            emergencyEmail: { $first: "$emergencyEmail" },
+            emergencyName: { $first: "$emergencyName" },
+            emergencyPhoneNumber: { $first: "$emergencyPhoneNumber" },
+            emergencyRelation: { $first: "$emergencyRelation" },
+            permitted: { $first: "$permitted" }
+          }
+        }
+      ]).exec();
+      
+  
+      if(checkEmail){
+
+
+        res.status(200).json(checkEmail);
+      }else{
+        responseError(res, 404, 'User Not Registered');}
+    }
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+}
+
+const employeeLogin = async (req,res)=>
+{    try {
+      const {email} = req.body;
+      const checkEmail = await Employee.findOne({email:email});
+      if(!checkEmail)
+      {
+         return responseError(res, 401, "Invalid Email or Password");
+      }
+      else
+      {
+        const permitted = checkEmail.permitted;
+
+        // Your logic to extract relevant information from the 'permitted' array
+        const payload = {
+          // Include relevant fields from 'permitted' array or other employee details
+          email: checkEmail.email,
+          role: permitted,
+        };
+        const options = { expiresIn: '1h' }; // Optional: Set the token expiration time
+  
+        const token = JWT.sign(payload, process.env.secretKey, options);
+
+        res.status(200).json({token : token ,data:"Logged in Successfully" });
+
+      }
+
+    } catch (error) {
+      responseError(res, 500, error);
+    }
+}
+
+
 module.exports = {
+  employeeRole,
   allEmployeeForRestaurent,
   allEmployeeForBranch,
   SearchEmployee,
@@ -265,5 +401,6 @@ module.exports = {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
+  employeeLogin
   // createUAccount,
 };

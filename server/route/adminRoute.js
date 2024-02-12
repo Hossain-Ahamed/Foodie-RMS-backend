@@ -8,6 +8,7 @@ const {
   SearchEmployee,
   allEmployeeForRestaurent,
   allEmployeeForBranch,
+  employeeRole,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -105,17 +106,21 @@ router.patch("/payment-package/branch/:branchID", createSubscription);
 
 //Search Employee
 router.post("/search/employee", SearchEmployee);
-router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
-router.get(
-  "/restaurant/:res_id/branch/:branchID/all-employee-list",
-  allEmployeeForBranch
-);
 
-router.post("/dev/create", CreateDev);
-router.get("/all-dev-profile", getAllDev);
-router.get("/dev/:uid", devFindByUID);
-router.get("/get-dev-profile/:email", getDevProfile);
+
+//
+router.get("/get-rms-employee-profile/:email",employeeRole);
+
+
+router.post("/dev/create",CreateDev);
+router.get("/all-dev-profile",getAllDev)
+router.get("/dev/:uid",devFindByUID);
+router.get("/get-dev-profile/:email",getDevProfile);
+
+router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
+router.get("/restaurant/:res_id/branch/:branchID/all-employee-list",allEmployeeForBranch);
 router.get("/all-restaurant-dev", getAllResturantsForDev);
+
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);

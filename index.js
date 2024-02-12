@@ -4,9 +4,11 @@ const app = express();
 app.use(express.json());
 const connectDB = require("./server/config/database");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 const AdminRoute = require("./server/route/adminRoute");
 const UserRoute = require("./server/route/userRoute");
 const { responseError } = require("./server/utils/utility");
+const cookieParser = require("cookie-parser");
 
 dotenv.config({ path: "./config.env" });
 const port = process.env.PORT || 5000;
@@ -36,8 +38,9 @@ app.use((req, res, next) => {
 });
 
 app.use(cors(corsOptions));
-
+app.use(bodyParser.urlencoded({ extended: true, limit: "100mb" }));
 // app.use("/", express.static("uploads"));
+app.use(cookieParser());
 app.use("/api/v1/auth", AdminRoute);
 app.use("/api/v1/auth",UserRoute);
 
