@@ -4,6 +4,7 @@ const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
 const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
+const branchModel = require("../model/branchModel");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -225,16 +226,16 @@ const SearchEmployee = async (req, res) => {
 
 const allEmployeeForBranch = async (req, res) => {
   try {
-    const { res_id } = req.params;
+    const { res_id ,branchID} = req.params;
     const employees = await Employee.find({
       "permitted.res_id": res_id,
+      "permitted.branchID": branchID,
     }).select("f_name l_name email profilePhoto nid _id mobile permitted");
 
-    if (!employees) {
+    if (!employees || employees.length === 0) {
       responseError(res, 404, "No Employee Found");
     } else {
-      // Map over each employee to extract the required fields from 'permitted'
-      const formattedEmployees = employees.map((employee) => {
+      const formattedEmployees = await Promise.all(employees.map(async employee => {
         const {
           f_name,
           l_name,
@@ -251,7 +252,9 @@ const allEmployeeForBranch = async (req, res) => {
         const formattedPermitted = matchedPermitted
           ? { branchID: matchedPermitted.branchID, role: matchedPermitted.role }
           : null;
-        return {
+        const data = await branchModel.findById(formattedPermitted.branchID).select('branch_name');
+
+        const returnData = {
           f_name,
           l_name,
           email,
@@ -259,10 +262,12 @@ const allEmployeeForBranch = async (req, res) => {
           nid,
           _id,
           mobile,
-          permitted: formattedPermitted,
+          role: formattedPermitted?.role,
+          branchID: formattedPermitted?.branchID,
+          branchName: data?.branch_name,
         };
-      });
-
+        return returnData;
+      }));
       res.status(200).send(formattedEmployees);
     }
   } catch (error) {
@@ -277,11 +282,10 @@ const allEmployeeForRestaurent = async (req, res) => {
       "permitted.res_id": res_id,
     }).select("f_name l_name email profilePhoto nid _id mobile permitted");
 
-    if (!employees) {
+    if (!employees || employees.length === 0) {
       responseError(res, 404, "No Employee Found");
     } else {
-      // Map over each employee to extract the required fields from 'permitted'
-      const formattedEmployees = employees.map((employee) => {
+      const formattedEmployees = await Promise.all(employees.map(async employee => {
         const {
           f_name,
           l_name,
@@ -298,7 +302,9 @@ const allEmployeeForRestaurent = async (req, res) => {
         const formattedPermitted = matchedPermitted
           ? { branchID: matchedPermitted.branchID, role: matchedPermitted.role }
           : null;
-        return {
+        const data = await branchModel.findById(formattedPermitted.branchID).select('branch_name');
+
+        const returnData = {
           f_name,
           l_name,
           email,
@@ -306,16 +312,19 @@ const allEmployeeForRestaurent = async (req, res) => {
           nid,
           _id,
           mobile,
-          permitted: formattedPermitted,
+          role: formattedPermitted?.role,
+          branchID: formattedPermitted?.branchID,
+          branchName: data?.branch_name,
         };
-      });
-
+        return returnData;
+      }));
       res.status(200).send(formattedEmployees);
     }
   } catch (error) {
     responseError(res, 500, error);
   }
 };
+
 
 const employeeRole = async (req, res) => {
   try {
