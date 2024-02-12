@@ -225,7 +225,7 @@ const SearchEmployee = async(req,res)=>{
 const allEmployeeForBranch = async (req,res)=>{
   try {
     const {res_id,branchID}= req.params;
-    // console.log("res id : ",res_id,"\n branch ID : ",
+    console.log("res id : ",res_id,"\n branch ID : ")
 
     const employee = await Employee.find({res_id:res_id,branchID:branchID});
     if(!employee){
@@ -242,7 +242,7 @@ const allEmployeeForBranch = async (req,res)=>{
 const allEmployeeForRestaurent = async (req,res)=>{
   try {
     const {res_id}= req.params;
-    // console.log("res id : ",res_id,"\n branch ID : ",
+    console.log("res id : ",res_id,"\n branch ID : ")
 
     const employee = await Employee.find({res_id:res_id});
     if(!employee){

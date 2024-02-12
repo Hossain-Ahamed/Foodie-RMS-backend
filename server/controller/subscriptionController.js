@@ -179,8 +179,15 @@ const updatePackageAfterPayment = async (req, res) => {
   if (!existingRestaurant) {
     return res.status(404).json({ error: "Restaurant not found" });
   }
-  const password = uuid.v4();
+  const password = uuid.v4().slice(0,8);
   const email = existingRestaurant.res_Owner_email;
+
+  createUserAccount({ email, password })
+  .then(res=>{
+         console.log(res?.uid)
+  })
+  .catch(e=>console.log(e));
+
   try {
     await sendMail({
       email: email,
@@ -195,7 +202,7 @@ const updatePackageAfterPayment = async (req, res) => {
     return next(new ErrorHandler(error.message, 500));
   }
 
-  createUserAccount({ email, password });
+
   createClient({ email, password });
 };
 

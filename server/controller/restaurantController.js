@@ -68,7 +68,7 @@ const createResturant = async (req, res) => {
         stateProvince: res_Owner_stateProvince,
         postalCode: res_Owner_postalCode,
         country: res_Owner_country,
-        permited: [
+        permitted: [
           {
             res_id: newResturant._id,
             branchID: newBranch._id,
