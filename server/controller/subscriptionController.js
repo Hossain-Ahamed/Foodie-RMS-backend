@@ -81,6 +81,7 @@ const createSubscription = async (req, res) => {
           packageType: packageType,
           startDate: startDate,
           endDate: endDate,
+          payment_time:0,
           price: 0,
           transactionID: "0000000000000000000",
         },
@@ -163,6 +164,7 @@ const updatePackageAfterPayment = async (req, res) => {
         {
           startDate: startdate,
           endDate: enddate,
+          payment_time: Date.now(),
           price: price,
           paymentStatus: true,
           transactionID: transactionID,
@@ -216,6 +218,7 @@ const extendSubscription = async (req, res) => {
       packageType: packageType,
       startDate: secondaryEndDate,
       endDate: newEndDate,
+      payment_time:Date.now(),
       price: price,
       paymentStatus: true,
       transactionID: transactionID,
