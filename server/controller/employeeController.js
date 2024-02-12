@@ -3,6 +3,7 @@ const Employee = require("../model/employeeModel");
 const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
 const uuid = require("uuid");
+const  JWT = require("jsonwebtoken");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -358,6 +359,38 @@ const employeeRole = async (req,res)=>{
   }
 }
 
+const employeeLogin = async (req,res)=>
+{    try {
+      const {email} = req.body;
+      const checkEmail = await Employee.findOne({email:email});
+      if(!checkEmail)
+      {
+         return responseError(res, 401, "Invalid Email or Password");
+      }
+      else
+      {
+        const permitted = checkEmail.permitted;
+
+        // Your logic to extract relevant information from the 'permitted' array
+        const payload = {
+          // Include relevant fields from 'permitted' array or other employee details
+          email: checkEmail.email,
+          role: permitted,
+        };
+        const options = { expiresIn: '1h' }; // Optional: Set the token expiration time
+  
+        const token = JWT.sign(payload, process.env.secretKey, options);
+
+        res.status(200).json({token : token ,data:"Logged in Successfully" });
+
+      }
+
+    } catch (error) {
+      responseError(res, 500, error);
+    }
+}
+
+
 module.exports = {
   employeeRole,
   allEmployeeForRestaurent,
@@ -368,5 +401,6 @@ module.exports = {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
+  employeeLogin
   // createUAccount,
 };

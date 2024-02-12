@@ -14,7 +14,8 @@ const {
     readCart
   }  = require('../controller/cartController')
 
-const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPackage} = require("../controller/subscriptionPackagesController")
+const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPackage} = require("../controller/subscriptionPackagesController");
+const { employeeLogin } = require("../controller/employeeController");
 
 const router = express.Router();
 
@@ -23,6 +24,10 @@ const router = express.Router();
 router.post("/user/cart",createCartForTable);
 
 router.get("/subscription-packages",getAllSubscriptionPackage);
+
+
+
+router.post("/rms-employee-jwt",employeeLogin);
 
 //Route for create order
 
