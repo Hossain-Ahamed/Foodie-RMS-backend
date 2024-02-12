@@ -15,7 +15,7 @@ const stripe = require("stripe")(
 const CreatePaymentIntent = async (req, res) => {
   try {
     const { price } = req.body;
-    console.log(price, process.env.PK_KEY);
+    // console.log(price, process.env.PK_KEY);
     const ammount = parseInt(price * 100);
 
     // Create a PaymentIntent with the order amount and currency
@@ -33,7 +33,7 @@ const CreatePaymentIntent = async (req, res) => {
       clientSecret: paymentIntent.client_secret,
     });
   } catch (e) {
-    console.log(1, e);
+    // console.log(1, e);
     // Bad Request: Server error or client sent an invalid request
     res
       .status(500)

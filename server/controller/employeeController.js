@@ -3,7 +3,7 @@ const Employee = require("../model/employeeModel");
 const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
 const uuid = require("uuid");
-const  JWT = require("jsonwebtoken");
+const JWT = require("jsonwebtoken");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -87,7 +87,7 @@ const allEmployee = async (req, res) => {
 //create user account
 const createUAccount = async (req, res) => {
   try {
-    const {email} = req.body;
+    const { email } = req.body;
     const password = uuid.v4();
     const user = await Employee.findOne({ email: email });
     if (!user) {
@@ -212,184 +212,228 @@ const deleteEmployeeById = async (req, res) => {
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
-const SearchEmployee = async(req,res)=>{
+const SearchEmployee = async (req, res) => {
   try {
     const data = req.body;
-    const searchData = await Employee.find(data); 
+    const searchData = await Employee.find(data);
     console.log(data);
     res.status(200).send(searchData);
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
 
-const allEmployeeForBranch = async (req,res)=>{
+const allEmployeeForBranch = async (req, res) => {
   try {
-    const {res_id,branchID}= req.params;
-    console.log("res id : ",res_id,"\n branch ID : ")
+    const { res_id, branchID } = req.params;
 
-    const employee = await Employee.find({res_id:res_id,branchID:branchID});
-    if(!employee){
-      return responseError(res,404,"No Employee Found");
-    }else{
+    const employee = await Employee.find({
+      "permitted.res_id": res_id,
+      "permitted.branchID": branchID
+    });
+    
+    if (!employee) {
+      return responseError(res, 404, "No Employee Found");
+    } else {
       res.status(200).send(employee);
     }
-    
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
 
-const allEmployeeForRestaurent = async (req,res)=>{
+const allEmployeeForRestaurent = async (req, res) => {
   try {
-    const {res_id}= req.params;
-    console.log("res id : ",res_id,"\n branch ID : ")
+    const { res_id } = req.params;
+    console.log("res id : ", res_id);
 
-    const employee = await Employee.find({res_id:res_id});
-    if(!employee){
-      return responseError(res,404,"No Employee Found");
-    }else{
+    const employee = await Employee.find({ "permitted.res_id": res_id });
+
+    if (!employee) {
+       responseError(res, 404, "No Employee Found");
+    } else {
       res.status(200).send(employee);
     }
-    
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
 
-const employeeRole = async (req,res)=>{
+const employeeRole = async (req, res) => {
   try {
-    const {email} = req.params;
-    if(!email){
+    const { email } = req.params;
+    if (!email) {
       responseError(res, 401, "email not found");
-    }else{
-      const checkEmail = await Employee.aggregate([
-        {
-          $match: { email: email },
-        },
-        {
-          $lookup: {
-            from: "branches",
-            localField: "permitted.branchID",
-            foreignField: "_id",
-            as: "branches"
-          }
-        },
-        {
-          $unwind: "$branches"
-        },
-        {
-          $lookup: {
-            from: "restaurants",
-            localField: "permitted.res_id",
-            foreignField: "_id",
-            as: "restaurants"
-          }
-        },
-        {
-          $unwind: "$restaurants"
-        },
-        {
-          $project: {
-            _id: 1,
-            f_name: 1,
-            l_name: 1,
-            email: 1,
-            gender: 1,
-            DOB: 1,
-            nid: 1,
-            mobile: 1,
-            commentNotes: 1,
-            profilePhoto: 1,
-            streetAddress: 1,
-            city: 1,
-            stateProvince: 1,
-            postalCode: 1,
-            country: 1,
-            emergencyAddress: 1,
-            emergencyEmail: 1,
-            emergencyName: 1,
-            emergencyPhoneNumber: 1,
-            emergencyRelation: 1,
-            "permitted.res_img": "$restaurants.img",
-            "permitted.res_name": "$restaurants.res_name",
-            "permitted.res_id": "$restaurants._id",
-            "permitted.branch_name": "$branches.branch_name",
-            "permitted.branchID": "$branches._id",
-            "permitted.role": 1
-          }
-        },
-        {
-          $group: {
-            _id: "$_id",
-            f_name: { $first: "$f_name" },
-            l_name: { $first: "$l_name" },
-            email: { $first: "$email" },
-            gender: { $first: "$gender" },
-            DOB: { $first: "$DOB" },
-            nid: { $first: "$nid" },
-            mobile: { $first: "$mobile" },
-            commentNotes: { $first: "$commentNotes" },
-            profilePhoto: { $first: "$profilePhoto" },
-            streetAddress: { $first: "$streetAddress" },
-            city: { $first: "$city" },
-            stateProvince: { $first: "$stateProvince" },
-            postalCode: { $first: "$postalCode" },
-            country: { $first: "$country" },
-            emergencyAddress: { $first: "$emergencyAddress" },
-            emergencyEmail: { $first: "$emergencyEmail" },
-            emergencyName: { $first: "$emergencyName" },
-            emergencyPhoneNumber: { $first: "$emergencyPhoneNumber" },
-            emergencyRelation: { $first: "$emergencyRelation" },
-            permitted: { $first: "$permitted" }
-          }
-        }
-      ]).exec();
-      
-  
-      if(checkEmail){
+    } else {
+      // const checkEmail = await Employee.aggregate([
+      //   {
+      //     $match: { email: email },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: "branches",
+      //       localField: "permitted.branchID",
+      //       foreignField: "_id",
+      //       as: "branches"
+      //     }
+      //   },
+      //   {
+      //     $unwind: "$branches"
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: "restaurants",
+      //       localField: "permitted.res_id",
+      //       foreignField: "_id",
+      //       as: "restaurants"
+      //     }
+      //   },
+      //   {
+      //     $unwind: "$restaurants"
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 1,
+      //       f_name: 1,
+      //       l_name: 1,
+      //       email: 1,
+      //       gender: 1,
+      //       DOB: 1,
+      //       nid: 1,
+      //       mobile: 1,
+      //       commentNotes: 1,
+      //       profilePhoto: 1,
+      //       streetAddress: 1,
+      //       city: 1,
+      //       stateProvince: 1,
+      //       postalCode: 1,
+      //       country: 1,
+      //       emergencyAddress: 1,
+      //       emergencyEmail: 1,
+      //       emergencyName: 1,
+      //       emergencyPhoneNumber: 1,
+      //       emergencyRelation: 1,
+      //       "permitted.res_img": "$restaurants.img",
+      //       "permitted.res_name": "$restaurants.res_name",
+      //       "permitted.res_id": "$restaurants._id",
+      //       "permitted.branch_name": "$branches.branch_name",
+      //       "permitted.branchID": "$branches._id",
+      //       "permitted.role": 1
+      //     }
+      //   },
+      //   {
+      //     $group: {
+      //       _id: "$_id",
+      //       f_name: { $first: "$f_name" },
+      //       l_name: { $first: "$l_name" },
+      //       email: { $first: "$email" },
+      //       gender: { $first: "$gender" },
+      //       DOB: { $first: "$DOB" },
+      //       nid: { $first: "$nid" },
+      //       mobile: { $first: "$mobile" },
+      //       commentNotes: { $first: "$commentNotes" },
+      //       profilePhoto: { $first: "$profilePhoto" },
+      //       streetAddress: { $first: "$streetAddress" },
+      //       city: { $first: "$city" },
+      //       stateProvince: { $first: "$stateProvince" },
+      //       postalCode: { $first: "$postalCode" },
+      //       country: { $first: "$country" },
+      //       emergencyAddress: { $first: "$emergencyAddress" },
+      //       emergencyEmail: { $first: "$emergencyEmail" },
+      //       emergencyName: { $first: "$emergencyName" },
+      //       emergencyPhoneNumber: { $first: "$emergencyPhoneNumber" },
+      //       emergencyRelation: { $first: "$emergencyRelation" },
+      //       permitted: { $first: "$permitted" }
+      //     }
+      //   }
+      // ]).exec();
+      const checkEmail = await Employee.findOne({ email: email })
+        .populate({
+          path: "permitted.res_id",
+          model: "Restaurants",
+          select: "_id img res_name",
+        })
+        .populate({
+          path: "permitted.branchID",
+          model: "Branches",
+          select: "_id branch_name",
+        });
 
+      if (checkEmail) {
+        const transformedData = {
+          _id: checkEmail._id,
+          f_name: checkEmail.f_name,
+          l_name: checkEmail.l_name,
+          email: checkEmail.email,
+          gender: checkEmail.gender,
+          DOB: checkEmail.DOB,
+          nid: checkEmail.nid,
+          mobile: checkEmail.mobile,
+          commentNotes: checkEmail.commentNotes,
+          profilePhoto: checkEmail.profilePhoto,
+          streetAddress: checkEmail.streetAddress,
+          city: checkEmail.city,
+          stateProvince: checkEmail.stateProvince,
+          postalCode: checkEmail.postalCode,
+          country: checkEmail.country,
+          emergencyAddress: checkEmail.emergencyAddress,
+          emergencyEmail: checkEmail.emergencyEmail,
+          emergencyName: checkEmail.emergencyName,
+          emergencyPhoneNumber: checkEmail.emergencyPhoneNumber,
+          emergencyRelation: checkEmail.emergencyRelation,
+          permitted: checkEmail.permitted.map((permit) => ({
+            res_img: permit.res_id.img,
+            res_name: permit.res_id.res_name,
+            res_id: permit.res_id._id,
+            branch_name: permit.branchID.branch_name,
+            branchID: permit.branchID._id,
+            role: permit.role,
+          })),
+        };
 
-        res.status(200).json(checkEmail);
-      }else{
-        responseError(res, 404, 'User Not Registered');}
+        res.status(200).json(transformedData);
+      } else {
+        responseError(res, 404, "User Not Registered");
+      }
     }
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
 
-const employeeLogin = async (req,res)=>
-{    try {
-      const {email} = req.body;
-      const checkEmail = await Employee.findOne({email:email});
-      if(!checkEmail)
-      {
-         return responseError(res, 401, "Invalid Email or Password");
-      }
-      else
-      {
-        const permitted = checkEmail.permitted;
+const employeeLogin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const checkEmail = await Employee.findOne({ email: email });
+    if (!checkEmail) {
+      return responseError(res, 401, "Invalid Email or Password");
+    } else {
+      const permitted = checkEmail.permitted;
 
-        // Your logic to extract relevant information from the 'permitted' array
-        const payload = {
-          // Include relevant fields from 'permitted' array or other employee details
-          email: checkEmail.email,
-          role: permitted,
-        };
-        const options = { expiresIn: '1h' }; // Optional: Set the token expiration time
-  
-        const token = JWT.sign(payload, process.env.secretKey, options);
+      // Your logic to extract relevant information from the 'permitted' array
+      const payload = {
+        // Include relevant fields from 'permitted' array or other employee details
+        email: checkEmail.email,
+        role: permitted,
+      };
+      const options = { expiresIn: "6h" }; // Optional: Set the token expiration time
 
-        res.status(200).json({token : token ,data:"Logged in Successfully" });
+      const token = JWT.sign(payload, process.env.secretKey, options);
 
-      }
+      // console.log(token)
 
-    } catch (error) {
-      responseError(res, 500, error);
+      res.cookie("_foodie_RRR_T", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.status(200).json({ token: token, data: "Logged in Successfully" });
     }
-}
-
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
 
 module.exports = {
   employeeRole,
@@ -401,6 +445,6 @@ module.exports = {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
-  employeeLogin
+  employeeLogin,
   // createUAccount,
 };
