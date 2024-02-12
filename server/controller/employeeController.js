@@ -225,17 +225,43 @@ const SearchEmployee = async (req, res) => {
 
 const allEmployeeForBranch = async (req, res) => {
   try {
-    const { res_id, branchID } = req.params;
-
-    const employee = await Employee.find({
+    const { res_id } = req.params;
+    const employees = await Employee.find({
       "permitted.res_id": res_id,
-      "permitted.branchID": branchID
-    });
-    
-    if (!employee) {
-      return responseError(res, 404, "No Employee Found");
+    }).select("f_name l_name email profilePhoto nid _id mobile permitted");
+
+    if (!employees) {
+      responseError(res, 404, "No Employee Found");
     } else {
-      res.status(200).send(employee);
+      // Map over each employee to extract the required fields from 'permitted'
+      const formattedEmployees = employees.map((employee) => {
+        const {
+          f_name,
+          l_name,
+          email,
+          profilePhoto,
+          nid,
+          _id,
+          mobile,
+          permitted,
+        } = employee;
+        const formattedPermitted = permitted.map(({ branchID, role }) => ({
+          branchID,
+          role,
+        }));
+        return {
+          f_name,
+          l_name,
+          email,
+          profilePhoto,
+          nid,
+          _id,
+          mobile,
+          permitted: formattedPermitted,
+        };
+      });
+
+      res.status(200).send(formattedEmployees);
     }
   } catch (error) {
     responseError(res, 500, error);
@@ -245,14 +271,42 @@ const allEmployeeForBranch = async (req, res) => {
 const allEmployeeForRestaurent = async (req, res) => {
   try {
     const { res_id } = req.params;
-    console.log("res id : ", res_id);
+    const employees = await Employee.find({
+      "permitted.res_id": res_id,
+    }).select("f_name l_name email profilePhoto nid _id mobile permitted");
 
-    const employee = await Employee.find({ "permitted.res_id": res_id });
-
-    if (!employee) {
-       responseError(res, 404, "No Employee Found");
+    if (!employees) {
+      responseError(res, 404, "No Employee Found");
     } else {
-      res.status(200).send(employee);
+      // Map over each employee to extract the required fields from 'permitted'
+      const formattedEmployees = employees.map((employee) => {
+        const {
+          f_name,
+          l_name,
+          email,
+          profilePhoto,
+          nid,
+          _id,
+          mobile,
+          permitted,
+        } = employee;
+        const formattedPermitted = permitted.map(({ branchID, role }) => ({
+          branchID,
+          role,
+        }));
+        return {
+          f_name,
+          l_name,
+          email,
+          profilePhoto,
+          nid,
+          _id,
+          mobile,
+          permitted: formattedPermitted,
+        };
+      });
+
+      res.status(200).send(formattedEmployees);
     }
   } catch (error) {
     responseError(res, 500, error);
