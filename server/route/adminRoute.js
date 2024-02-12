@@ -5,6 +5,7 @@ const {
   getEmployeeById,
   updateEmployeeById,
   deleteEmployeeById,
+  SearchEmployee,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -93,6 +94,11 @@ router.patch('/payment-package/branch/:branchID', createSubscription)
 //Create Account
 // router.post("/admin/create/account/emplyoee", createUAccount);
 // router.post("/admin/create/account/owner", createAccount);
+
+
+
+//Search Employee
+router.post("/search/employee", SearchEmployee);
 
 
 router.post("/dev/create",CreateDev);

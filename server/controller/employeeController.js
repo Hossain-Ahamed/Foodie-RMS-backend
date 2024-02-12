@@ -210,8 +210,17 @@ const deleteEmployeeById = async (req, res) => {
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
+const SearchEmployee = async(req,res)=>{
+  try {
+    const data = req.body;
+    console.log(data);
+  } catch (error) {
+    
+  }
+}
 
 module.exports = {
+  SearchEmployee,
   allEmployee,
   addEmployee,
   getEmployeeById,
