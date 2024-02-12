@@ -117,14 +117,18 @@ const getAllBranch = async (req, res) => {
         res_name: branch.restaurant[0].res_name,
         branch_name: branch.branch_name,
         branchID: branch._id,
-        isActive : subscription.isActive,
+        isActive: subscription.isActive,
         subscriptionStart: new Date(subscription.startDate).toISOString(),
         subscriptionEnd: new Date(subscription.endDate).toISOString(),
         amount: subscription.previousSubscriptions[0].price,
-        payment_time: new Date(subscription.previousSubscriptions[0].payment_time).toISOString(),
+        payment_time: new Date(
+          subscription.previousSubscriptions[0].payment_time
+        ).toISOString(),
         transaction_id: subscription.previousSubscriptions[0].transactionID,
         payment_method: "card", // Assuming a default value, modify as needed
-        payment_status: subscription.previousSubscriptions[0].paymentStatus ? "Paid" : "Not Paid",
+        payment_status: subscription.previousSubscriptions[0].paymentStatus
+          ? "Paid"
+          : "Not Paid",
       };
     });
 
@@ -134,22 +138,50 @@ const getAllBranch = async (req, res) => {
   }
 };
 
-const addTables = async(req,res)=>{
+const addTables = async (req, res) => {
   try {
-    const{branchID}=req.params;
-    const {number, capacity ,location} = req.body;
-    const branch =  await branchModel.findById({_id:branchID});
-    if(!branch){
+    const { branchID } = req.params;
+    const { number, capacity, location } = req.body;
+    const branch = await branchModel.findById({ _id: branchID });
+    if (!branch) {
       responseError(res, 404, error);
-    }else{
-      const qrCodeData = "/restaurant/ "+branch.res_id +"/branch/"+branch._id+"?table="+number;
-      const createTable = branchModel.findByIdAndUpdate(branch._id,{tables:[number,capacity,location,qrCodeData]},{new:true});
+    } else {
+      const qrCodeData =
+        "/restaurant/ " +
+        branch.res_id +
+        "/branch/" +
+        branch._id +
+        "?table=" +
+        number;
+      const createTable = branchModel.findByIdAndUpdate(
+        branch._id,
+        { tables: [number, capacity, location, qrCodeData] },
+        { new: true }
+      );
       res.status(200).send(createTable);
     }
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
+
+const getAllBranchForDev = async (req, res) => {
+  try {
+    const { res_id } = req.params;
+    const branchList = await branchModel
+      .find({
+        res_id: res_id,
+        deleteStatus: false,
+      })
+      .select(
+        "res_id _id branch_name streetAddress city stateProvince country paymentTypes"
+      )
+      .populate("res_id");
+    res.status(200).send(branchList);
+  } catch (error) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
 
 module.exports = {
   addTables,
@@ -157,4 +189,5 @@ module.exports = {
   createBranch,
   updateBranch,
   deleteBranch,
+  getAllBranchForDev,
 };
