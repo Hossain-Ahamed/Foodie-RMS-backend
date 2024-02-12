@@ -4,6 +4,7 @@ const { createUserAccount } = require("../config/firbase-config.js");
 const restaurantModel = require("../model/restaurantModel");
 const packageModel = require("../model/subcripstionPackages");
 const createClient = require("./clientController.js");
+const sendMail = require("../utils/sendEmail.js");
 const uuid = require("uuid");
 // This is your test secret API key.
 const stripe = require("stripe")(
@@ -81,7 +82,7 @@ const createSubscription = async (req, res) => {
           packageType: packageType,
           startDate: startDate,
           endDate: endDate,
-          payment_time:0,
+          payment_time: 0,
           price: 0,
           transactionID: "0000000000000000000",
         },
@@ -180,11 +181,28 @@ const updatePackageAfterPayment = async (req, res) => {
   }
   const password = uuid.v4().slice(0,8);
   const email = existingRestaurant.res_Owner_email;
+
   createUserAccount({ email, password })
   .then(res=>{
          console.log(res?.uid)
   })
   .catch(e=>console.log(e));
+
+  try {
+    await sendMail({
+      email: email,
+      subject: "Receive your password",
+      message: `Hello ${existingRestaurant.res_Owner_Name}, this is your email: ${email} and password: ${password} for log in`,
+    });
+    res.status(201).json({
+      success: true,
+      message: `please check your email:- ${email}`,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+
+
   createClient({ email, password });
 };
 
@@ -222,7 +240,7 @@ const extendSubscription = async (req, res) => {
       packageType: packageType,
       startDate: secondaryEndDate,
       endDate: newEndDate,
-      payment_time:Date.now(),
+      payment_time: Date.now(),
       price: price,
       paymentStatus: true,
       transactionID: transactionID,
