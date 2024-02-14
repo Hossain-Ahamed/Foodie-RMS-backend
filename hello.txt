@@ -1,29 +1,27 @@
 {
-
-                    "_id": "87342fdjskllf",
-                    "res_name": "Fuoco",
-                    "res_email": "hossainahamed6872@gmail.com",
-                    "res_mobile": "01868726172",
-                    "res_Owner_Name": "Hossain",
-                    "res_Owner_email": "hossainahamed6872@gmail.com",
-                    "res_Owner_mobile": "01868726172",
-                    "res_Owner_streetAddress": "J A M T O L A",
-                    "res_Owner_city": "Narayanganj",
-                    "res_Owner_stateProvince": "Dhaka",
-                    "res_Owner_postalCode": "1400",
-                    "res_Owner_country": "Bangladesh",
-                    "branches": [{
-                        "branch_name": "Fouco Update",
-                        "streetAddress": "Jamtola",
-                        "city": "Mymensingh",
-                        "stateProvince": "Dhaka",
-                        "postalCode": "1440",
-                        "country": "Bangladesh",
-                        "branchID": "q-Naynabad-f-Bangladesh-1440-1705850705607"
-                    },],
-
-
-
-                    "img": "https://lh3.googleusercontent.com/a/ACg8ocKjKSD7xxcI8hEoNgPnsxZ632hSVJFspYJNcAAmPKc39g=s360-c-no",
-
-                }
+    "f_name": "GZM Fuad Tahsin",
+    "l_name": ".",
+    "email": "gazitahsin323@gmail.com",
+    "mobile": "01537399940",
+    "gender": "Male",
+    "DOB": "2024-02-07",
+    "nid": "3333",
+    "streetAddress": "Bandor",
+    "city": "Narayanganj",
+    "stateProvince": "Dhaka",
+    "postalCode": "1400",
+    "country": "Bangladesh",
+    "emergencyName": "Md. Hossain Ahamed",
+    "emergencyRelation": "3",
+    "emergencyPhoneNumber": "01868726172",
+    "emergencyEmail": "hossainahamed6872@gmail.com",
+    "emergencyAddress": "J A M T O L A",
+    "branch_name": "Main Branch",
+    "branchID": "65c9f33c9e291b9126c718d7",
+    "role": "Admin",
+    "salary_type": "Monthly",
+    "salary_unit": 20000,
+    "res_id": "65c9f33c9e291b9126c718d5",
+    "res_img": "https://i.ibb.co/zStJ6Ky/std9.jpg",
+    "res_name": "Burger Point"
+}

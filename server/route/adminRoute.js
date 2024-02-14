@@ -10,6 +10,7 @@ const {
   allEmployeeForBranch,
   employeeRole,
   addExistingEmployee,
+  getEmployeeData_ByID_ForCurrentEmployeeEdit,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -81,6 +82,7 @@ router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
 router.get("/restaurant/:res_id/existing-employee-data/:employeeId", getEmployeeById); // Get Employee By Id
+router.get("/restaurant/:res_id/edit-employee-data/:employeeID", getEmployeeData_ByID_ForCurrentEmployeeEdit); // Get Employee By Id for current employee
 router.post("/add-an-employee-to-my-restaurant/:res_id/:branchID/employee/:employeeID",addExistingEmployee)
 router.post("/enlisted-payment", updatePackageAfterPayment);
 
