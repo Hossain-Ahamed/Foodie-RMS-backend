@@ -275,15 +275,11 @@ const updateEmployeeById = async (req, res) => {
       {
         f_name,
         l_name,
-        permitted,
-
         email,
         gender,
         DOB,
         nid,
-        designation,
         mobile,
-
         profilePhoto,
         streetAddress,
         city,
@@ -298,12 +294,29 @@ const updateEmployeeById = async (req, res) => {
       },
       { new: true }
     );
+    const updatedPermitted = {
+      role,
+      res_id,
+      branchID,
+      salary_type,
+      salary_unit,
+    };
+
+    const latest_employee = await Employee.findByIdAndUpdate({ _id: employeeId, "permitted.res_id": res_id },
+    {
+      $set: {
+        "permitted.$": updatedPermitted,
+      },
+    },
+    { new: true }
+    )
+
 
     if (!employee) {
       return res.status(404).json({ msg: "Employee not found" });
     }
 
-    res.status(200).json(employee);
+    res.status(200).json(latest_employee);
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: "Internal Server Error" });
@@ -313,15 +326,22 @@ const updateEmployeeById = async (req, res) => {
 const deleteEmployeeById = async (req, res) => {
   try {
     const employeeId = req.params.id;
-    const employee = await Employee.findByIdAndUpdate(
+    const res_id = req.params.res_id; // Assuming res_id is part of req.params
+    const branchID = req.params.branchID; // Assuming branchID is part of req.params
+
+    // Update the employee by removing all matching entries from the permitted array
+    const updatedEmployee = await Employee.findByIdAndUpdate(
       employeeId,
       {
+        $pull: {
+          permitted: { res_id, branchID },
+        },
         deleteStatus: true,
       },
       { new: true }
     );
 
-    if (!employee) {
+    if (!updatedEmployee) {
       return res.status(404).json({ msg: "Employee not found" });
     }
 
