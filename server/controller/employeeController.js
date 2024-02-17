@@ -92,12 +92,26 @@ const addExistingEmployee = async (req, res) => {
     const existingEmployee = await Employee.findOne({
       _id: employeeID,
       "permitted.res_id": res_id,
-      "permitted.branchID": branchID,
     }).select("f_name");
-   
+
     if (!existingEmployee) {
-     //todo
-     // add employyes profile permitted with salary and all
+      const { res_id, branchID, role, salary_type, salary_unit } = req.body;
+      const result = await Employee.findByIdAndUpdate(
+        employeeID,
+        {
+          $push: {
+            permitted: {
+              res_id: res_id,
+              branchID: branchID,
+              role: role,
+              salary_type: salary_type,
+              salary_unit: salary_unit,
+            },
+          },
+        },
+        { new: true }
+      );
+      res.status(200).json(result);
     } else {
       res.status(409).json({ message: "Already Enlisted employee" });
     }
@@ -148,18 +162,95 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
+const getEmployeeData_ByID_ForCurrentEmployeeEdit = async (req, res) => {
+  try {
+    console.log("hello");
+    const { res_id, employeeID } = req.params;
+    const employee = await Employee.findById({
+      _id: employeeID,
+      "permitted.res_id": res_id,
+      deleteStatus: false,
+    });
+
+    const allBranches_beforeRename = await branchModel
+      .find({ res_id: res_id })
+      .select("_id branch_name");
+
+    const allBranches = allBranches_beforeRename.map((i) => {
+      return {
+        branchID: i?._id,
+        branch_name: i?.branch_name,
+      };
+    });
+
+    const RestaurantData = await restaurantModel
+      .findById({ _id: res_id })
+      .select("_id res_name img");
+
+    const EmployeeData_inThatRestaurant = employee.permitted.find((item) => item?.res_id == res_id);
+ console.log(EmployeeData_inThatRestaurant?.branchID)
+
+    const EmployeeBranchName_inThatRestaurant = allBranches.find((item) => item?.branchID.toString() == EmployeeData_inThatRestaurant?.branchID);
+
+    console.log(EmployeeData_inThatRestaurant,EmployeeBranchName_inThatRestaurant);
+
+    res.status(200).json({
+      employeeData: {
+        _id: employee._id,
+        f_name: employee.f_name,
+        l_name: employee.l_name,
+        email: employee.email,
+
+        mobile: employee.mobile,
+        gender: employee.gender,
+        nid: employee.nid,
+        uid: employee.uid,
+
+        DOB: employee.DOB,
+        profilePhoto: employee.profilePhoto,
+        streetAddress: employee.streetAddress,
+        city: employee.city,
+        stateProvince: employee.stateProvince,
+        postalCode: employee.postalCode,
+        country: employee.country,
+
+        emergencyName: employee.emergencyName,
+        emergencyRelation: employee.emergencyRelation,
+        emergencyPhoneNumber: employee.emergencyPhoneNumber,
+        emergencyEmail: employee.emergencyEmail,
+        emergencyAddress: employee.emergencyAddress,
+
+        res_id: RestaurantData?._id,
+        res_img: RestaurantData?.img,
+        res_name: RestaurantData?.res_name,
+        branch_name: EmployeeBranchName_inThatRestaurant?.branch_name,
+        branchID: EmployeeBranchName_inThatRestaurant?.branchID,
+        role: EmployeeData_inThatRestaurant?.role  ,
+        salary_type: EmployeeData_inThatRestaurant?.salary_type  ,
+        salary_unit: EmployeeData_inThatRestaurant?.salary_unit  ,
+      },
+      restaurantData: {
+        _id: RestaurantData?._id,
+        res_name: RestaurantData?.res_name,
+        img: RestaurantData?.img,
+        branches: allBranches,
+      },
+    });
+  } catch (error) {
+    responseError(res,500,error)
+  }
+};
+
 const updateEmployeeById = async (req, res) => {
   try {
     const employeeId = req.params.id;
     const {
       f_name,
       l_name,
-      permitted,
       email,
       gender,
       DOB,
       nid,
-      designation,
       mobile,
       profilePhoto,
       streetAddress,
@@ -174,6 +265,9 @@ const updateEmployeeById = async (req, res) => {
       emergencyRelation,
       salary_type,
       salary_unit,
+      role,
+      res_id,
+      branchID,
     } = req.body;
 
     const employee = await Employee.findByIdAndUpdate(
@@ -201,8 +295,6 @@ const updateEmployeeById = async (req, res) => {
         emergencyName,
         emergencyPhoneNumber,
         emergencyRelation,
-        salary_type,
-        salary_unit,
       },
       { new: true }
     );
@@ -553,4 +645,5 @@ module.exports = {
   deleteEmployeeById,
   employeeLogin,
   addExistingEmployee,
+  getEmployeeData_ByID_ForCurrentEmployeeEdit,
 };
