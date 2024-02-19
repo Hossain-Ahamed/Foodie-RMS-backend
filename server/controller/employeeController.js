@@ -269,7 +269,7 @@ const updateEmployeeById = async (req, res) => {
       res_id,
       branchID,
     } = req.body;
-
+    console.log(req.body)
     const employee = await Employee.findByIdAndUpdate(
       employeeId,
       {
@@ -305,7 +305,7 @@ const updateEmployeeById = async (req, res) => {
     const latest_employee = await Employee.findByIdAndUpdate({ _id: employeeId, "permitted.res_id": res_id },
     {
       $set: {
-        "permitted.$": updatedPermitted,
+        "permitted": updatedPermitted,
       },
     },
     { new: true }
