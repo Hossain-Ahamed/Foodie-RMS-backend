@@ -90,14 +90,14 @@ router.post("/enlisted-payment", updatePackageAfterPayment);
 router.put("/admin/update/restaurant/:id", updateResturant); //Update restaurant By ID
 router.put("/admin/update/brach/:_id", updateResturant); //Update branch By ID
 router.put("/admin/update/categories/:id", updateCategory); //Update Category By ID
-router.put("/admin/update/employee/:id", updateEmployeeById); //Update Employee  By  ID
+router.patch("/admin/update/employee/:id", updateEmployeeById); //Update Employee  By  ID for my current employee
 router.put("/admin/update/dish/:_id", updateDish); //Update The Dish By its id
 
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
 router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
 router.delete("/admin/delete/categories/:id", deleteCategory); //Delete A Category By Its ID
-router.delete("/admin/delete/employee/:id", deleteEmployeeById); //Delete An Employee
+router.delete("/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id", deleteEmployeeById); //Delete An Employee
 router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 
 //Subscription Route
