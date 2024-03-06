@@ -41,7 +41,7 @@ const addNewSubscriptionPackage = async (req, res) => {
 };
 const updateSubscriptionPackage = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.params._id;
     const { packageType, shortDescription, finalPrice, cutPrice, duration } =
       req.body;
     const updatedPackage = await subscriptionPackagesModel
