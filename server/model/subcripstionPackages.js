@@ -5,6 +5,9 @@ const subscriptionPackagesSchema =  new mongoose.Schema({
         type:String,
         require:true,
     },
+    duration:{
+        type: Number,
+    },
     shortDescription:{
         type:String,
         require:true
