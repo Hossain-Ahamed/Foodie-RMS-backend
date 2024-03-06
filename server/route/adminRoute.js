@@ -61,6 +61,12 @@ const {
   getAllDev,
 } = require("../controller/devController");
 
+const {
+  getAllSubscriptionPackage,
+  addNewSubscriptionPackage,
+  updateSubscriptionPackage,
+} = require("../controller/subscriptionPackagesController");
+
 const router = express.Router();
 // http://localhost:5000/admin/login
 
@@ -71,6 +77,7 @@ router.post("/admin/create/categories", addCategory); // Add a new category to t
 router.post("/admin/create/employee", addEmployee); // Create a new employee in the database
 router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
+
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
@@ -78,12 +85,22 @@ router.get("/admin/read/categories", allCategory); // Get all available Categori
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
 router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
+router.get("/subscription-packages", getAllSubscriptionPackage);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
-router.get("/restaurant/:res_id/existing-employee-data/:employeeId", getEmployeeById); // Get Employee By Id
-router.get("/restaurant/:res_id/edit-employee-data/:employeeID", getEmployeeData_ByID_ForCurrentEmployeeEdit); // Get Employee By Id for current employee
-router.post("/add-an-employee-to-my-restaurant/:res_id/:branchID/employee/:employeeID",addExistingEmployee)
+router.get(
+  "/restaurant/:res_id/existing-employee-data/:employeeId",
+  getEmployeeById
+); // Get Employee By Id
+router.get(
+  "/restaurant/:res_id/edit-employee-data/:employeeID",
+  getEmployeeData_ByID_ForCurrentEmployeeEdit
+); // Get Employee By Id for current employee
+router.post(
+  "/add-an-employee-to-my-restaurant/:res_id/:branchID/employee/:employeeID",
+  addExistingEmployee
+);
 router.post("/enlisted-payment", updatePackageAfterPayment);
 
 //For  Update => Admin or Super User Access (Admin can only update his own profile)
@@ -97,7 +114,10 @@ router.put("/admin/update/dish/:_id", updateDish); //Update The Dish By its id
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
 router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
 router.delete("/admin/delete/categories/:id", deleteCategory); //Delete A Category By Its ID
-router.delete("/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id", deleteEmployeeById); //Delete An Employee
+router.delete(
+  "/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id",
+  deleteEmployeeById
+); //Delete An Employee
 router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 
 //Subscription Route
