@@ -65,6 +65,8 @@ const {
   getAllSubscriptionPackage,
   addNewSubscriptionPackage,
   updateSubscriptionPackage,
+  deleteSubscriptionPackage,
+  giveOldSubscriptionData,
 } = require("../controller/subscriptionPackagesController");
 
 const router = express.Router();
@@ -85,7 +87,7 @@ router.get("/admin/read/categories", allCategory); // Get all available Categori
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
 router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
-router.get("/subscription-packages", getAllSubscriptionPackage);
+router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
