@@ -126,9 +126,11 @@ router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
 router.patch("/edit-subscription-packages/:_id", updateSubscriptionPackage);
 router.delete(
-  "/delete-subscription-packages/:_id} ",
+  "/delete-subscription-packages/:_id",
   deleteSubscriptionPackage
 );
+
+router.post('/add-subscription-packages', addNewSubscriptionPackage);
 
 //Subscription Route
 // router.post("/admin/subscription", createSubscription);
