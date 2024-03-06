@@ -67,7 +67,7 @@ const deleteSubscriptionPackage = async (req, res) => {
   try {
     const { _id } = req.params;
     if (_id) {
-      await subscriptionPackagesModel.remove({ _id: _id }).exec();
+      await subscriptionPackagesModel.findByIdAndDelete({ _id: _id });
       return res.status(200).send(true);
     }
   } catch {
