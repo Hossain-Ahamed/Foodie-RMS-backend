@@ -2,7 +2,8 @@ const subscriptionPackagesModel = require("../model/subcripstionPackages");
 
 const getAllSubscriptionPackage = async (req, res) => {
   try {
-    const data = await subscriptionPackagesModel.find();
+    const data = await subscriptionPackagesModel.find().sort({ duration: -1 });
+
     res.status(200).send(data);
   } catch (e) {
     console.log("Error in getting all Subscription Packages", e);
