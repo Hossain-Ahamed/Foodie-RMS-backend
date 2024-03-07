@@ -155,7 +155,7 @@ router.post("/dev/create", CreateDev);
 router.get("/all-dev-profile", getAllDev);
 router.get("/dev/:uid", devFindByUID);
 router.get("/get-dev-profile/:email", getDevProfile);
-router.delete("/delete-dev-profile/:uid", deleteDevAccount);
+router.delete("/delete-dev-profile/:_id", deleteDevAccount);
 
 router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
 router.get(
