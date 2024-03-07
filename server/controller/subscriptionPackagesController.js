@@ -2,7 +2,7 @@ const subscriptionPackagesModel = require("../model/subcripstionPackages");
 
 const getAllSubscriptionPackage = async (req, res) => {
   try {
-    const data = await subscriptionPackagesModel.find().sort({ duration: -1 });
+    const data = await subscriptionPackagesModel.find().sort({ duration: 1 });
 
     res.status(200).send(data);
   } catch (e) {

@@ -59,6 +59,7 @@ const {
   devFindByUID,
   getDevProfile,
   getAllDev,
+  deleteDevAccount
 } = require("../controller/devController");
 
 const {
@@ -87,7 +88,7 @@ router.get("/admin/read/categories", allCategory); // Get all available Categori
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
 router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
-router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
+// router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/readbyid/categories/:id", getCategoryById); // Get Category by ID
@@ -148,10 +149,13 @@ router.post("/search-employee-to-add", SearchEmployee);
 //
 router.get("/get-rms-employee-profile/:email", employeeRole);
 
+
+//development side employee list
 router.post("/dev/create", CreateDev);
 router.get("/all-dev-profile", getAllDev);
 router.get("/dev/:uid", devFindByUID);
 router.get("/get-dev-profile/:email", getDevProfile);
+router.delete("/delete-dev-profile/:uid", deleteDevAccount);
 
 router.get("/restaurant/:res_id/all-employee-list", allEmployeeForRestaurent);
 router.get(

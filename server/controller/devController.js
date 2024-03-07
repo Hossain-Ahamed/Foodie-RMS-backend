@@ -1,4 +1,3 @@
-
 const { createUserAccount } = require("../config/firbase-config");
 const devModel = require("../model/devModel");
 const { responseError } = require("../utils/utility");
@@ -40,6 +39,7 @@ const CreateDev = async (req, res) => {
     // console.log(req.body);
 
     const password = uuid.v4().slice(0, 8);
+    //creating id in firebase
     createUserAccount({ email, password: password }).then(async (data) => {
       const Createdev = await devModel({
         uid: data.uid,
@@ -82,7 +82,6 @@ const devFindByUID = async (req, res) => {
   }
 };
 
-
 const getDevProfile = async (req, res) => {
   try {
     const { email } = req.params;
@@ -96,9 +95,9 @@ const getDevProfile = async (req, res) => {
   }
 };
 
-const changePassword = async(req,res)=>{
+const changePassword = async (req, res) => {
   try {
-    const { email ,} = req.params;
+    const { email } = req.params;
     if (!email) {
       responseError(res, 404, {}, "No data is found because of no email");
     }
@@ -107,11 +106,32 @@ const changePassword = async(req,res)=>{
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
+
+//delete dev account
+const deleteDevAccount = async (req, res) => {
+  try {
+    //removing from database mongodb
+    const uid = req.params;
+    const data = await devModel.findOne({ uid: uid });
+    await devModel.findByIdAndUpdate(
+      data._id,
+      {
+        deleteStatus: true,
+      },
+      { new: true }
+    );
+
+    //removeing from firebase
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
 
 module.exports = {
   devFindByUID,
   CreateDev,
   getAllDev,
   getDevProfile,
+  deleteDevAccount,
 };
