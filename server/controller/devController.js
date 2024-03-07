@@ -4,7 +4,7 @@ const { responseError } = require("../utils/utility");
 const uuid = require("uuid");
 const getAllDev = async (req, res) => {
   try {
-    const dev = await devModel.find().select("-password");
+    const dev = await devModel.find({deleteStatus: "false"}).select("-password");
     res.status(200).send(dev);
   } catch (e) {
     console.log(e);
@@ -112,16 +112,17 @@ const changePassword = async (req, res) => {
 const deleteDevAccount = async (req, res) => {
   try {
     //removing from database mongodb
-    const uid = req.params;
-    const data = await devModel.findOne({ uid: uid });
-    await devModel.findByIdAndUpdate(
-      data._id,
+    const {_id} = req.params;
+    // const data = await devModel.findOne({ _id: _id });
+    // console.log(data)
+    const data = await devModel.findByIdAndUpdate(
+      _id,
       {
         deleteStatus: true,
       },
       { new: true }
     );
-
+    res.status(200).send(data);
     //removeing from firebase
   } catch (error) {
     responseError(res, 500, error);
