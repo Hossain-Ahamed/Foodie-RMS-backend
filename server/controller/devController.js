@@ -1,11 +1,10 @@
-
 const { createUserAccount } = require("../config/firbase-config");
 const devModel = require("../model/devModel");
 const { responseError } = require("../utils/utility");
 const uuid = require("uuid");
 const getAllDev = async (req, res) => {
   try {
-    const dev = await devModel.find().select("-password");
+    const dev = await devModel.find({deleteStatus: "false"}).select("-password");
     res.status(200).send(dev);
   } catch (e) {
     console.log(e);
@@ -40,6 +39,7 @@ const CreateDev = async (req, res) => {
     // console.log(req.body);
 
     const password = uuid.v4().slice(0, 8);
+    //creating id in firebase
     createUserAccount({ email, password: password }).then(async (data) => {
       const Createdev = await devModel({
         uid: data.uid,
@@ -82,7 +82,6 @@ const devFindByUID = async (req, res) => {
   }
 };
 
-
 const getDevProfile = async (req, res) => {
   try {
     const { email } = req.params;
@@ -96,9 +95,9 @@ const getDevProfile = async (req, res) => {
   }
 };
 
-const changePassword = async(req,res)=>{
+const changePassword = async (req, res) => {
   try {
-    const { email ,} = req.params;
+    const { email } = req.params;
     if (!email) {
       responseError(res, 404, {}, "No data is found because of no email");
     }
@@ -107,11 +106,33 @@ const changePassword = async(req,res)=>{
   } catch (error) {
     responseError(res, 500, error);
   }
-}
+};
+
+//delete dev account
+const deleteDevAccount = async (req, res) => {
+  try {
+    //removing from database mongodb
+    const {_id} = req.params;
+    // const data = await devModel.findOne({ _id: _id });
+    // console.log(data)
+    const data = await devModel.findByIdAndUpdate(
+      _id,
+      {
+        deleteStatus: true,
+      },
+      { new: true }
+    );
+    res.status(200).send(data);
+    //removeing from firebase
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
 
 module.exports = {
   devFindByUID,
   CreateDev,
   getAllDev,
   getDevProfile,
+  deleteDevAccount,
 };
