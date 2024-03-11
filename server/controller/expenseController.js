@@ -44,6 +44,17 @@ const createExpense = async (req, res) => {
   }
 };
 
+//show expense in the list
+const showAllExpense = async (req, res) => {
+  const data = await Expense.find();
+  if (data) {
+    res.status(200).json(data);
+  } else {
+    res.status(404).json({ message: "No Data Found!" });
+  }
+};
+
 module.exports = {
   createExpense,
+  showAllExpense,
 };

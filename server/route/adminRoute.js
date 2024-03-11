@@ -60,7 +60,10 @@ const {
   notifyOwnerFromDev,
 } = require("../controller/devSubscriptionsEdit");
 
-const { createExpense } = require("../controller/expenseController");
+const {
+  createExpense,
+  showAllExpense,
+} = require("../controller/expenseController");
 const {
   CreateDev,
   devFindByUID,
@@ -103,7 +106,10 @@ router.get(
   "/restaurant/:res_id/existing-employee-data/:employeeId",
   getEmployeeById
 ); // Get Employee By Id
-router.get("/restaurant/:res_id/get-restaurant-name-and-all-branches",getAllBranch_And_ResturantData) // get all branch and restaurant data
+router.get(
+  "/restaurant/:res_id/get-restaurant-name-and-all-branches",
+  getAllBranch_And_ResturantData
+); // get all branch and restaurant data
 router.get(
   "/restaurant/:res_id/edit-employee-data/:employeeID",
   getEmployeeData_ByID_ForCurrentEmployeeEdit
@@ -186,5 +192,6 @@ router.get("/restaurant/branch/:branchID", singleBranchDataForDev);
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);
+router.get("/admin/all-expenses", showAllExpense);
 
 module.exports = router;
