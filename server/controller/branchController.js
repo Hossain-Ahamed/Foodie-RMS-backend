@@ -99,17 +99,17 @@ const getAllBranch = async (req, res) => {
       {
         $unwind: "$subscriptions", // If there can be multiple subscriptions for a branch
       },
-      // {
-      //   $match: {
-      //     "subscriptions.deleteStatus": false, // Filter by deleteStatus: false
-      //   },
-      // },
       {
         $lookup: {
           from: "restaurants", // Assuming the name of the restaurant model collection
           localField: "subscriptions.res_id",
           foreignField: "_id",
           as: "restaurant",
+        },
+      },
+      {
+        $match: {
+          "subscriptions.deleteStatus":"false",
         },
       },
       {

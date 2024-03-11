@@ -269,8 +269,8 @@ const updateEmployeeById = async (req, res) => {
       res_id,
       branchID,
     } = req.body;
-    console.log(req.body)
-    const employee = await Employee.findByIdAndUpdate(
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(
       employeeId,
       {
         f_name,
@@ -294,34 +294,39 @@ const updateEmployeeById = async (req, res) => {
       },
       { new: true }
     );
-    const updatedPermitted = {
-      role,
-      res_id,
-      branchID,
-      salary_type,
-      salary_unit,
-    };
 
-    const latest_employee = await Employee.findByIdAndUpdate({ _id: employeeId, "permitted.res_id": res_id },
-    {
-      $set: {
-        "permitted": updatedPermitted,
-      },
-    },
-    { new: true }
-    )
-
-
-    if (!employee) {
+    if (!updatedEmployee) {
       return res.status(404).json({ msg: "Employee not found" });
     }
 
-    res.status(200).json(latest_employee);
+    // Use map to update the permitted array
+    updatedEmployee.permitted = updatedEmployee.permitted.map((permit) => {
+      if (permit.res_id.toString() === res_id) {
+        return {
+          ...permit,
+          role:role || permit.role,
+          res_id,
+          branchID : branchID || permit.branchID ,
+          salary_type:salary_type || permit.salary_type,
+          salary_unit:salary_unit || permit.salary_unit,
+        };
+      }
+      return permit;
+    });
+
+    // Save the updated employee with the modified permitted array
+    await updatedEmployee.save();
+
+    // Fetch the latest employee details after the updates
+    const latestEmployee = await Employee.findById(employeeId);
+
+    res.status(200).json(latestEmployee);
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
+
 
 const deleteEmployeeById = async (req, res) => {
   try {
