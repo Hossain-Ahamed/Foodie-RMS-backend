@@ -2,6 +2,7 @@
 const Employee = require("../model/employeeModel");
 const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
+const { createUserAccount } = require("../config/firbase-config.js");
 const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
 const branchModel = require("../model/branchModel");
@@ -11,12 +12,10 @@ const addEmployee = async (req, res) => {
     const {
       f_name,
       l_name,
-      permitted,
       email,
       gender,
       DOB,
       nid,
-      designation,
       mobile,
       profilePhoto,
       streetAddress,
@@ -31,6 +30,9 @@ const addEmployee = async (req, res) => {
       emergencyRelation,
       salary_type,
       salary_unit,
+      role,
+      res_id,
+      branchID,
     } = req.body;
 
     if (!f_name || !l_name || !email) {
@@ -40,18 +42,26 @@ const addEmployee = async (req, res) => {
       if (employeeExist) {
         return res.status(409).json({ msg: `${email} already exists` });
       } else {
+        const password = uuid.v4().slice(0, 8);
+            // Check if the email already exists
+    const userRecord = await admin.auth().getUserByEmail(email);
+
+    // If the userRecord exists, the email is already in use
+    if (userRecord) {
+      res.status(409).json({ msg: `${email} already exists` });
+      // You might want to handle this case accordingly, e.g., return an error or take appropriate action
+    }
+    createUserAccount({ name:f_name, email, password });
+    createClient({ email, password });
+
         const newEmployee = new Employee({
           f_name,
           l_name,
-          permitted,
-
           email,
           gender,
           DOB,
           nid,
-          designation,
           mobile,
-
           profilePhoto,
           streetAddress,
           city,
@@ -63,8 +73,13 @@ const addEmployee = async (req, res) => {
           emergencyName,
           emergencyPhoneNumber,
           emergencyRelation,
-          salary_type,
-          salary_unit,
+          permitted:[
+            {res_id,
+            branchID,
+            role,
+            salary_type,
+            salary_unit,}
+          ]
         });
 
         const result = await newEmployee.save();
