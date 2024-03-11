@@ -11,6 +11,7 @@ const {
   employeeRole,
   addExistingEmployee,
   getEmployeeData_ByID_ForCurrentEmployeeEdit,
+  getAllBranch_And_ResturantData,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -102,6 +103,7 @@ router.get(
   "/restaurant/:res_id/existing-employee-data/:employeeId",
   getEmployeeById
 ); // Get Employee By Id
+router.get("/restaurant/:res_id/get-restaurant-name-and-all-branches",getAllBranch_And_ResturantData) // get all branch and restaurant data
 router.get(
   "/restaurant/:res_id/edit-employee-data/:employeeID",
   getEmployeeData_ByID_ForCurrentEmployeeEdit
