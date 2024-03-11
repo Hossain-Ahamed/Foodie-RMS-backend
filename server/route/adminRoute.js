@@ -54,7 +54,8 @@ const {
 } = require("../controller/subscriptionController");
 
 const {
-  deleteBranchFromDevPaymentList
+  deleteBranchFromDevPaymentList,
+  deactivateBranchFromDevPaymentList,
 } = require("../controller/devSubscriptionsEdit");
 
 const { createExpense } = require("../controller/expenseController");
@@ -151,7 +152,14 @@ router.post("/search-employee-to-add", SearchEmployee);
 router.get("/get-rms-employee-profile/:email", employeeRole);
 
 //development side payment list
-router.delete("/delete-branch-from-payment-lists/:_id",deleteBranchFromDevPaymentList);
+router.delete(
+  "/delete-branch-from-payment-lists/:_id",
+  deleteBranchFromDevPaymentList
+);
+router.patch(
+  "/deactive-branch-from-payment-lists/:_id",
+  deactivateBranchFromDevPaymentList
+);
 
 //development side employee list
 router.post("/dev/create", CreateDev);
