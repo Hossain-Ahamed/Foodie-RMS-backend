@@ -12,21 +12,23 @@ const deleteBranchFromDevPaymentList = async (req, res) => {
       },
       { new: true }
     );
-    // res.status(200).send(getAllBranch()); //return updated branch list after deleting the selected one from dev payment list
+    res.status(200).send(true);
   } catch (err) {}
 };
 
 const deactivateBranchFromDevPaymentList = async (req, res) => {
   try {
     const _id = req.params._id;
+    const { status } = req.body;
+    const newStatus = status ? false : true;
     await Subscription.findByIdAndUpdate(
       _id,
       {
-        isActive: false,
+        isActive: newStatus,
       },
       { new: true }
     );
-    // res.send(getAllBranch()); //return updated branch list after deleting the selected one from dev payment list
+    res.status(200).send(true);
   } catch (err) {}
 };
 
