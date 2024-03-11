@@ -12,7 +12,7 @@ const deleteBranchFromDevPaymentList = async (req, res) => {
       },
       { new: true }
     );
-    res.send(getAllBranch()); //return updated branch list after deleting the selected one from dev payment list
+    // res.status(200).send(getAllBranch()); //return updated branch list after deleting the selected one from dev payment list
   } catch (err) {}
 };
 
