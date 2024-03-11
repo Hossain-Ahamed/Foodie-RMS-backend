@@ -56,6 +56,7 @@ const {
 const {
   deleteBranchFromDevPaymentList,
   deactivateBranchFromDevPaymentList,
+  notifyOwnerFromDev,
 } = require("../controller/devSubscriptionsEdit");
 
 const { createExpense } = require("../controller/expenseController");
@@ -159,6 +160,10 @@ router.delete(
 router.patch(
   "/deactive-branch-from-payment-lists/:_id",
   deactivateBranchFromDevPaymentList
+);
+router.patch(
+  "/notify-branch-owner-from-payment-lists/:_id",
+  notifyOwnerFromDev
 );
 
 //development side employee list

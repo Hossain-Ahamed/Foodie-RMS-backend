@@ -121,6 +121,8 @@ const getAllBranch = async (req, res) => {
 
       return {
         _id: subscription._id,
+        streetAddress: branch.streetAddress,
+        city: branch.city,
         res_id: subscription.res_id,
         res_name: branch.restaurant[0].res_name,
         branch_name: branch.branch_name,
