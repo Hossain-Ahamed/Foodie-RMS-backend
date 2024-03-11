@@ -84,7 +84,7 @@ const router = express.Router();
 router.post("/create-restaurant", createResturant); // Create a new Restaurant in the database
 router.post("/admin/create/branch", createBranch); // Create a new branch in the database
 router.post("/admin/create/categories", addCategory); // Add a new category to the list of categories
-router.post("/admin/create/employee", addEmployee); // Create a new employee in the database
+router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a new employee in the database
 router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
 
