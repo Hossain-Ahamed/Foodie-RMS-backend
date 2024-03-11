@@ -83,7 +83,7 @@ const deleteBranch = async (req, res) => {
       },
       { new: true }
     );
-  } catch (err) { }
+  } catch (err) {}
 };
 const getAllBranch = async (req, res) => {
   try {
@@ -98,6 +98,11 @@ const getAllBranch = async (req, res) => {
       },
       {
         $unwind: "$subscriptions", // If there can be multiple subscriptions for a branch
+      },
+      {
+        $match: {
+          "subscriptions.deleteStatus": false, // Filter by deleteStatus: false
+        },
       },
       {
         $lookup: {
