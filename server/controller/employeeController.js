@@ -414,13 +414,21 @@ const deleteEmployeeById = async (req, res) => {
     const branchID = req.params.branchID; // Assuming branchID is part of req.params
 
     // Update the employee by removing all matching entries from the permitted array
-    const updatedEmployee = await Employee.findByIdAndUpdate(
-      employeeId,
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { _id: employeeId },
       {
-        $pull: {
-          permitted: { res_id, branchID },
+        $set: {
+          permitted: {
+            $filter: {
+              input: "$permitted",
+              as: "permission",
+              cond: {
+                $ne: ["$$permission.res_id", res_id],
+                $ne: ["$$permission.branchID", branchID],
+              },
+            },
+          },
         },
-        deleteStatus: true,
       },
       { new: true }
     );
