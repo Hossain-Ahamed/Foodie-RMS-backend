@@ -29,6 +29,10 @@ const subscriptionSchema = new mongoose.Schema({
   updatedAt: {
     type: Number,
   },
+  deleteStatus: {
+    type: String,
+    default: false,
+  },
   previousSubscriptions: [
     {
       packageType: {
@@ -40,8 +44,8 @@ const subscriptionSchema = new mongoose.Schema({
       endDate: {
         type: Number,
       },
-      payment_time:{
-        type:Number,
+      payment_time: {
+        type: Number,
       },
       price: {
         type: Number,

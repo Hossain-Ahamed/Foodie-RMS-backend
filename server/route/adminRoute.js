@@ -53,13 +53,19 @@ const {
   updatePackageAfterPayment,
 } = require("../controller/subscriptionController");
 
+const {
+  deleteBranchFromDevPaymentList,
+  deactivateBranchFromDevPaymentList,
+  notifyOwnerFromDev,
+} = require("../controller/devSubscriptionsEdit");
+
 const { createExpense } = require("../controller/expenseController");
 const {
   CreateDev,
   devFindByUID,
   getDevProfile,
   getAllDev,
-  deleteDevAccount
+  deleteDevAccount,
 } = require("../controller/devController");
 
 const {
@@ -126,12 +132,9 @@ router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 //subcription package for dev
 router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
 router.patch("/edit-subscription-packages/:_id", updateSubscriptionPackage);
-router.delete(
-  "/delete-subscription-packages/:_id",
-  deleteSubscriptionPackage
-);
+router.delete("/delete-subscription-packages/:_id", deleteSubscriptionPackage);
 
-router.post('/add-subscription-packages', addNewSubscriptionPackage);
+router.post("/add-subscription-packages", addNewSubscriptionPackage);
 
 //Subscription Route
 // router.post("/admin/subscription", createSubscription);
@@ -149,6 +152,19 @@ router.post("/search-employee-to-add", SearchEmployee);
 //
 router.get("/get-rms-employee-profile/:email", employeeRole);
 
+//development side payment list
+router.delete(
+  "/delete-branch-from-payment-lists/:_id",
+  deleteBranchFromDevPaymentList
+);
+router.patch(
+  "/deactive-branch-from-payment-lists/:_id",
+  deactivateBranchFromDevPaymentList
+);
+router.patch(
+  "/notify-branch-owner-from-payment-lists/:_id",
+  notifyOwnerFromDev
+);
 
 //development side employee list
 router.post("/dev/create", CreateDev);

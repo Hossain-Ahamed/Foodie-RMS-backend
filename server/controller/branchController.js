@@ -83,7 +83,7 @@ const deleteBranch = async (req, res) => {
       },
       { new: true }
     );
-  } catch (err) { }
+  } catch (err) {}
 };
 const getAllBranch = async (req, res) => {
   try {
@@ -99,6 +99,11 @@ const getAllBranch = async (req, res) => {
       {
         $unwind: "$subscriptions", // If there can be multiple subscriptions for a branch
       },
+      // {
+      //   $match: {
+      //     "subscriptions.deleteStatus": false, // Filter by deleteStatus: false
+      //   },
+      // },
       {
         $lookup: {
           from: "restaurants", // Assuming the name of the restaurant model collection
@@ -115,6 +120,9 @@ const getAllBranch = async (req, res) => {
       const subscription = branch.subscriptions;
 
       return {
+        _id: subscription._id,
+        streetAddress: branch.streetAddress,
+        city: branch.city,
         res_id: subscription.res_id,
         res_name: branch.restaurant[0].res_name,
         branch_name: branch.branch_name,
