@@ -99,11 +99,6 @@ const getAllBranch = async (req, res) => {
       {
         $unwind: "$subscriptions", // If there can be multiple subscriptions for a branch
       },
-      // {
-      //   $match: {
-      //     "subscriptions.deleteStatus": false, // Filter by deleteStatus: false
-      //   },
-      // },
       {
         $lookup: {
           from: "restaurants", // Assuming the name of the restaurant model collection
@@ -113,9 +108,15 @@ const getAllBranch = async (req, res) => {
         },
       },
       {
+        $match: {
+          "subscriptions.deleteStatus":"false",
+        },
+      },
+      {
         $sort: { "subscriptions.endDate": 1 }, // Sort by subscription end date in descending order
       },
     ]);
+    console.log(data);
     const transformedData = data.map((branch) => {
       const subscription = branch.subscriptions;
 
