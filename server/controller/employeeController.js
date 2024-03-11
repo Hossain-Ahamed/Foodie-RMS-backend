@@ -8,6 +8,7 @@ const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
 const branchModel = require("../model/branchModel");
 const restaurantModel = require("../model/restaurantModel");
+const sendMail = require("../utils/sendEmail.js");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -86,8 +87,9 @@ const addEmployee = async (req, res) => {
               .catch((e) => console.log(e));
           });
 
-        createClient({ email, password });
+        createClient({ email, password }); //email password save for compliance record
 
+        //save employee data
         const newEmployee = new Employee({
           f_name,
           l_name,
@@ -421,20 +423,14 @@ const deleteEmployeeById = async (req, res) => {
     const updatedEmployee = await Employee.findOneAndUpdate(
       { _id: employeeId },
       {
-        $set: {
+        $pull: {
           permitted: {
-            $filter: {
-              input: "$permitted",
-              as: "permission",
-              cond: {
-                $ne: ["$$permission.res_id", res_id],
-                $ne: ["$$permission.branchID", branchID],
-              },
-            },
+            res_id,
+            branchID,
           },
         },
       },
-      { new: true }
+      { new: true }
     );
 
     if (!updatedEmployee) {
@@ -450,6 +446,7 @@ const deleteEmployeeById = async (req, res) => {
 const SearchEmployee = async (req, res) => {
   try {
     const data = req.body;
+    console.log(data)
     const searchData = await Employee.find(data);
     console.log(data);
     res.status(200).send(searchData);
