@@ -116,7 +116,6 @@ const getAllBranch = async (req, res) => {
         $sort: { "subscriptions.endDate": 1 }, // Sort by subscription end date in descending order
       },
     ]);
-    console.log(data);
     const transformedData = data.map((branch) => {
       const subscription = branch.subscriptions;
 
