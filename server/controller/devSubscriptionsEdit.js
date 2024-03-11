@@ -37,9 +37,11 @@ const deactivateBranchFromDevPaymentList = async (req, res) => {
 
 const notifyOwnerFromDev = async (req, res) => {
   try {
-    const { streetAddress, city, res_id, subscriptionEnd } = req.body;
+    const { streetAddress, city, res_id, subscriptionEnd } = req.body.data;
+    console.log(res_id)
     const _id = req.params._id;
-    const restaurant = await restaurantModel.findById(res_id);
+    const restaurant = await restaurantModel.findOne({_id:res_id});
+    console.log(restaurant.res_email);
     if (restaurant) {
       sendMail({
         email: restaurant.res_email,
