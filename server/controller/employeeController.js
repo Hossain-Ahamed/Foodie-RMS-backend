@@ -207,6 +207,40 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
+// --------------------- get branch and restaurant data for Adding New Employee 
+const getAllBranch_And_ResturantData = async (req, res) => {
+  try {
+    const { res_id } = req.params;
+
+    const allBranches_beforeRename = await branchModel
+      .find({ res_id: res_id })
+      .select("_id branch_name");
+
+    const allBranches = allBranches_beforeRename.map((i) => {
+      return {
+        branchID: i?._id,
+        branch_name: i?.branch_name,
+      };
+    });
+
+    const RestaurantData = await restaurantModel
+      .findById({ _id: res_id })
+      .select("_id res_name img");
+
+    res.status(200).json({
+        _id: RestaurantData?._id,
+        res_name: RestaurantData?.res_name,
+        img: RestaurantData?.img,
+        branches: allBranches,
+      
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+//-------------------------
+
 const getEmployeeData_ByID_ForCurrentEmployeeEdit = async (req, res) => {
   try {
     console.log("hello");
@@ -716,4 +750,5 @@ module.exports = {
   employeeLogin,
   addExistingEmployee,
   getEmployeeData_ByID_ForCurrentEmployeeEdit,
+  getAllBranch_And_ResturantData,
 };
