@@ -11,9 +11,28 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
     },
-    address: {
-      type: String,
+    DOB: {
+      type: Number,
     },
+    address: [
+      {
+        streetAddress: {
+          type: String,
+        },
+        city: {
+          type: String,
+        },
+        stateProvince: {
+          type: String,
+        },
+        postalCode: {
+          type: String,
+        },
+        country: {
+          type: String,
+        },
+      },
+    ],
     imgURL: {
       type: String,
     },
