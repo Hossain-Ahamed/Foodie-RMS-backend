@@ -105,6 +105,18 @@ const createResturant = async (req, res) => {
 //   }
 // };
 
+const sendRestaurantData = async (req, res) => {
+  try {
+    const id = req.params;
+    const data = await restaurantModel.findOne({ _id: id });
+    res.status(200).send(data);
+  } catch (error) {
+    return res.status(401).json({
+      Error: "Error In getiing Data",
+    });
+  }
+};
+
 const updateResturant = async (req, res) => {
   const id = req.params.id;
   const {
@@ -200,5 +212,6 @@ module.exports = {
   createResturant,
   updateResturant,
   deleteResturent,
+  sendRestaurantData
   // createAccount,
 };

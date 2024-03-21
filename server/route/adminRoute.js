@@ -43,6 +43,7 @@ const {
   createResturant,
   updateResturant,
   deleteResturent,
+  sendRestaurantData,
   // createAccount,
 } = require("../controller/restaurantController");
 
@@ -90,6 +91,8 @@ router.post("/admin/create/categories", addCategory); // Add a new category to t
 router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a new employee in the database
 router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
+
+router.get("/edit-restaurant/:_id", sendRestaurantData);
 
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
