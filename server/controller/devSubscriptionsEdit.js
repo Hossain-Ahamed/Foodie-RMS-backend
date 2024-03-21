@@ -37,7 +37,7 @@ const deactivateBranchFromDevPaymentList = async (req, res) => {
 
 const notifyOwnerFromDev = async (req, res) => {
   try {
-    const { streetAddress, city, res_id, subscriptionEnd } = req.body.data;
+    const { streetAddress, city, res_id, subscriptionEnd,branch_name } = req.body.data;
     const _id = req.params._id;
     const restaurant = await restaurantModel.findOne({ _id: res_id });
     if (restaurant) {
@@ -142,7 +142,7 @@ const notifyOwnerFromDev = async (req, res) => {
                                                                         <td align="left" style="padding:0;Margin:0;padding-right:35px;padding-left:40px">
                                                                             <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:24px;color:#666666;font-size:16px;text-align:left">
                                                                                 Dear <b> ${restaurant.res_Owner_Name} </b>,
-                                                                                <br><br>Your subscription for <b> ${streetAddress}, ${city} </b> to the Foodie Restaurant Management System will expire in <b> ${new Date(subscriptionEnd).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</b> .To ensure uninterrupted access to our services and continue enjoying the benefits of Foodie, we kindly request you to renew your subscription at your earliest convenience.
+                                                                                <br><br>Your subscription for <b>  ${branch_name} : ${streetAddress}, ${city} : ${restaurant.res_name}</b> to the Foodie Restaurant Management System will expire in <b> ${new Date(subscriptionEnd).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</b> .To ensure uninterrupted access to our services and continue enjoying the benefits of Foodie, we kindly request you to renew your subscription at your earliest convenience.
         
         
                                                                                 <br><br>
