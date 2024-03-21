@@ -71,6 +71,7 @@ const {
   getDevProfile,
   getAllDev,
   deleteDevAccount,
+  devLogIn,
 } = require("../controller/devController");
 
 const {
@@ -196,5 +197,8 @@ router.get("/restaurant/branch/:branchID", singleBranchDataForDev);
 //Expense Route
 router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses", showAllExpense);
+
+//login dev panel
+router.post('/dev-admin-login',devLogIn)
 
 module.exports = router;
