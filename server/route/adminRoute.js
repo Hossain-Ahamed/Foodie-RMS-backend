@@ -35,6 +35,10 @@ const {
   getAllBranch,
   getAllBranchForDev,
   singleBranchDataForDev,
+  showBusinessHours,
+  modifyBusinessHours,
+  showPaymentType,
+  modifyPaymentType,
 } = require("../controller/branchController");
 
 const {
@@ -192,6 +196,15 @@ router.get(
 router.get("/all-restaurant-dev", getAllResturantsForDev);
 router.get("/restaurant-all-branches/:res_id", getAllBranchForDev);
 router.get("/restaurant/branch/:branchID", singleBranchDataForDev);
+
+//Business Hours
+router.get("/restaurant/:res_id/branch/:branchID/manage-shift",showBusinessHours);//show Business Hours
+router.patch("/restaurant/:res_id/branch/:branchID/manage-shift",modifyBusinessHours);//modify Business Hours
+
+
+//Payment Type of policy
+router.get("/restaurant/:res_id/branch/:branchID/payments-type",showPaymentType);//show payment type
+router.patch("/restaurant/:res_id/branch/:branchID/payments-type",modifyPaymentType);//modify payment type
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);

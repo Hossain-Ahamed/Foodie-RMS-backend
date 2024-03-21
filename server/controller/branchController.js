@@ -219,6 +219,81 @@ const singleBranchDataForDev = async (req, res) => {
   }
 };
 
+const showBusinessHours = async (req,res)=>{
+  const {res_id,branchID} = req.params;
+  
+  try{
+    const data = await branchModel.findById({_id:branchID},"shift").lean();
+    console.log(data);
+    res.status(200).send(data.shift);
+  }
+  catch(e){
+    console.log(e);
+    res.status(400).send("Error getting business hours")
+
+  }
+
+
+}
+
+const modifyBusinessHours = async (req,res)=>{
+  const {res_id,branchID} = req.params;
+  //const {data} = req.body;
+  console.log(req.body,"this is the data in controller");
+  
+  try{
+    const data1 = await branchModel.findByIdAndUpdate({_id:branchID},{shift:req.body},{new:true});
+    console.log(data1);
+    res.status(200).send(true);
+  }
+  catch(e){
+    console.log(e);
+    res.status(400).send("Error getting business hours")
+
+  }
+
+
+}
+
+const showPaymentType = async (req,res)=>{
+  const {res_id,branchID} = req.params;
+  
+  try{
+    const data = await branchModel.findById({_id:branchID}).select("paymentTypes , takewayCharge , deliveryCharge").lean();
+    console.log(data);
+   res.status(200).send(data);
+  }
+  catch(e){
+    console.log(e);
+    res.status(400).send("Error getting business hours")
+
+  }
+
+
+}
+
+const modifyPaymentType = async (req,res)=>{
+  const {res_id,branchID} = req.params;
+  const{paymentType,
+    takewayCharge,
+    deliveryCharge} = req.body;
+  
+  try{
+    const data =await branchModel.findByIdAndUpdate({_id:branchID},{paymentType,
+      takewayCharge,
+      deliveryCharge},{new:true});
+    console.log(data);
+   res.status(200).send(data);
+  }
+  catch(e){
+    console.log(e);
+    res.status(400).send("Error getting business hours")
+
+  }
+
+
+}
+
 module.exports = {
   addTables,
   getAllBranch,
@@ -227,4 +302,8 @@ module.exports = {
   deleteBranch,
   getAllBranchForDev,
   singleBranchDataForDev,
+  showBusinessHours,
+  modifyBusinessHours,
+  showPaymentType,
+  modifyPaymentType
 };
