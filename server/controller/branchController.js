@@ -274,12 +274,13 @@ const showPaymentType = async (req,res)=>{
 
 const modifyPaymentType = async (req,res)=>{
   const {res_id,branchID} = req.params;
-  const{paymentType,
+  const{paymentTypes,
     takewayCharge,
     deliveryCharge} = req.body;
   
+    console.log(req.body)
   try{
-    const data =await branchModel.findByIdAndUpdate({_id:branchID},{paymentType,
+    const data =await branchModel.findByIdAndUpdate({_id:branchID},{paymentTypes,
       takewayCharge,
       deliveryCharge},{new:true});
     console.log(data);
