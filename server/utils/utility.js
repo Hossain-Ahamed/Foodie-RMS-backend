@@ -12,8 +12,8 @@ const responseError = (res,errorCode=500,error={},message)=>{
     else if(errorCode==401){
         res.status(errorCode).send({message : message ||"Forbidden",error: error})  
     }
-    else if(errorCode==400){
-        res.status(errorCode).send({message : message ||"Forbidden",error: error})  
+    else if(errorCode==403){
+        res.status(errorCode).send({message : message ||"Unauthorized",error: error})  
     }
     else if(errorCode==409){
         res.status(errorCode).send({message : message || "ConflictedData",error: error})  
