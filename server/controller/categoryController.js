@@ -2,8 +2,8 @@ const categoryModel = require("../model/categoryModel");
 
 const addCategory = async (req, res) => {
   try {
-    console.log("dektasi");
-    const { res_id, branchID, title, img, description } = req.body;
+    const { res_id, branchID } = req.params;
+    const { title, img, description } = req.body;
     if (!title) {
       return res.status(400).json({ msg: "Please fill all fields" });
     } else {

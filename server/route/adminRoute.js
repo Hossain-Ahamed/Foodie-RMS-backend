@@ -92,7 +92,7 @@ const router = express.Router();
 //For create => Restricted  Route (Only for admin)
 router.post("/create-restaurant", createResturant); // Create a new Restaurant in the database
 router.post("/admin/create/branch", createBranch); // Create a new branch in the database
-router.post("/admin/create/categories", addCategory); // Add a new category to the list of categories
+router.post("/admin/restaurant/:res_id/branch/:branchID/add-category", addCategory); // Add a new category to the list of categories
 router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a new employee in the database
 router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
