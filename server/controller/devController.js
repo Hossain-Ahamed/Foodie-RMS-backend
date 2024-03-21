@@ -2,9 +2,54 @@ const { createUserAccount } = require("../config/firbase-config");
 const devModel = require("../model/devModel");
 const { responseError } = require("../utils/utility");
 const uuid = require("uuid");
+const JWT = require("jsonwebtoken");
+const devLogIn = async (req, res) => {
+  try {
+    const { email } = req.body;
+ 
+    const existedDev = await devModel.findOne({
+      email: email,
+      deleteStatus: "false",
+    }).select('-password');
+
+    if (!existedDev || !email) {
+      
+      return responseError(res, 401);
+    }
+
+    const devJWT = await JWT.sign(
+      {...existedDev},
+      process.env.secretKey,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.cookie("_DEV_FOODIE_JWT", devJWT, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict', 
+      expires: new Date(Date.now() + 8 * 60 * 60 * 1000),
+    });
+
+    res.status(200).send({
+      success: true,
+      message: "Loging successfully",
+      existedDev,
+      token : devJWT
+
+    });
+
+
+  } catch (e) {
+    responseError(res, 500, e);
+  }
+};
 const getAllDev = async (req, res) => {
   try {
-    const dev = await devModel.find({deleteStatus: "false"}).select("-password");
+    const dev = await devModel
+      .find({ deleteStatus: "false" })
+      .select("-password");
     res.status(200).send(dev);
   } catch (e) {
     console.log(e);
@@ -112,7 +157,7 @@ const changePassword = async (req, res) => {
 const deleteDevAccount = async (req, res) => {
   try {
     //removing from database mongodb
-    const {_id} = req.params;
+    const { _id } = req.params;
     // const data = await devModel.findOne({ _id: _id });
     // console.log(data)
     const data = await devModel.findByIdAndUpdate(
@@ -135,4 +180,5 @@ module.exports = {
   getAllDev,
   getDevProfile,
   deleteDevAccount,
+  devLogIn,
 };
