@@ -34,7 +34,8 @@ const addCategory = async (req, res) => {
 
 const allCategory = async (req, res) => {
   try {
-    const { branchID, currentPage, dataSize, status } = req.query;
+    const branchID = req.params;
+    const { currentPage, dataSize, status } = req.query;
     const skip = (parseInt(currentPage) - 1) * parseInt(dataSize);
     let categories;
     let totalCount;
