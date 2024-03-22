@@ -142,7 +142,7 @@ router.put("/admin/update/dish/:_id", updateDish); //Update The Dish By its id
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
 router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
-router.delete("/admin/delete/categories/:id", deleteCategory); //Delete A Category By Its ID
+router.delete("/admin/delete-categories/:id", deleteCategory); //Delete A Category By Its ID
 router.delete(
   "/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id",
   deleteEmployeeById
@@ -228,12 +228,12 @@ router.get("/admin/all-expenses", showAllExpense);
 
 //login dev panel
 
-router.post('/dev-admin-login',devLogIn);
-
+router.post("/dev-admin-login", devLogIn);
 
 // Subscription data for supper admin
-router.get('/restaurant/:res_id/bill-history-list',getSubscriptionPurchaseHistory);
-
-
+router.get(
+  "/restaurant/:res_id/bill-history-list",
+  getSubscriptionPurchaseHistory
+);
 
 module.exports = router;
