@@ -34,9 +34,9 @@ const addCategory = async (req, res) => {
 
 const allCategory = async (req, res) => {
   try {
-    const branchID = req.params;
+    const { branchID } = req.params;
     const { currentPage, dataSize, status } = req.query;
-    const skip = (parseInt(currentPage) - 1) * parseInt(dataSize);
+    const skip = (parseInt(currentPage)) * parseInt(dataSize);
     let categories;
     let totalCount;
     if (status === "all") {
@@ -80,8 +80,6 @@ const allCategory = async (req, res) => {
         active: false,
       });
     }
-
-    // console.log(categories);
     res.status(200).json({
       categories,
       currentPage: parseInt(currentPage),
@@ -134,7 +132,6 @@ const updateCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ msg: "Category not found" });
     }
-
     res.status(200).json(category);
   } catch (err) {
     console.error(err);

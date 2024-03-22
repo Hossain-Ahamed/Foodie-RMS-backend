@@ -6,6 +6,9 @@ const packageModel = require("../model/subcripstionPackages");
 const createClient = require("./clientController.js");
 const sendMail = require("../utils/sendEmail.js");
 const uuid = require("uuid");
+const { responseError } = require("../utils/utility.js");
+const mongoose = require("mongoose");
+const subscriptionModel = require("../model/subscriptionModel");
 // This is your test secret API key.
 const stripe = require("stripe")(
   "sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le"
@@ -274,10 +277,81 @@ const extendSubscription = async (req, res) => {
   }
 };
 
+
+const getSubscriptionPurchaseHistory = async (req, res) => {
+  try {
+    const { res_id } = req.params;
+    if (!res_id) {
+      return res.status(404).send({ error: "Res_id is required." });
+    }
+    const objectIdResId = new mongoose.Types.ObjectId(res_id);
+
+    const subscriptionHistory = await subscriptionModel.aggregate([
+      {
+        $match: { res_id: objectIdResId }
+      },
+      {
+        $unwind: "$previousSubscriptions"
+      },
+      {
+        $sort: { "previousSubscriptions.payment_time": 1 } // Sorting by payment_time ascending
+      },
+      {
+        $lookup: {
+          from: "Branches",
+          localField: "branchID",
+          foreignField: "_id",
+          as: "branch"
+        }
+      },
+      {
+        $addFields: {
+          "previousSubscriptions.branchName": { $arrayElemAt: ["$branch.branch_name", 0] },
+          "previousSubscriptions.branchID": { $arrayElemAt: ["$branch._id", 0] }
+        }
+      },
+      {
+        $project: {
+          "branch": 0, // Exclude the branch field from the output
+          "previousSubscriptions._id": 0 // Exclude the _id field from each previous subscription
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          previousSubscriptions: { $push: "$previousSubscriptions" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          previousSubscriptions: 1
+        }
+      }
+    ]).exec();
+
+    if (!subscriptionHistory || subscriptionHistory.length === 0) {
+      return res.status(404).send({ error: "No subscription history found." });
+    }
+
+    res.status(200).send(subscriptionHistory[0]);
+
+  } catch (error) {
+    console.error("Error in getSubscriptionPurchaseHistory:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+}
+
+
+
+
+
+
 module.exports = {
   createSubscription,
   extendSubscription,
   CreatePaymentIntent,
   getPaymentDetails,
   updatePackageAfterPayment,
+  getSubscriptionPurchaseHistory
 };
