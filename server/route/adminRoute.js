@@ -57,6 +57,7 @@ const {
   CreatePaymentIntent,
   getPaymentDetails,
   updatePackageAfterPayment,
+  getSubscriptionPurchaseHistory,
 } = require("../controller/subscriptionController");
 
 const {
@@ -226,6 +227,13 @@ router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses", showAllExpense);
 
 //login dev panel
-router.post("/dev-admin-login", devLogIn);
+
+router.post('/dev-admin-login',devLogIn);
+
+
+// Subscription data for supper admin
+router.get('/restaurant/:res_id/bill-history-list',getSubscriptionPurchaseHistory);
+
+
 
 module.exports = router;
