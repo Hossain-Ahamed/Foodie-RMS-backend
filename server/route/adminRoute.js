@@ -93,7 +93,10 @@ const router = express.Router();
 //For create => Restricted  Route (Only for admin)
 router.post("/create-restaurant", createResturant); // Create a new Restaurant in the database
 router.post("/admin/create/branch", createBranch); // Create a new branch in the database
-router.post("/admin/restaurant/:res_id/branch/:branchID/add-category", addCategory); // Add a new category to the list of categories
+router.post(
+  "/admin/restaurant/:res_id/branch/:branchID/add-category",
+  addCategory
+); // Add a new category to the list of categories
 router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a new employee in the database
 router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
@@ -103,7 +106,7 @@ router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
-router.get("/admin/read/categories", allCategory); // Get all available Categories
+router.get("/admin/:branchID/all-categories", allCategory); // Get all available Categories
 router.get("/admin/read/employee", allEmployee); // Get all employees from the database
 // router.get('/admin/read/dish', getDish);                  //Get All Dishes
 router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
@@ -200,23 +203,37 @@ router.get("/restaurant-all-branches/:res_id", getAllBranchForDev);
 router.get("/restaurant/branch/:branchID", singleBranchDataForDev);
 
 //Business Hours
-router.get("/restaurant/:res_id/branch/:branchID/manage-shift",showBusinessHours);//show Business Hours
-router.patch("/restaurant/:res_id/branch/:branchID/manage-shift",modifyBusinessHours);//modify Business Hours
-
+router.get(
+  "/restaurant/:res_id/branch/:branchID/manage-shift",
+  showBusinessHours
+); //show Business Hours
+router.patch(
+  "/restaurant/:res_id/branch/:branchID/manage-shift",
+  modifyBusinessHours
+); //modify Business Hours
 
 //Payment Type of policy
-router.get("/restaurant/:res_id/branch/:branchID/payments-type",showPaymentType);//show payment type
-router.patch("/restaurant/:res_id/branch/:branchID/payments-type",modifyPaymentType);//modify payment type
+router.get(
+  "/restaurant/:res_id/branch/:branchID/payments-type",
+  showPaymentType
+); //show payment type
+router.patch(
+  "/restaurant/:res_id/branch/:branchID/payments-type",
+  modifyPaymentType
+); //modify payment type
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses", showAllExpense);
 
 //login dev panel
+
 router.post('/dev-admin-login',devLogIn);
 
 
 // Subscription data for supper admin
 router.get('/restaurant/:res_id/bill-history-list',getSubscriptionPurchaseHistory);
+
+
 
 module.exports = router;
