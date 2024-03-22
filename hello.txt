@@ -1,39 +1,11 @@
-{
-                data: {
-                    "res_name": "Fuoco",
-
-                    "headerText": "Welcome to Fuoco",
-                    "greetingText": "Thank you!",
-
-                    "streetAddress": "45 New Chasara",
-                    "city": "Narayangnaj",
-                    "stateProvince": "Dhaka",
-                    "postalCode": "1400",
-                    "print_address": true,
-
-                    "print_logo": true,
-                    "img": "https://images.unsplash.com/photo-1682685797660-3d847763208e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-
-                    "res_email": "hossainahamed6872@gmail.com",
-                    "print_res_email": false,
-
-                    "res_mobile": "01868726172",
-                    "print_res_mobile": false,
-
-
-                    "print_kitchen_print" : true,
-
-
-
-                }
-}
-
-{
-    "print_res_email": false,
-    "print_res_mobile": false,
-    "print_address": true,
-    "print_logo": true,
-    "print_kitchen_print": true,
-    "headerText": "Welcome to Fuoco",
-    "greetingText": "Thank you!"
+try {
+        const branch = await Branch.findOneAndUpdate(
+            { "tables.number": "2" }, // Find the branch containing the table with number = 2
+            { $pull: { tables: { number: "2" } } }, // Remove the table with number = 2
+            { new: true }
+        );
+        console.log("Branch after deletion:", branch);
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
