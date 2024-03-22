@@ -26,6 +26,7 @@ const {
   createDishes,
   updateDish,
   deleteDish,
+  getAllCategoryTitles,
 } = require("../controller/dishesControllers");
 
 const {
@@ -98,11 +99,11 @@ router.post(
   addCategory
 ); // Add a new category to the list of categories
 router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a new employee in the database
-router.post("/admin/create/dish", createDishes); //Create a new dish from the menu
+router.post("/admin/:res_id/add-new-dishes/:branchID", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
 
 router.get("/edit-restaurant/:_id", sendRestaurantData);
-
+router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant

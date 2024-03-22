@@ -6,8 +6,6 @@ const categoryModel = require("../model/categoryModel");
 const createDishes = async (req, res) => {
   try {
     const {
-      res_id,
-      branchID,
       title,
       category,
       isActive,
@@ -21,6 +19,7 @@ const createDishes = async (req, res) => {
       options,
       addOn,
     } = req.body;
+    const { res_id, branchID } = req.params;
     // if (dishesModel.findOne({ title:title, branchID:branchID })) {
     //   return res.status(400).send({
     //     success: false,
@@ -48,6 +47,25 @@ const createDishes = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(400).send(false);
+  }
+};
+
+//send category name
+const getAllCategoryTitles = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    const categories = await categoryModel.find({
+      deleteStatus: false,
+      branchID: branchID,
+    });
+    const titles = categories.map((category) => category.title);
+
+    res.status(200).json({
+      titles,
+    });
+  } catch (error) {
+    console.error("Error fetching category titles:", error);
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
@@ -126,4 +144,5 @@ module.exports = {
   createDishes,
   updateDish,
   deleteDish,
+  getAllCategoryTitles,
 };
