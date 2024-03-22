@@ -1,28 +1,39 @@
 {
-    "res_id": "87342fdjskllf",
-    "res_img": "https://lh3.googleusercontent.com/a/ACg8ocKjKSD7xxcI8hEoNgPnsxZ632hSVJFspYJNcAAmPKc39g=s360-c-no",
-    "res_name": "Fuoco",
-    "f_name": "Md.",
-    "l_name": "Ahamed",
-    "email": "hossainahamed6872@gmail.com",
-    "mobile": "01868726172",
-    "gender": "Male",
-    "DOB": "2024-03-04",
-    "nid": "2323",
-    "streetAddress": "J A M T O L A",
-    "city": "Narayanganj",
-    "stateProvince": "3",
-    "postalCode": "1400",
-    "country": "Bangladesh",
-    "emergencyName": "Md. Hossain Ahamed",
-    "emergencyRelation": "3",
-    "emergencyPhoneNumber": "01868726172",
-    "emergencyEmail": "hossainahamed6872@gmail.com",
-    "emergencyAddress": "J A M T O L A",
-    "branch_name": "Fouco Chasara",
-    "branchID": "q-Chasara-f-Bangladesh-1440-1705850705607",
-    "role": "Kitchen Staff",
-    "salary_type": "Monthly",
-    "salary_unit": "3",
-    "profilePhoto": {}
+                data: {
+                    "res_name": "Fuoco",
+
+                    "headerText": "Welcome to Fuoco",
+                    "greetingText": "Thank you!",
+
+                    "streetAddress": "45 New Chasara",
+                    "city": "Narayangnaj",
+                    "stateProvince": "Dhaka",
+                    "postalCode": "1400",
+                    "print_address": true,
+
+                    "print_logo": true,
+                    "img": "https://images.unsplash.com/photo-1682685797660-3d847763208e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+
+                    "res_email": "hossainahamed6872@gmail.com",
+                    "print_res_email": false,
+
+                    "res_mobile": "01868726172",
+                    "print_res_mobile": false,
+
+
+                    "print_kitchen_print" : true,
+
+
+
+                }
+}
+
+{
+    "print_res_email": false,
+    "print_res_mobile": false,
+    "print_address": true,
+    "print_logo": true,
+    "print_kitchen_print": true,
+    "headerText": "Welcome to Fuoco",
+    "greetingText": "Thank you!"
 }
