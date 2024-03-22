@@ -34,9 +34,59 @@ const addCategory = async (req, res) => {
 
 const allCategory = async (req, res) => {
   try {
-    const categories = await categoryModel.find({ deleteStatus: false });
+    const { branchID, currentPage, dataSize, status } = req.query;
+    const skip = (parseInt(currentPage) - 1) * parseInt(dataSize);
+    let categories;
+    let totalCount;
+    if (status === "all") {
+      categories = await categoryModel
+        .find({
+          deleteStatus: false,
+          branchID: branchID,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+      });
+    } else if (status === "active") {
+      categories = await categoryModel
+        .find({
+          deleteStatus: false,
+          branchID: branchID,
+          active: true,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+        active: true,
+      });
+    } else if (status === "inactive") {
+      categories = await categoryModel
+        .find({
+          deleteStatus: false,
+          branchID: branchID,
+          active: false,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+        active: false,
+      });
+    }
+
     // console.log(categories);
-    res.status(200).json(categories);
+    res.status(200).json({
+      categories,
+      currentPage: parseInt(currentPage),
+      dataSize: parseInt(dataSize),
+      totalCount,
+    });
   } catch (error) {
     return res.status(500).json({ msg: "Server error" });
   }
