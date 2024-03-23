@@ -170,7 +170,7 @@ const updateDish = async (req, res) => {
       options,
       addOn,
     } = req.body;
-    const { dishId } = req.params;
+    const { dishID } = req.params;
     // if (!dishesModel.findOne({ title })) {
     //   return res.status(400).send({
     //     success: false,
@@ -178,7 +178,7 @@ const updateDish = async (req, res) => {
     //   });
     // }
     const dish = await dishesModel.findByIdAndUpdate(
-      dishId,
+      dishID,
       {
         res_id,
         branchID,
