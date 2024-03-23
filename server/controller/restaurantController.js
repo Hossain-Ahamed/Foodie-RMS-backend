@@ -118,7 +118,7 @@ const sendRestaurantData = async (req, res) => {
 };
 
 const updateResturant = async (req, res) => {
-  const id = req.params.id;
+  const { _id } = req.params;
   const {
     res_name,
     res_email,
@@ -136,7 +136,7 @@ const updateResturant = async (req, res) => {
 
   try {
     let updatedData = await restaurantModel.findByIdAndUpdate(
-      req.params.id,
+      _id,
       {
         res_name,
         res_email,
@@ -154,7 +154,7 @@ const updateResturant = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).send({ msg: "succesfull", updatedData });
+    res.status(200).send(true);
   } catch (err) {
     console.log("Error In Updating Data", err);
     return res.status(401).json({
@@ -212,6 +212,6 @@ module.exports = {
   createResturant,
   updateResturant,
   deleteResturent,
-  sendRestaurantData
+  sendRestaurantData,
   // createAccount,
 };
