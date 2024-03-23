@@ -70,15 +70,13 @@ const getAllCategoryTitles = async (req, res) => {
 
 const getDishById = async (req, res) => {
   try {
-    const { dishId } = req.params;
+    const { dishID } = req.params;
+    console.log(dishID)
     const dish = await dishesModel.findById({
-      _id: dishId,
+      _id: dishID,
       deleteStatus: false,
     });
-
-    if (!dish) {
-      return res.status(404).json({ msg: "Dish not found" });
-    }
+    console.log(dish)
     res.status(200).json(dish);
   } catch (err) {
     console.error(err);
@@ -92,7 +90,6 @@ const getDishesByBranchId = async (req, res) => {
   try {
     const { branchID } = req.params;
     const { currentPage, dataSize, status } = req.query;
-    console.log(req.query)
     const skip = parseInt(currentPage) * parseInt(dataSize);
     let dishes;
     let totalCount;
