@@ -70,14 +70,20 @@ const getAllCategoryTitles = async (req, res) => {
 
 const getDishById = async (req, res) => {
   try {
-    const { dishID } = req.params;
-    console.log(dishID)
+    const { dishID, branchID } = req.params;
+    const categories = await categoryModel.find({
+      deleteStatus: false,
+      branchID: branchID,
+    });
+    const titles = categories.map((category) => category.title);
     const dish = await dishesModel.findById({
       _id: dishID,
       deleteStatus: false,
     });
-    console.log(dish)
-    res.status(200).json(dish);
+    res.status(200).json({
+      titles,
+      dish
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Internal Server Error" });
