@@ -76,6 +76,9 @@ const {
 const {
   createExpense,
   showAllExpense,
+  deleteExpense,
+  updateExpense,
+  getExpenseById,
 } = require("../controller/expenseController");
 const {
   CreateDev,
@@ -238,6 +241,15 @@ router.patch(
 //Expense Route
 router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses/:branchID", showAllExpense);
+router.delete(
+  "/admin/:res_id/branch/:branchID/delete-expenses/:_id",
+  deleteExpense
+);
+router.get("/admin/:res_id/branch/:branchID/get-expenses/:_id", getExpenseById);
+router.patch(
+  "/admin/:res_id/branch/:branchID/edit-expenses/:_id",
+  updateExpense
+);
 
 //printing Setup
 router.get(
@@ -262,9 +274,15 @@ router.delete(
 router.post("/dev-admin-login", devLogIn);
 
 // Subscription billing history data for supper admin
-router.get("/restaurant/:res_id/bill-history-list",getSubscriptionPurchaseHistory);
+router.get(
+  "/restaurant/:res_id/bill-history-list",
+  getSubscriptionPurchaseHistory
+);
 
 // Subscription durations  supper admin
-router.get("/restaurant/:res_id/subscription-duration-of-all-branch",subscription_Duration_For_All_Branches);
+router.get(
+  "/restaurant/:res_id/subscription-duration-of-all-branch",
+  subscription_Duration_For_All_Branches
+);
 
 module.exports = router;
