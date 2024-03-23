@@ -68,6 +68,24 @@ const getAllCategoryTitles = async (req, res) => {
   }
 };
 
+const getDishById = async (req, res) => {
+  try {
+    const { dishId } = req.params;
+    const dish = await dishesModel.findById({
+      _id: dishId,
+      deleteStatus: false,
+    });
+
+    if (!dish) {
+      return res.status(404).json({ msg: "Dish not found" });
+    }
+    res.status(200).json(dish);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
 //grt all dishes
 
 const getDishesByBranchId = async (req, res) => {
@@ -151,7 +169,7 @@ const updateDish = async (req, res) => {
       options,
       addOn,
     } = req.body;
-    const _id = req.params._id;
+    const { dishId } = req.params;
     // if (!dishesModel.findOne({ title })) {
     //   return res.status(400).send({
     //     success: false,
@@ -159,7 +177,7 @@ const updateDish = async (req, res) => {
     //   });
     // }
     const dish = await dishesModel.findByIdAndUpdate(
-      _id,
+      dishId,
       {
         res_id,
         branchID,
@@ -208,4 +226,5 @@ module.exports = {
   deleteDish,
   getAllCategoryTitles,
   getDishesByBranchId,
+  getDishById,
 };
