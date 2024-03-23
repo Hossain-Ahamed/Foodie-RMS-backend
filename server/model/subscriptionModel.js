@@ -7,7 +7,7 @@ const subscriptionSchema = new mongoose.Schema({
   },
   branchID: {
     type: mongoose.ObjectId,
-    ref: "Branchs",
+    ref: "Branches",
   },
   packageType: {
     type: String,

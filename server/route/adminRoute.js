@@ -64,6 +64,7 @@ const {
   getPaymentDetails,
   updatePackageAfterPayment,
   getSubscriptionPurchaseHistory,
+  subscription_Duration_For_All_Branches,
 } = require("../controller/subscriptionController");
 
 const {
@@ -260,10 +261,10 @@ router.delete(
 
 router.post("/dev-admin-login", devLogIn);
 
-// Subscription data for supper admin
-router.get(
-  "/restaurant/:res_id/bill-history-list",
-  getSubscriptionPurchaseHistory
-);
+// Subscription billing history data for supper admin
+router.get("/restaurant/:res_id/bill-history-list",getSubscriptionPurchaseHistory);
+
+// Subscription durations  supper admin
+router.get("/restaurant/:res_id/subscription-duration-of-all-branch",subscription_Duration_For_All_Branches);
 
 module.exports = router;
