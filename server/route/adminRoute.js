@@ -155,7 +155,6 @@ router.delete(
   "/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id",
   deleteEmployeeById
 ); //Delete An Employee
-router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 
 //subcription package for dev
 router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages

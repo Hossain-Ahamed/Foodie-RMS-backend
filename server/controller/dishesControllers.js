@@ -58,9 +58,6 @@ const getAllCategoryTitles = async (req, res) => {
       deleteStatus: false,
       branchID: branchID,
     });
-    if (!titles) {
-      return res.status(404).json("No category Found");
-    }
     const titles = categories.map((category) => category.title);
 
     res.status(200).json({
@@ -76,18 +73,60 @@ const getAllCategoryTitles = async (req, res) => {
 const getDishesByBranchId = async (req, res) => {
   try {
     const { branchID } = req.params;
-    const dishes = await dishesModel
-      .find({
-        branchID: branchID,
-        deleteStatus: false,
-      })
-      .select(
-        "title,category,active,preparation_cost,price,supplementary_duty,sales_tax,offerPrice"
-      );
+    const { currentPage, dataSize, status } = req.query;
+    const skip = parseInt(currentPage) * parseInt(dataSize);
+    let dishes;
+    let totalCount;
     if (!dishes) {
       return res.status(404).json("No Dish Found");
     }
-    res.status(200).json(dishes);
+    if (status === "all") {
+      dishes = await dishesModel
+        .find({
+          branchID: branchID,
+          deleteStatus: false,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+      });
+    } else if (status === "active") {
+      dishes = await dishesModel
+        .find({
+          branchID: branchID,
+          deleteStatus: false,
+          active: true,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+        active: true,
+      });
+    } else if (status === "inactive") {
+      dishes = await dishesModel
+        .find({
+          branchID: branchID,
+          deleteStatus: false,
+          active: false,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+        active: false,
+      });
+    }
+    res.status(200).json({
+      dishes,
+      currentPage: parseInt(currentPage),
+      dataSize: parseInt(dataSize),
+      totalCount,
+    });
   } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
@@ -101,7 +140,7 @@ const updateDish = async (req, res) => {
       branchID,
       title,
       category,
-      isActive,
+      active,
       description,
       supplementary_duty,
       img,
@@ -126,7 +165,7 @@ const updateDish = async (req, res) => {
         branchID,
         title,
         category,
-        isActive,
+        active,
         description,
         supplementary_duty,
         img,
@@ -157,7 +196,7 @@ const deleteDish = async (req, res) => {
       },
       { new: true }
     );
-    res.satus(200).send(true);
+    res.status(200).send(true);
   } catch (err) {
     res.status(400).send(false);
   }
