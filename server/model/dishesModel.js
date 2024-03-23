@@ -29,7 +29,8 @@ const dishesSchema = new mongoose.Schema(
       type: String,
     },
     supplementary_duty: {
-      type: String,
+      type: Number,
+      default: 0
     },
     img: {
       type: String,
@@ -48,6 +49,7 @@ const dishesSchema = new mongoose.Schema(
     },
     sales_tax: {
       type: Number,
+      default: 0
     },
     options: [
       {

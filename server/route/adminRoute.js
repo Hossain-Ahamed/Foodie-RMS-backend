@@ -125,7 +125,7 @@ router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/get-categories/:id", getCategoryById); // Get Category by ID
-router.get("/admin/get-previous-dish/:dishID", getDishById);
+router.get("/admin/:branchID/get-previous-dish/:dishID", getDishById);
 router.get(
   "/restaurant/:res_id/existing-employee-data/:employeeId",
   getEmployeeById
@@ -149,7 +149,7 @@ router.put("/admin/update/restaurant/:id", updateResturant); //Update restaurant
 router.put("/admin/update/brach/:_id", updateResturant); //Update branch By ID
 router.patch("/admin/edit-categories/:id", updateCategory); //Update Category By ID
 router.patch("/admin/update/employee/:id", updateEmployeeById); //Update Employee  By  ID for my current employee
-router.put("/admin/edit-dishes/:dishId", updateDish); //Update The Dish By its id
+router.patch("/admin/:branchID/edit-dishes/:dishID", updateDish); //Update The Dish By its id
 
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
