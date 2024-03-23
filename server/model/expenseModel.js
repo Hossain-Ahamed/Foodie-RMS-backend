@@ -27,6 +27,10 @@ const expenseSchema = new mongoose.Schema({
   vendorDescription: {
     type: String,
   },
+  deleteStatus: {
+    type: String,
+    default: false
+  },
   transactions: [
     {
       paymentDate: {
