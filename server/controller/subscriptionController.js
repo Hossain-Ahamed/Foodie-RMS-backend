@@ -284,64 +284,84 @@ const getSubscriptionPurchaseHistory = async (req, res) => {
     if (!res_id) {
       return res.status(404).send({ error: "Res_id is required." });
     }
-    const objectIdResId = new mongoose.Types.ObjectId(res_id);
 
-    const subscriptionHistory = await subscriptionModel.aggregate([
-      {
-        $match: { res_id: objectIdResId }
-      },
-      {
-        $unwind: "$previousSubscriptions"
-      },
-      {
-        $sort: { "previousSubscriptions.payment_time": 1 } // Sorting by payment_time ascending
-      },
-      {
-        $lookup: {
-          from: "Branches",
-          localField: "branchID",
-          foreignField: "_id",
-          as: "branch"
-        }
-      },
-      {
-        $addFields: {
-          "previousSubscriptions.branchName": { $arrayElemAt: ["$branch.branch_name", 0] },
-          "previousSubscriptions.branchID": { $arrayElemAt: ["$branch._id", 0] }
-        }
-      },
-      {
-        $project: {
-          "branch": 0, // Exclude the branch field from the output
-          "previousSubscriptions._id": 0 // Exclude the _id field from each previous subscription
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          previousSubscriptions: { $push: "$previousSubscriptions" }
-        }
-      },
-      {
-        $project: {
-          _id: 0,
-          previousSubscriptions: 1
-        }
-      }
-    ]).exec();
+    const subscriptions = await subscriptionModel.find({
+      res_id: res_id,
+      deleteStatus: "false"
+    })
+    .populate({
+      path: 'res_id',
+      select: 'res_name _id'
+    })
+    .populate({
+      path: 'branchID',
+      select: 'branch_name _id'
+    })
+    .select('_id previousSubscriptions res_id branchID');
 
-    if (!subscriptionHistory || subscriptionHistory.length === 0) {
-      return res.status(404).send({ error: "No subscription history found." });
-    }
+    // Flattening previous subscriptions and formatting data
+    let formattedData = [];
+    subscriptions.forEach(subscription => {
+      subscription.previousSubscriptions.forEach(prevSub => {
+        formattedData.push({
+          res_id: subscription.res_id._id,
+          res_name: subscription.res_id.res_name,
+          branch_name: subscription.branchID.branch_name,
+          branchID: subscription.branchID._id,
+          subscriptionStart: new Date(prevSub.startDate).toISOString(),
+          subscriptionEnd: new Date(prevSub.endDate).toISOString(),
+          amount: prevSub.price,
+          payment_time: new Date(prevSub.payment_time).toISOString(),
+          transaction_id: prevSub.transactionID
+        });
+      });
+    });
 
-    res.status(200).send(subscriptionHistory[0]);
+    // Sort by payment time
+    formattedData.sort((a, b) => new Date(b.payment_time) - new Date(a.payment_time));
 
+    res.status(200).send(formattedData);
   } catch (error) {
     console.error("Error in getSubscriptionPurchaseHistory:", error);
     res.status(500).send({ error: "Internal Server Error" });
   }
-}
+};
 
+
+
+const subscription_Duration_For_All_Branches = async (req, res) => {
+  try {
+    const { res_id } = req.params;
+    const subscriptions = await subscriptionModel.find({
+      res_id: res_id,
+      deleteStatus: "false"
+    })
+    .populate({
+      path: 'res_id',
+      select: 'res_name _id'
+    })
+    .populate({
+      path: 'branchID',
+      select: 'branch_name _id'
+    })
+    .select('_id startDate endDate res_id branchID');
+
+    // Transforming the result array to match the desired output format
+    const transformedData = subscriptions.map(subscription => ({
+      _id: subscription._id,
+      subscriptionStart: subscription.startDate,
+      subscriptionEnd: subscription.endDate,
+      res_name: subscription.res_id.res_name,
+      res_id: subscription.res_id._id,
+      branchID: subscription.branchID._id,
+      branch_name: subscription.branchID.branch_name
+    }));
+
+    res.status(200).send(transformedData);
+  } catch (e) {
+    responseError(res, 500, e);
+  }
+};
 
 
 
@@ -353,5 +373,6 @@ module.exports = {
   CreatePaymentIntent,
   getPaymentDetails,
   updatePackageAfterPayment,
-  getSubscriptionPurchaseHistory
+  getSubscriptionPurchaseHistory,
+  subscription_Duration_For_All_Branches
 };
