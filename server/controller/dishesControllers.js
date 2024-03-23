@@ -8,7 +8,7 @@ const createDishes = async (req, res) => {
     const {
       title,
       category,
-      isActive,
+      active,
       description,
       supplementary_duty,
       img,
@@ -32,7 +32,7 @@ const createDishes = async (req, res) => {
       branchID,
       title,
       category,
-      isActive,
+      active,
       description,
       supplementary_duty,
       img,
@@ -64,7 +64,89 @@ const getAllCategoryTitles = async (req, res) => {
       titles,
     });
   } catch (error) {
-    console.error("Error fetching category titles:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+const getDishById = async (req, res) => {
+  try {
+    const { dishID, branchID } = req.params;
+    const categories = await categoryModel.find({
+      deleteStatus: false,
+      branchID: branchID,
+    });
+    const titles = categories.map((category) => category.title);
+    const dish = await dishesModel.findById({
+      _id: dishID,
+      deleteStatus: false,
+    });
+    res.status(200).json({
+      titles,
+      dish
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+//grt all dishes
+
+const getDishesByBranchId = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    const { currentPage, dataSize, status } = req.query;
+    const skip = parseInt(currentPage) * parseInt(dataSize);
+    let dishes;
+    let totalCount;
+    if (status === "all") {
+      dishes = await dishesModel
+        .find({
+          branchID: branchID,
+          deleteStatus: false,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+      });
+    } else if (status === "active") {
+      dishes = await dishesModel
+        .find({
+          branchID: branchID,
+          deleteStatus: false,
+          isActive: true,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+        isActive: true,
+      });
+    } else if (status === "inactive") {
+      dishes = await dishesModel
+        .find({
+          branchID: branchID,
+          deleteStatus: false,
+          isActive: false,
+        })
+        .skip(skip)
+        .limit(parseInt(dataSize));
+      totalCount = await categoryModel.countDocuments({
+        deleteStatus: false,
+        branchID: branchID,
+        isActive: false,
+      });
+    }
+    res.status(200).json({
+      dishes,
+      currentPage: parseInt(currentPage),
+      dataSize: parseInt(dataSize),
+      totalCount,
+    });
+  } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
 };
@@ -77,7 +159,7 @@ const updateDish = async (req, res) => {
       branchID,
       title,
       category,
-      isActive,
+      active,
       description,
       supplementary_duty,
       img,
@@ -88,7 +170,7 @@ const updateDish = async (req, res) => {
       options,
       addOn,
     } = req.body;
-    const _id = req.params._id;
+    const { dishId } = req.params;
     // if (!dishesModel.findOne({ title })) {
     //   return res.status(400).send({
     //     success: false,
@@ -96,13 +178,13 @@ const updateDish = async (req, res) => {
     //   });
     // }
     const dish = await dishesModel.findByIdAndUpdate(
-      _id,
+      dishId,
       {
         res_id,
         branchID,
         title,
         category,
-        isActive,
+        active,
         description,
         supplementary_duty,
         img,
@@ -133,9 +215,8 @@ const deleteDish = async (req, res) => {
       },
       { new: true }
     );
-    res.satus(200).send(true);
+    res.status(200).send(true);
   } catch (err) {
-    console.log("Error in deleting the dish : ", err);
     res.status(400).send(false);
   }
 };
@@ -145,4 +226,6 @@ module.exports = {
   updateDish,
   deleteDish,
   getAllCategoryTitles,
+  getDishesByBranchId,
+  getDishById,
 };

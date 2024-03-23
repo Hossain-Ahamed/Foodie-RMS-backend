@@ -27,6 +27,8 @@ const {
   updateDish,
   deleteDish,
   getAllCategoryTitles,
+  getDishesByBranchId,
+  getDishById,
 } = require("../controller/dishesControllers");
 
 const {
@@ -91,7 +93,10 @@ const {
   deleteSubscriptionPackage,
   giveOldSubscriptionData,
 } = require("../controller/subscriptionPackagesController");
-const { getPrintingSetUp, showPrintingSetUp } = require("../controller/printingSetUpController");
+const {
+  getPrintingSetUp,
+  showPrintingSetUp,
+} = require("../controller/printingSetUpController");
 
 const router = express.Router();
 // http://localhost:5000/admin/login
@@ -109,6 +114,7 @@ router.post("/create-payment-intent", CreatePaymentIntent);
 
 router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
+router.get("/admin/get-all-dishes/:branchID", getDishesByBranchId);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
@@ -120,6 +126,7 @@ router.get("/all-branch-payment-wise-list-for-dev-admins", getAllBranch);
 
 //For ReadById =>  Private Route (Only for admin and super user)
 router.get("/admin/get-categories/:id", getCategoryById); // Get Category by ID
+router.get("/admin/get-previous-dish/:dishID", getDishById);
 router.get(
   "/restaurant/:res_id/existing-employee-data/:employeeId",
   getEmployeeById
@@ -143,17 +150,17 @@ router.put("/admin/update/restaurant/:id", updateResturant); //Update restaurant
 router.put("/admin/update/brach/:_id", updateResturant); //Update branch By ID
 router.patch("/admin/edit-categories/:id", updateCategory); //Update Category By ID
 router.patch("/admin/update/employee/:id", updateEmployeeById); //Update Employee  By  ID for my current employee
-router.put("/admin/update/dish/:_id", updateDish); //Update The Dish By its id
+router.put("/admin/edit-dishes/:dishId", updateDish); //Update The Dish By its id
 
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
 router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
 router.delete("/admin/delete-categories/:id", deleteCategory); //Delete A Category By Its ID
+router.delete("/admin/delete-dishes/:_id", deleteDish); //Delete a dish by its id
 router.delete(
   "/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id",
   deleteEmployeeById
 ); //Delete An Employee
-router.delete("/admin/delete/dish/:_id", deleteDish); //Delete An Employee
 
 //subcription package for dev
 router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
@@ -232,15 +239,23 @@ router.patch(
 router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses", showAllExpense);
 
-
 //printing Setup
-router.get("/restaurant/:res_id/branch/:branchID/payment-slip-format", getPrintingSetUp);
-router.patch("/restaurant/:res_id/branch/:branchID/payment-slip-format", showPrintingSetUp);
+router.get(
+  "/restaurant/:res_id/branch/:branchID/payment-slip-format",
+  getPrintingSetUp
+);
+router.patch(
+  "/restaurant/:res_id/branch/:branchID/payment-slip-format",
+  showPrintingSetUp
+);
 
 //Tables
-router.get("/restaurant/:res_id/branch/:branchID/tables",getBranchesTable)
-router.post("/restaurant/:res_id/branch/:branchID/tables",addTables)
-router.delete("/restaurant/:res_id/branch/:branchID/tables/:number",barnchTableDelete);
+router.get("/restaurant/:res_id/branch/:branchID/tables", getBranchesTable);
+router.post("/restaurant/:res_id/branch/:branchID/tables", addTables);
+router.delete(
+  "/restaurant/:res_id/branch/:branchID/tables/:number",
+  barnchTableDelete
+);
 
 //login dev panel
 
