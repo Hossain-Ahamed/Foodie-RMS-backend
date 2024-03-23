@@ -92,12 +92,10 @@ const getDishesByBranchId = async (req, res) => {
   try {
     const { branchID } = req.params;
     const { currentPage, dataSize, status } = req.query;
+    console.log(req.query)
     const skip = parseInt(currentPage) * parseInt(dataSize);
     let dishes;
     let totalCount;
-    if (!dishes) {
-      return res.status(404).json("No Dish Found");
-    }
     if (status === "all") {
       dishes = await dishesModel
         .find({
@@ -115,28 +113,28 @@ const getDishesByBranchId = async (req, res) => {
         .find({
           branchID: branchID,
           deleteStatus: false,
-          active: true,
+          isActive: true,
         })
         .skip(skip)
         .limit(parseInt(dataSize));
       totalCount = await categoryModel.countDocuments({
         deleteStatus: false,
         branchID: branchID,
-        active: true,
+        isActive: true,
       });
     } else if (status === "inactive") {
       dishes = await dishesModel
         .find({
           branchID: branchID,
           deleteStatus: false,
-          active: false,
+          isActive: false,
         })
         .skip(skip)
         .limit(parseInt(dataSize));
       totalCount = await categoryModel.countDocuments({
         deleteStatus: false,
         branchID: branchID,
-        active: false,
+        isActive: false,
       });
     }
     res.status(200).json({
