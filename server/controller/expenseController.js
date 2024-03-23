@@ -46,7 +46,8 @@ const createExpense = async (req, res) => {
 
 //show expense in the list
 const showAllExpense = async (req, res) => {
-  const data = await Expense.find();
+  const { branchID } = req.params
+  const data = await Expense.find({branchID: branchID});
   if (data) {
     res.status(200).json(data);
   } else {

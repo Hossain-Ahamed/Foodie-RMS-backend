@@ -236,7 +236,7 @@ router.patch(
 
 //Expense Route
 router.post("/admin/create/expense", createExpense);
-router.get("/admin/all-expenses", showAllExpense);
+router.get("/admin/all-expenses/:branchID", showAllExpense);
 
 //printing Setup
 router.get(
