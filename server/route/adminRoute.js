@@ -27,6 +27,7 @@ const {
   updateDish,
   deleteDish,
   getAllCategoryTitles,
+  getDishesByBranchId,
 } = require("../controller/dishesControllers");
 
 const {
@@ -108,6 +109,7 @@ router.post("/create-payment-intent", CreatePaymentIntent);
 
 router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
+router.get("/admin/get-all-dishes/:branchID", getDishesByBranchId);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
@@ -148,6 +150,7 @@ router.put("/admin/update/dish/:_id", updateDish); //Update The Dish By its id
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
 router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
 router.delete("/admin/delete-categories/:id", deleteCategory); //Delete A Category By Its ID
+router.delete("/admin/delete-dishes/:_id", deleteDish); //Delete a dish by its id
 router.delete(
   "/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id",
   deleteEmployeeById
