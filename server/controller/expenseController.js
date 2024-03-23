@@ -54,7 +54,87 @@ const showAllExpense = async (req, res) => {
   }
 };
 
+//getExpenseById
+const getExpenseById = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const expenseData = await Expense.find({
+      deleteStatus: false,
+      _id: _id,
+    });
+    res.status(200).json(expenseData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+const updateExpense = async (req, res) => {
+  try {
+    const {
+      res_id,
+      branchID,
+      category,
+      billDate,
+      expense,
+      payTo,
+      payeeID,
+      vendorDescription,
+      paymentDate,
+      paymentAmount,
+      reference,
+      description,
+    } = req.body;
+    const { _id } = req.params;
+    const expenseUpdate = await Expense.findByIdAndUpdate(
+      _id,
+      {
+        res_id,
+        branchID,
+        category,
+        billDate,
+        expense,
+        payTo,
+        payeeID,
+        vendorDescription,
+        transactions: [
+          {
+            paymentDate,
+            paymentAmount,
+            reference,
+            description,
+          },
+        ],
+      },
+      { new: true }
+    );
+    res.status(200).send(true);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(false);
+  }
+};
+
+const deleteExpense = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    await Expense.findByIdAndUpdate(
+      _id,
+      {
+        deleteStatus: true,
+      },
+      { new: true }
+    );
+    res.status(200).send(true);
+  } catch (err) {
+    res.status(400).send(false);
+  }
+};
+
 module.exports = {
   createExpense,
   showAllExpense,
+  deleteExpense,
+  updateExpense,
+  getExpenseById
 };

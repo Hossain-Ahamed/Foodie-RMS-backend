@@ -76,6 +76,9 @@ const {
 const {
   createExpense,
   showAllExpense,
+  deleteExpense,
+  updateExpense,
+  getExpenseById
 } = require("../controller/expenseController");
 const {
   CreateDev,
@@ -238,6 +241,7 @@ router.patch(
 //Expense Route
 router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses", showAllExpense);
+
 
 //printing Setup
 router.get(
