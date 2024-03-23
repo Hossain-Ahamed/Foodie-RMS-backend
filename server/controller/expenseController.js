@@ -47,7 +47,7 @@ const createExpense = async (req, res) => {
 //show expense in the list
 const showAllExpense = async (req, res) => {
   const { branchID } = req.params
-  const data = await Expense.find({branchID: branchID});
+  const data = await Expense.find({ branchID: branchID, deleteStatus: false});
   if (data) {
     res.status(200).json(data);
   } else {
@@ -63,7 +63,7 @@ const getExpenseById = async (req, res) => {
       deleteStatus: false,
       _id: _id,
     });
-    res.status(200).json(expenseData);
+    res.status(200).send(expenseData);
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Internal Server Error" });
@@ -86,7 +86,15 @@ const updateExpense = async (req, res) => {
       reference,
       description,
     } = req.body;
+    const data = {
+      paymentDate,
+      paymentAmount,
+      reference,
+      description,
+    }
     const { _id } = req.params;
+    const a = await Expense.find({_id: _id})
+    Expense.transactions.push(data)
     const expenseUpdate = await Expense.findByIdAndUpdate(
       _id,
       {
@@ -98,14 +106,6 @@ const updateExpense = async (req, res) => {
         payTo,
         payeeID,
         vendorDescription,
-        transactions: [
-          {
-            paymentDate,
-            paymentAmount,
-            reference,
-            description,
-          },
-        ],
       },
       { new: true }
     );
