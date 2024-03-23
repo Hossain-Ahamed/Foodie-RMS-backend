@@ -149,8 +149,7 @@ router.post(
 router.post("/enlisted-payment", updatePackageAfterPayment);
 
 //For  Update => Admin or Super User Access (Admin can only update his own profile)
-router.put("/admin/update/restaurant/:id", updateResturant); //Update restaurant By ID
-router.put("/admin/update/brach/:_id", updateResturant); //Update branch By ID
+router.patch("/edit-restaurant/:_id", updateResturant);
 router.patch("/admin/edit-categories/:id", updateCategory); //Update Category By ID
 router.patch("/admin/update/employee/:id", updateEmployeeById); //Update Employee  By  ID for my current employee
 router.patch("/admin/:branchID/edit-dishes/:dishID", updateDish); //Update The Dish By its id
