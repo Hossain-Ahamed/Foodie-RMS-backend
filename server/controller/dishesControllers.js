@@ -8,7 +8,7 @@ const createDishes = async (req, res) => {
     const {
       title,
       category,
-      isActive,
+      active,
       description,
       supplementary_duty,
       img,
@@ -32,7 +32,7 @@ const createDishes = async (req, res) => {
       branchID,
       title,
       category,
-      isActive,
+      active,
       description,
       supplementary_duty,
       img,
@@ -58,13 +58,37 @@ const getAllCategoryTitles = async (req, res) => {
       deleteStatus: false,
       branchID: branchID,
     });
+    if (!titles) {
+      return res.status(404).json("No category Found");
+    }
     const titles = categories.map((category) => category.title);
 
     res.status(200).json({
       titles,
     });
   } catch (error) {
-    console.error("Error fetching category titles:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+//grt all dishes
+
+const getDishesByBranchId = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    const dishes = await dishesModel
+      .find({
+        branchID: branchID,
+        deleteStatus: false,
+      })
+      .select(
+        "title,category,active,preparation_cost,price,supplementary_duty,sales_tax,offerPrice"
+      );
+    if (!dishes) {
+      return res.status(404).json("No Dish Found");
+    }
+    res.status(200).json(dishes);
+  } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
 };
@@ -135,7 +159,6 @@ const deleteDish = async (req, res) => {
     );
     res.satus(200).send(true);
   } catch (err) {
-    console.log("Error in deleting the dish : ", err);
     res.status(400).send(false);
   }
 };
@@ -145,4 +168,5 @@ module.exports = {
   updateDish,
   deleteDish,
   getAllCategoryTitles,
+  getDishesByBranchId,
 };
