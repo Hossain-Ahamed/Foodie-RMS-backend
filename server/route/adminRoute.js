@@ -40,6 +40,9 @@ const {
   modifyBusinessHours,
   showPaymentType,
   modifyPaymentType,
+  getBranchesTable,
+  addTables,
+  barnchTableDelete,
 } = require("../controller/branchController");
 
 const {
@@ -87,6 +90,7 @@ const {
   deleteSubscriptionPackage,
   giveOldSubscriptionData,
 } = require("../controller/subscriptionPackagesController");
+const { getPrintingSetUp, showPrintingSetUp } = require("../controller/printingSetUpController");
 
 const router = express.Router();
 // http://localhost:5000/admin/login
@@ -226,6 +230,16 @@ router.patch(
 //Expense Route
 router.post("/admin/create/expense", createExpense);
 router.get("/admin/all-expenses", showAllExpense);
+
+
+//printing Setup
+router.get("/restaurant/:res_id/branch/:branchID/payment-slip-format", getPrintingSetUp);
+router.patch("/restaurant/:res_id/branch/:branchID/payment-slip-format", showPrintingSetUp);
+
+//Tables
+router.get("/restaurant/:res_id/branch/:branchID/tables",getBranchesTable)
+router.post("/restaurant/:res_id/branch/:branchID/tables",addTables)
+router.delete("/restaurant/:res_id/branch/:branchID/tables/:number",barnchTableDelete);
 
 //login dev panel
 

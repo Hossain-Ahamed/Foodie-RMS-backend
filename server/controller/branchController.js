@@ -152,28 +152,80 @@ const addTables = async (req, res) => {
   try {
     const { branchID } = req.params;
     const { number, capacity, location } = req.body;
+    console.log(number, capacity, location);
     const branch = await branchModel.findById({ _id: branchID });
     if (!branch) {
       responseError(res, 404, error);
     } else {
-      const qrCodeData =
+      const qrCodeData = 
         "/restaurant/ " +
         branch.res_id +
         "/branch/" +
         branch._id +
         "?table=" +
         number;
-      const createTable = branchModel.findByIdAndUpdate(
-        branch._id,
-        { tables: [number, capacity, location, qrCodeData] },
-        { new: true }
-      );
-      res.status(200).send(createTable);
+        const updateTable = await branchModel.findByIdAndUpdate(
+          branch._id,
+          {
+            $push: {
+              tables: {
+                number: number,
+                capacity: capacity,
+                location: location,
+                qrCodeData: qrCodeData
+              }
+            }
+          },
+          { new: true }
+        );
+        console.log("updateTable", updateTable);
+      res.status(200).send(updateTable);
     }
   } catch (error) {
     responseError(res, 500, error);
   }
 };
+
+const getBranchesTable = async (req, res) => {
+  const { branchID } = req.params;
+  try {
+    const branches = await branchModel.findOne({_id:branchID}).select("tables").lean(); // Using lean() to convert mongoose documents to plain JavaScript objects
+    if(!branches){
+      responseError( res, 404 , 'No branches found');
+    }
+    if(branches?.tables && Array.isArray(branches.tables)) 
+    {// Preprocess each branch before sending it to the frontend
+      const modifiedTables = branches.tables.map(table => {
+        if (table.qrCodeData) {
+          table.qrCodeData = process.env.LINK + table.qrCodeData;
+        }
+        return table;
+      });
+    res.status(200).send(modifiedTables);
+    }else{
+      res.status(200).send([]);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const barnchTableDelete = async (req,res) =>{
+  const { branchID,number } = req.params;
+  
+  try {
+    const branch = await branchModel.findOneAndUpdate(
+        { _id:branchID }, // Find the branch containing the table with number = 2
+        { $pull: { tables: { number: number } } }, // Remove the table with number = 2
+        { new: true }
+    );
+    res.status(200).send(true);
+    console.log("Branch after deletion:", branch);
+} catch (error) {
+    console.error("Error:", error);
+    }
+}
 
 const getAllBranchForDev = async (req, res) => {
   try {
@@ -306,5 +358,7 @@ module.exports = {
   showBusinessHours,
   modifyBusinessHours,
   showPaymentType,
-  modifyPaymentType
+  modifyPaymentType,
+  getBranchesTable,
+  barnchTableDelete
 };
