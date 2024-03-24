@@ -46,7 +46,9 @@ const addEmployee = async (req, res) => {
       } else {
         const password = uuid.v4().slice(0, 8);
         // Check if the email already exists
-        admin.auth().getUserByEmail(email)
+        admin
+          .auth()
+          .getUserByEmail(email)
           .then((userRecord) => {
             res
               .status(409)
@@ -430,7 +432,7 @@ const deleteEmployeeById = async (req, res) => {
           },
         },
       },
-      { new: true }
+      { new: true }
     );
 
     if (!updatedEmployee) {
@@ -446,7 +448,7 @@ const deleteEmployeeById = async (req, res) => {
 const SearchEmployee = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data)
+    console.log(data);
     const searchData = await Employee.find(data);
     console.log(data);
     res.status(200).send(searchData);
@@ -712,6 +714,51 @@ const employeeRole = async (req, res) => {
   }
 };
 
+const allBranchesOfSuperAdmin = async (req, res) => {
+  try {
+    const { email ,res_id} = req.params;
+
+    const response = [];
+    if (!email) {
+      responseError(res, 401, "email not found");
+    } else {
+      const checkEmail = await Employee.findOne({ email: email })
+        .populate({
+          path: "permitted.res_id",
+          model: "Restaurants",
+          select: "_id img res_name",
+        })
+        .populate({
+          path: "permitted.branchID",
+          model: "Branches",
+          select: "_id branch_name",
+        })
+        .select("permitted");
+
+      if (checkEmail) {
+        checkEmail?.permitted.map((permit) => {
+          if (permit?.res_id?._id == res_id) {
+            response.push({
+              res_img: permit?.res_id?.img,
+              res_name: permit?.res_id?.res_name,
+              res_id: permit?.res_id?._id,
+              branch_name: permit?.branchID?.branch_name,
+              branchID: permit?.branchID?._id,
+              role: permit?.role,
+            });
+          }
+        });
+
+        res.status(200).json(response);
+      } else {
+        responseError(res, 404, "User Not Registered all brance");
+      }
+    }
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
 const employeeLogin = async (req, res) => {
   try {
     const { email } = req.body;
@@ -760,4 +807,5 @@ module.exports = {
   addExistingEmployee,
   getEmployeeData_ByID_ForCurrentEmployeeEdit,
   getAllBranch_And_ResturantData,
+  allBranchesOfSuperAdmin,
 };

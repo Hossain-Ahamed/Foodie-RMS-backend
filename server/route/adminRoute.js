@@ -12,6 +12,7 @@ const {
   addExistingEmployee,
   getEmployeeData_ByID_ForCurrentEmployeeEdit,
   getAllBranch_And_ResturantData,
+  allBranchesOfSuperAdmin,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -45,6 +46,7 @@ const {
   getBranchesTable,
   addTables,
   barnchTableDelete,
+  getBranchDetail,
 } = require("../controller/branchController");
 
 const {
@@ -186,6 +188,7 @@ router.post("/search-employee-to-add", SearchEmployee);
 
 //
 router.get("/get-rms-employee-profile/:email", employeeRole);
+router.get("/all-branches-of-super-admin/:email/restaurant/:res_id", allBranchesOfSuperAdmin);
 
 //development side payment list
 router.delete(
@@ -283,5 +286,9 @@ router.get(
   "/restaurant/:res_id/subscription-duration-of-all-branch",
   subscription_Duration_For_All_Branches
 );
+
+//get branch detail  and update   ///  super admin
+router.get("/restaurant/:res_id/branch/:branchID/get-branch-detail", getBranchDetail);  //get branch detail for edit
+router.patch("/restaurant/:res_id/branch/:branchID/get-branch-detail/edit", updateBranch);  // update branch data after edit
 
 module.exports = router;
