@@ -2,6 +2,7 @@ const branchModel = require("../model/branchModel");
 const restaurantModel = require("../model/restaurantModel");
 const subscriptionModel = require("../model/subscriptionModel");
 const { responseError } = require("../utils/utility");
+const employeeModel = require("../model/employeeModel.js");
 
 // create branch
 
@@ -32,6 +33,16 @@ const createBranch = async (req, res) => {
       postalCode,
       country,
     }).save();
+
+    const employee = await employeeModel.findOneAndUpdate({'permitted.res_id' : res_id , 'permitted.role': 'Super-Admin'},
+      { $push: {permitted: 
+        {
+          res_id: res_id,
+          branchID: branch._id,
+          role: "Super-Admin",
+        },
+    }},{new:true});
+
     res.status(200).send(true);
   } catch (err) {
     console.log(err);

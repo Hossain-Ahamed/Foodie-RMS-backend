@@ -27,6 +27,7 @@ const createExpense = async (req, res) => {
       payTo,
       payeeID,
       vendorDescription,
+      totalPayment: parseFloat(paymentAmount),
       transactions: [
         {
           paymentDate,
@@ -46,8 +47,8 @@ const createExpense = async (req, res) => {
 
 //show expense in the list
 const showAllExpense = async (req, res) => {
-  const { branchID } = req.params
-  const data = await Expense.find({ branchID: branchID, deleteStatus: false});
+  const { branchID } = req.params;
+  const data = await Expense.find({ branchID: branchID, deleteStatus: false });
   if (data) {
     res.status(200).json(data);
   } else {
@@ -86,29 +87,27 @@ const updateExpense = async (req, res) => {
       reference,
       description,
     } = req.body;
+    const { _id } = req.params;
+    const b = parseFloat(paymentAmount);
     const data = {
       paymentDate,
       paymentAmount,
       reference,
       description,
-    }
-    const { _id } = req.params;
-    const a = await Expense.find({_id: _id})
-    Expense.transactions.push(data)
-    const expenseUpdate = await Expense.findByIdAndUpdate(
-      _id,
-      {
-        res_id,
-        branchID,
-        category,
-        billDate,
-        expense,
-        payTo,
-        payeeID,
-        vendorDescription,
-      },
-      { new: true }
-    );
+    };
+    const a = await Expense.findById(_id);
+    a.transactions.push(data);
+    const updatedA = await a.save();
+    updatedA.res_id = res_id;
+    updatedA.branchID = branchID;
+    updatedA.category = category;
+    updatedA.billDate = billDate;
+    updatedA.expense = expense;
+    updatedA.payTo = payTo;
+    updatedA.payeeID = payeeID;
+    updatedA.vendorDescription = vendorDescription;
+    updatedA.totalPayment += b;
+    await updatedA.save();
     res.status(200).send(true);
   } catch (err) {
     console.log(err);
@@ -137,5 +136,5 @@ module.exports = {
   showAllExpense,
   deleteExpense,
   updateExpense,
-  getExpenseById
+  getExpenseById,
 };

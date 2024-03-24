@@ -18,6 +18,9 @@ const expenseSchema = new mongoose.Schema({
   expense: {
     type: Number,
   },
+  totalPayment: {
+    type: Number,
+  },
   payTo: {
     type: String,
   },
@@ -29,25 +32,21 @@ const expenseSchema = new mongoose.Schema({
   },
   deleteStatus: {
     type: String,
-    default: false
+    default: false,
   },
   transactions: [
     {
       paymentDate: {
         type: String,
-  
       },
       paymentAmount: {
         type: String,
-  
       },
       reference: {
         type: String,
-  
       },
       description: {
         type: String,
-  
       },
     },
   ],
