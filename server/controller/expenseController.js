@@ -98,8 +98,6 @@ const updateExpense = async (req, res) => {
     const a = await Expense.findById(_id);
     a.transactions.push(data);
     const updatedA = await a.save();
-    updatedA.res_id = res_id;
-    updatedA.branchID = branchID;
     updatedA.category = category;
     updatedA.billDate = billDate;
     updatedA.expense = expense;
