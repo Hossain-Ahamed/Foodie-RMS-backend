@@ -50,38 +50,7 @@ const createBranch = async (req, res) => {
   }
 };
 
-//update Branch
-const updateBranch = async (req, res) => {
-  try {
-    const {
-      res_id,
-      branch_name,
-      streetAddress,
-      city,
-      stateProvince,
-      postalCode,
-      country,
-    } = req.body;
-    const _id = req.params._id;
-    const branch = await branchModel.findByIdAndUpdate(
-      _id,
-      {
-        res_id,
-        branch_name,
-        streetAddress,
-        city,
-        stateProvince,
-        postalCode,
-        country,
-      },
-      { new: true }
-    );
-    res.status(200).send(true);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(false);
-  }
-};
+
 
 //delete branch
 const deleteBranch = async (req, res) => {
@@ -120,7 +89,7 @@ const getAllBranch = async (req, res) => {
       },
       {
         $match: {
-          "subscriptions.deleteStatus":"false",
+          "subscriptions.deleteStatus": "false",
         },
       },
       {
@@ -168,28 +137,28 @@ const addTables = async (req, res) => {
     if (!branch) {
       responseError(res, 404, error);
     } else {
-      const qrCodeData = 
+      const qrCodeData =
         "/restaurant/ " +
         branch.res_id +
         "/branch/" +
         branch._id +
         "?table=" +
         number;
-        const updateTable = await branchModel.findByIdAndUpdate(
-          branch._id,
-          {
-            $push: {
-              tables: {
-                number: number,
-                capacity: capacity,
-                location: location,
-                qrCodeData: qrCodeData
-              }
-            }
+      const updateTable = await branchModel.findByIdAndUpdate(
+        branch._id,
+        {
+          $push: {
+            tables: {
+              number: number,
+              capacity: capacity,
+              location: location,
+              qrCodeData: qrCodeData,
+            },
           },
-          { new: true }
-        );
-        console.log("updateTable", updateTable);
+        },
+        { new: true }
+      );
+      console.log("updateTable", updateTable);
       res.status(200).send(updateTable);
     }
   } catch (error) {
@@ -200,43 +169,46 @@ const addTables = async (req, res) => {
 const getBranchesTable = async (req, res) => {
   const { branchID } = req.params;
   try {
-    const branches = await branchModel.findOne({_id:branchID}).select("tables").lean(); // Using lean() to convert mongoose documents to plain JavaScript objects
-    if(!branches){
-      responseError( res, 404 , 'No branches found');
+    const branches = await branchModel
+      .findOne({ _id: branchID })
+      .select("tables")
+      .lean(); // Using lean() to convert mongoose documents to plain JavaScript objects
+    if (!branches) {
+      responseError(res, 404, "No branches found");
     }
-    if(branches?.tables && Array.isArray(branches.tables)) 
-    {// Preprocess each branch before sending it to the frontend
-      const modifiedTables = branches.tables.map(table => {
+    if (branches?.tables && Array.isArray(branches.tables)) {
+      // Preprocess each branch before sending it to the frontend
+      const modifiedTables = branches.tables.map((table) => {
         if (table.qrCodeData) {
           table.qrCodeData = process.env.LINK + table.qrCodeData;
         }
         return table;
       });
-    res.status(200).send(modifiedTables);
-    }else{
+      res.status(200).send(modifiedTables);
+    } else {
       res.status(200).send([]);
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
-const barnchTableDelete = async (req,res) =>{
-  const { branchID,number } = req.params;
-  
+const barnchTableDelete = async (req, res) => {
+  const { branchID, number } = req.params;
+
   try {
     const branch = await branchModel.findOneAndUpdate(
-        { _id:branchID }, // Find the branch containing the table with number = 2
-        { $pull: { tables: { number: number } } }, // Remove the table with number = 2
-        { new: true }
+      { _id: branchID }, // Find the branch containing the table with number = 2
+      { $pull: { tables: { number: number } } }, // Remove the table with number = 2
+      { new: true }
     );
     res.status(200).send(true);
     console.log("Branch after deletion:", branch);
-} catch (error) {
-    console.error("Error:", error);
-    }
-}
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 
 const getAllBranchForDev = async (req, res) => {
   try {
@@ -282,87 +254,135 @@ const singleBranchDataForDev = async (req, res) => {
   }
 };
 
-const showBusinessHours = async (req,res)=>{
-  const {res_id,branchID} = req.params;
-  
-  try{
-    const data = await branchModel.findById({_id:branchID},"shift").lean();
+const showBusinessHours = async (req, res) => {
+  const { res_id, branchID } = req.params;
+
+  try {
+    const data = await branchModel.findById({ _id: branchID }, "shift").lean();
     console.log(data);
     res.status(200).send(data.shift);
-  }
-  catch(e){
+  } catch (e) {
     console.log(e);
-    res.status(400).send("Error getting business hours")
-
+    res.status(400).send("Error getting business hours");
   }
+};
 
-
-}
-
-const modifyBusinessHours = async (req,res)=>{
-  const {res_id,branchID} = req.params;
+const modifyBusinessHours = async (req, res) => {
+  const { res_id, branchID } = req.params;
   //const {data} = req.body;
-  console.log(req.body,"this is the data in controller");
-  
-  try{
-    const data1 = await branchModel.findByIdAndUpdate({_id:branchID},{shift:req.body},{new:true});
+  console.log(req.body, "this is the data in controller");
+
+  try {
+    const data1 = await branchModel.findByIdAndUpdate(
+      { _id: branchID },
+      { shift: req.body },
+      { new: true }
+    );
     console.log(data1);
     res.status(200).send(true);
-  }
-  catch(e){
+  } catch (e) {
     console.log(e);
-    res.status(400).send("Error getting business hours")
-
+    res.status(400).send("Error getting business hours");
   }
+};
 
+const showPaymentType = async (req, res) => {
+  const { res_id, branchID } = req.params;
 
-}
-
-const showPaymentType = async (req,res)=>{
-  const {res_id,branchID} = req.params;
-  
-  try{
-    const data = await branchModel.findById({_id:branchID}).select("paymentTypes , takewayCharge , deliveryCharge").lean();
+  try {
+    const data = await branchModel
+      .findById({ _id: branchID })
+      .select("paymentTypes , takewayCharge , deliveryCharge")
+      .lean();
     console.log(data);
-   res.status(200).send(data);
-  }
-  catch(e){
+    res.status(200).send(data);
+  } catch (e) {
     console.log(e);
-    res.status(400).send("Error getting business hours")
-
+    res.status(400).send("Error getting business hours");
   }
+};
 
+const modifyPaymentType = async (req, res) => {
+  const { res_id, branchID } = req.params;
+  const { paymentTypes, takewayCharge, deliveryCharge } = req.body;
 
-}
-
-const modifyPaymentType = async (req,res)=>{
-  const {res_id,branchID} = req.params;
-  const{paymentTypes,
-    takewayCharge,
-    deliveryCharge} = req.body;
-  
-    console.log(req.body)
-  try{
-    const data =await branchModel.findByIdAndUpdate({_id:branchID},{paymentTypes,
-      takewayCharge,
-      deliveryCharge},{new:true});
+  console.log(req.body);
+  try {
+    const data = await branchModel.findByIdAndUpdate(
+      { _id: branchID },
+      { paymentTypes, takewayCharge, deliveryCharge },
+      { new: true }
+    );
     console.log(data);
-   res.status(200).send(data);
-  }
-  catch(e){
+    res.status(200).send(data);
+  } catch (e) {
     console.log(e);
-    res.status(400).send("Error getting business hours")
-
+    res.status(400).send("Error getting business hours");
   }
+};
+
+const getBranchDetail = async (req, res) => {
+  const { branchID } = req.params;
+
+  try {
+    const data = await branchModel.findOne({
+      _id: branchID,
+      deleteStatus: "false"
+    }).select("branch_name streetAddress city stateProvince postalCode country ")
 
 
-}
+    if (data) {
+      res.status(200).send(data);
+    } else {
+      responseError(res, 404);
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(400).send("Error getting business hours");
+  }
+};
+
+
+// update branch info 
+const updateBranch = async (req, res) => {
+  const { branchID } = req.params;
+  const {
+    branch_name,
+    city,
+    country,
+    postalCode,
+    stateProvince,
+    streetAddress,
+
+  } = req.body;
+
+  try {
+    let updatedData = await branchModel.findByIdAndUpdate(
+      branchID,
+      {
+        branch_name,
+        city,
+        country,
+        postalCode,
+        stateProvince,
+        streetAddress,
+      },
+      { new: true }
+    );
+
+    res.status(200).send(updatedData);
+  } catch (err) {
+    console.log("Error In Updating Data", err);
+    return res.status(401).json({
+      Error: "Error In updating Data",
+    });
+  }
+};
 
 module.exports = {
   addTables,
   getAllBranch,
   createBranch,
-  updateBranch,
   deleteBranch,
   getAllBranchForDev,
   singleBranchDataForDev,
@@ -371,5 +391,7 @@ module.exports = {
   showPaymentType,
   modifyPaymentType,
   getBranchesTable,
-  barnchTableDelete
+  barnchTableDelete,
+  getBranchDetail,
+  updateBranch
 };
