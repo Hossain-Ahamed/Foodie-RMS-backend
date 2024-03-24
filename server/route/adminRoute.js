@@ -67,6 +67,8 @@ const {
   updatePackageAfterPayment,
   getSubscriptionPurchaseHistory,
   subscription_Duration_For_All_Branches,
+  getPaymentDetailsForExtendAndAddBranch,
+  updatePackageAfterPaymentForNewBranch,
 } = require("../controller/subscriptionController");
 
 const {
@@ -121,6 +123,7 @@ router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
 router.get("/admin/get-all-dishes/:branchID", getDishesByBranchId);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
+router.get("/subscription-payment-for-extend-and-add-branch/:branchID", getPaymentDetailsForExtendAndAddBranch);
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
 router.get("/admin/:branchID/all-categories", allCategory); // Get all available Categories
@@ -149,6 +152,7 @@ router.post(
   addExistingEmployee
 );
 router.post("/enlisted-payment", updatePackageAfterPayment);
+router.post("/rms-enlist-payment", updatePackageAfterPaymentForNewBranch);
 
 //For  Update => Admin or Super User Access (Admin can only update his own profile)
 router.patch("/edit-restaurant/:_id", updateResturant);
