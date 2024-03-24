@@ -27,6 +27,7 @@ const createExpense = async (req, res) => {
       payTo,
       payeeID,
       vendorDescription,
+      totalPayment: parseFloat(paymentAmount),
       transactions: [
         {
           paymentDate,
@@ -87,6 +88,7 @@ const updateExpense = async (req, res) => {
       description,
     } = req.body;
     const { _id } = req.params;
+    const b = parseFloat(paymentAmount);
     const data = {
       paymentDate,
       paymentAmount,
@@ -104,6 +106,7 @@ const updateExpense = async (req, res) => {
     updatedA.payTo = payTo;
     updatedA.payeeID = payeeID;
     updatedA.vendorDescription = vendorDescription;
+    updatedA.totalPayment += b;
     await updatedA.save();
     res.status(200).send(true);
   } catch (err) {
