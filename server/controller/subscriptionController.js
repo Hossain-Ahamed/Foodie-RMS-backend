@@ -9,6 +9,7 @@ const uuid = require("uuid");
 const { responseError } = require("../utils/utility.js");
 const mongoose = require("mongoose");
 const subscriptionModel = require("../model/subscriptionModel");
+const subcripstionPackages = require("../model/subcripstionPackages");
 // This is your test secret API key.
 const stripe = require("stripe")(
   "sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le"
@@ -127,6 +128,42 @@ const getPaymentDetails = async (req, res) => {
   }
 };
 
+const getPaymentDetailsForExtendAndAddBranch = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    const existingSubscription = await Subscription.findOne({
+      branchID: branchID,
+    });
+    if (!existingSubscription) {
+      return res.status(404).json({ error: "No such Branch ID" });
+    }
+    const latest_seleted_non_paid_package_index = existingSubscription.previousSubscriptions.length - 1;
+    const latest_seleted_non_paid_package = existingSubscription.previousSubscriptions[latest_seleted_non_paid_package_index];
+    console.log(latest_seleted_non_paid_package);
+    if(latest_seleted_non_paid_package.paymentStatus){
+      responseError(res,404,"You have already paid for this Package");
+      return ;
+    }
+    const packages = await packageModel.findOne({
+      packageType: latest_seleted_non_paid_package.packageType,
+    });
+    
+
+    const Data = {
+      Details: {
+        _id: existingSubscription._id,
+        res_id: existingSubscription.res_id,
+        branchID: existingSubscription.branchID,
+        packageType: latest_seleted_non_paid_package.packageType,
+      },
+      price: parseFloat(packages.finalPrice),
+    };
+    res.status(200).json(Data);
+  } catch (error) {
+    console.log("Error in getting Payment details", error);
+  }
+};
+
 //update packages data after payment
 
 const updatePackageAfterPayment = async (req, res) => {
@@ -226,6 +263,79 @@ const updatePackageAfterPayment = async (req, res) => {
     message: `please check your email:- ${email}`,
   });
 };
+
+const updatePackageAfterPaymentForNewBranch = async (req, res) => {
+  const { subscriptionID, packageType, transactionID, price } = req.body;
+  const existingSubscription = await Subscription.findById(subscriptionID);
+  if (!existingSubscription) {
+    return res.status(404).json({ error: "Subscription not found" });
+  }
+  
+  let startdate = existingSubscription.startDate;
+  if(existingSubscription?.endDate < startdate ||existingSubscription?.endDate  == 0){
+    startdate = Date.now();
+  }
+  const Subscription_package_data = await subcripstionPackages.findOne({
+    packageType : packageType,
+  });
+  if (!Subscription_package_data) {
+    return res.status(400).json({ error: "Subscription package not found" });
+  }
+  let enddate = startdate + Subscription_package_data?.duration * 30 * 24 * 60 * 60 * 1000;
+
+ /* existingSubscription.startDate = startdate;
+  existingSubscription.endDate = enddate;
+  existingSubscription.isActive = true;
+  
+  
+  // Update previousSubscriptions array
+  existingSubscription.previousSubscriptions.forEach(subscription => {
+    if (subscription.packageType == packageType && subscription.paymentStatus == false) {
+      subscription.startDate = startdate;
+      subscription.endDate = enddate;
+      subscription.transactionID = transactionID;
+      subscription.paymentStatus = true;
+      subscription.payment_time = Date.now();
+      subscription.price = Subscription_package_data.finalPrice;
+
+    }
+  });
+  
+  console.log(existingSubscription); // Output updated data*/
+
+
+
+
+  const subscriptionUpdate = await Subscription.updateOne(
+    { 
+      _id: subscriptionID, 
+      "previousSubscriptions.packageType": packageType, 
+      "previousSubscriptions.paymentStatus": false 
+    },
+    { 
+      $set: {
+        'startDate': startdate ,
+        'endDate': enddate ,
+        "isActive": true ,
+        "previousSubscriptions.$.startDate": startdate,
+        "previousSubscriptions.$.endDate": enddate,
+        "previousSubscriptions.$.transactionID": transactionID,
+        "previousSubscriptions.$.paymentStatus": true,
+        "previousSubscriptions.$.payment_time": Date.now(),
+        "previousSubscriptions.$.price": Subscription_package_data?.finalPrice,
+      }
+    }
+  );
+  
+
+
+
+
+  res.status(201).json({
+    success: true,
+  });
+};
+
 
 //when user expend their subscription
 const extendSubscription = async (req, res) => {
@@ -374,5 +484,7 @@ module.exports = {
   getPaymentDetails,
   updatePackageAfterPayment,
   getSubscriptionPurchaseHistory,
-  subscription_Duration_For_All_Branches
+  subscription_Duration_For_All_Branches,
+  updatePackageAfterPaymentForNewBranch,
+  getPaymentDetailsForExtendAndAddBranch
 };
