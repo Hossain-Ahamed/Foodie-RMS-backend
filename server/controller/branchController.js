@@ -35,13 +35,12 @@ const createBranch = async (req, res) => {
     }).save();
 
     const employee = await employeeModel.findOneAndUpdate({'permitted.res_id' : res_id , 'permitted.role': 'Super-Admin'},
-      { $push: {permitted: [
+      { $push: {permitted: 
         {
           res_id: res_id,
           branchID: branch._id,
           role: "Super-Admin",
         },
-      ],
     }},{new:true});
 
     res.status(200).send(true);
