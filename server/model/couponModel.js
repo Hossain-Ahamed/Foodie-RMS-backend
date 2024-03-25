@@ -12,23 +12,18 @@ const couponSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
     },
     percentage: {
       type: Number,
-      required: true,
     },
     minimumOrderAmount: {
       type: Number,
-      required: true,
     },
     maximumDiscountLimit: {
       type: Number,
-      required: true,
     },
     maximumNumberOfUse: {
       type: Number,
-      required: true,
     },
     userCount: {
       type: mongoose.ObjectId,
@@ -36,11 +31,9 @@ const couponSchema = new mongoose.Schema(
     },
     from: {
       type: String,
-      required: true,
     },
     to: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true }
