@@ -117,6 +117,10 @@ const {
   createVendor,
   getVendorById,
 } = require("../controller/vendorController");
+const {
+  getMembershipDetailsById,
+  updateMembership,
+} = require("../controller/membershipController");
 
 const router = express.Router();
 // http://localhost:5000/admin/login
@@ -173,6 +177,7 @@ router.get(
   "/restaurant/:res_id/edit-employee-data/:employeeID",
   getEmployeeData_ByID_ForCurrentEmployeeEdit
 ); // Get Employee By Id for current employee
+router.get("/restaurant/:res_id/membership-rules", getMembershipDetailsById);
 router.post(
   "/add-an-employee-to-my-restaurant/:res_id/:branchID/employee/:employeeID",
   addExistingEmployee
@@ -243,6 +248,7 @@ router.patch(
   "/notify-branch-owner-from-payment-lists/:_id",
   notifyOwnerFromDev
 );
+router.patch("/restaurant/:res_id/membership-rules", updateMembership);
 
 //development side employee list
 router.post("/dev/create", CreateDev);
