@@ -115,6 +115,7 @@ const {
   updateVendor,
   getAllVendors,
   createVendor,
+  getVendorById,
 } = require("../controller/vendorController");
 
 const router = express.Router();
@@ -131,19 +132,22 @@ router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a ne
 router.post("/admin/:res_id/add-new-dishes/:branchID", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
 router.post("/admin/:res_id/branch/:branchID/create-coupons", createCoupon);
-router.post("/admin/:res_id/branch/:branchID/create-vendors",createVendor);
+router.post("/admin/:res_id/branch/:branchID/create-vendors", createVendor);
 
 router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
 router.get("/admin/get-all-dishes/:branchID", getDishesByBranchId);
-router.get("/admin/:res_id/branch/:branchID/get-all-vendors",getAllVendors);
+router.get("/admin/:res_id/branch/:branchID/get-all-vendors", getAllVendors);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 router.get(
   "/subscription-payment-for-extend-and-add-branch/:branchID",
   getPaymentDetailsForExtendAndAddBranch
 );
 router.get("/admin/:res_id/branch/:branchID/coupon-list", getAllCoupons);
-
+router.get(
+  "/admin/:res_id/branch/:branchID/get-single-vendor/:_id",
+  getVendorById
+);
 
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
@@ -181,7 +185,7 @@ router.patch("/edit-restaurant/:_id", updateResturant);
 router.patch("/admin/edit-categories/:id", updateCategory); //Update Category By ID
 router.patch("/admin/update/employee/:id", updateEmployeeById); //Update Employee  By  ID for my current employee
 router.patch("/admin/:branchID/edit-dishes/:dishID", updateDish); //Update The Dish By its id
-router.patch("",updateVendor);
+router.patch("/admin/:res_id/branch/:branchID/edit-vendor/:_id", updateVendor);
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
 router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
@@ -195,7 +199,10 @@ router.delete(
   "/admin/:res_id/branch/:branchID/delete-coupon/:_id",
   deleteCoupon
 );
-router.delete("",deleteVendor);
+router.delete(
+  "/admin/:res_id/branch/:branchID/delete-vendor/:_id",
+  deleteVendor
+);
 //subcription package for dev
 router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
 router.patch("/edit-subscription-packages/:_id", updateSubscriptionPackage);
