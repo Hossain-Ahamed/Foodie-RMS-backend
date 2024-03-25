@@ -193,7 +193,7 @@ router.patch("/admin/:branchID/edit-dishes/:dishID", updateDish); //Update The D
 router.patch("/admin/:res_id/branch/:branchID/edit-vendor/:_id", updateVendor);
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
-router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
+router.delete("/restaurant/:res_id/branch/:branchID/delete-branch", deleteBranch); //Delete A branch By Its ID
 router.delete("/admin/delete-categories/:id", deleteCategory); //Delete A Category By Its ID
 router.delete("/admin/delete-dishes/:_id", deleteDish); //Delete a dish by its id
 router.delete(

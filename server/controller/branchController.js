@@ -126,7 +126,7 @@ const createBranch = async (req, res) => {
 
 //delete branch
 const deleteBranch = async (req, res) => {
-  const { branchID, res_id } = req.params._id;
+  const { branchID, res_id } = req.params;
   try {
     await branchModel.findByIdAndDelete(branchID);
     await subscriptionModel.deleteMany({ branchID: branchID });
