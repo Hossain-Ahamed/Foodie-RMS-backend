@@ -1,6 +1,13 @@
 const branchModel = require("../model/branchModel");
 const restaurantModel = require("../model/restaurantModel");
 const subscriptionModel = require("../model/subscriptionModel");
+const cartModel = require("../model/cartModel.js");
+const category = require("../model/categoryModel.js");
+const coupon = require("../model/couponModel.js");
+const dish = require("../model/dishesModel.js");
+const expense = require("../model/expenseModel.js");
+const print = require("../model/printingSetUpModel.js");
+const vendor = require("../model/vendorModel.js");
 const { responseError } = require("../utils/utility");
 const employeeModel = require("../model/employeeModel.js");
 const subcripstionPackages = require("../model/subcripstionPackages.js");
@@ -11,7 +18,7 @@ const { link } = require("fs/promises");
 
 const createBranch = async (req, res) => {
   try {
-    const {res_id} = req.params;
+    const { res_id } = req.params;
     const {
       branch_name,
       streetAddress,
@@ -30,17 +37,18 @@ const createBranch = async (req, res) => {
 
     let startDate = Date.now();
     const Subscription_package_data = await subcripstionPackages.findOne({
-      packageType : packageType,
+      packageType: packageType,
     });
     if (!Subscription_package_data) {
       return res.status(400).json({ error: "Subscription package not found" });
     }
-    let endDate = startDate + Subscription_package_data?.duration * 30 * 24 * 60 * 60 * 1000;
-
+    let endDate =
+      startDate +
+      Subscription_package_data?.duration * 30 * 24 * 60 * 60 * 1000;
 
     const check_res = await restaurantModel.findById(res_id);
     if (!check_res) {
-      return responseError(res,404,"Invalid Restaurant Id");
+      return responseError(res, 404, "Invalid Restaurant Id");
     }
     const branch = await new branchModel({
       res_id,
@@ -54,10 +62,10 @@ const createBranch = async (req, res) => {
 
     const newSubscription = new subscriptionModel({
       res_id: check_res._id,
-      branchID:branch._id,
+      branchID: branch._id,
       packageType,
-      startDate:0,
-      endDate:0,
+      startDate: 0,
+      endDate: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       previousSubscriptions: [
@@ -72,15 +80,20 @@ const createBranch = async (req, res) => {
       ],
     }).save();
 
-    const employee = await employeeModel.findOneAndUpdate({'permitted.res_id' : res_id , 'permitted.role': 'Super-Admin'},
-      { $push: {permitted: 
-        {
-          res_id: res_id,
-          branchID: branch._id,
-          role: "Super-Admin",
+    const employee = await employeeModel.findOneAndUpdate(
+      { "permitted.res_id": res_id, "permitted.role": "Super-Admin" },
+      {
+        $push: {
+          permitted: {
+            res_id: res_id,
+            branchID: branch._id,
+            role: "Super-Admin",
+          },
         },
-    }},{new:true});
-    const link =process.env.LINK+`/subscription-payment/${branch._id}`
+      },
+      { new: true }
+    );
+    const link = process.env.LINK + `/subscription-payment/${branch._id}`;
     sendMail({
       email: check_res.res_Owner_email,
       subject: "Foodie- Branch Payment Link",
@@ -101,30 +114,41 @@ const createBranch = async (req, res) => {
       <td style="padding:0;Margin:0;padding-left:20px;padding-right:20px;padding-top:40px;background-color:transparent;background-position:left top" bgcolor="transparent" align="left"><table width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"><tr style="border-collapse:collapse"><td valign="top" align="center" style="padding:0;Margin:0;width:560px"><table style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-position:left top" width="100%" cellspacing="0" cellpadding="0"><tr style="border-collapse:collapse">
       <td align="center" style="padding:0;Margin:0;padding-top:5px;padding-bottom:5px;font-size:0"><img src="https://efnrmol.stripocdn.email/content/guids/CABINET_dd354a98a803b60e2f0411e893c82f56/images/23891556799905703.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="175" height="208"></td> </tr><tr style="border-collapse:collapse"><td align="center" style="padding:0;Margin:0;padding-top:15px;padding-bottom:15px"><h1 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:20px;font-style:normal;font-weight:normal;color:#333333"><b>Thank you for choosing Foodie&nbsp;</b></h1></td></tr><tr style="border-collapse:collapse">
       <td align="center" style="padding:0;Margin:0;padding-left:40px;padding-right:40px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:24px;color:#666666;font-size:16px;text-align:left">Hi ${check_res?.res_Owner_Name},</p></td></tr> <tr style="border-collapse:collapse"><td align="left" style="padding:0;Margin:0;padding-right:35px;padding-left:40px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:24px;color:#666666;font-size:16px">Here are your payment link: <a href=${link}>Click to Pay</a></p></td></tr><tr style="border-collapse:collapse">
-    <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:24px;color:red;font-size:16px;margin-top:1.5rem">NB: Please do not share this information with anyone.</p></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body></html>`
+    <td style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:24px;color:red;font-size:16px;margin-top:1.5rem">NB: Please do not share this information with anyone.</p></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body></html>`,
     });
 
-    res.status(200).send({branchID: branch._id});
+    res.status(200).send({ branchID: branch._id });
   } catch (err) {
     console.log(err);
     res.status(400).send(false);
   }
-};  
-
-
+};
 
 //delete branch
 const deleteBranch = async (req, res) => {
+  const { branchID, res_id } = req.params._id;
   try {
-    const _id = req.params._id;
-    await branchModel.findByIdAndUpdate(
-      _id,
+    await branchModel.findByIdAndDelete(branchID);
+    await subscriptionModel.deleteMany({ branchID: branchID });
+    await employeeModel.updateMany(
       {
-        deleteStatus: true,
+        "permitted.branchID": branchID,
       },
-      { new: true }
+      {
+        $pull: { permitted: { branchID: branchID } },
+      }
     );
-  } catch (err) {}
+    await cartModel.deleteMany({ branchID: branchID });
+    await category.deleteMany({ branchID: branchID });
+    await coupon.deleteMany({ branchID: branchID });
+    await dish.deleteMany({ branchID: branchID });
+    await expense.deleteMany({ branchID: branchID });
+    await print.deleteMany({ branchID: branchID });
+    await vendor.deleteMany({ branchID: branchID });
+    res.status(200).json("Deleted Successfully");
+  } catch (error) {
+    res.status(500).send(false);
+  }
 };
 const getAllBranch = async (req, res) => {
   try {
@@ -386,11 +410,14 @@ const getBranchDetail = async (req, res) => {
   const { branchID } = req.params;
 
   try {
-    const data = await branchModel.findOne({
-      _id: branchID,
-      deleteStatus: "false"
-    }).select("branch_name streetAddress city stateProvince postalCode country ")
-
+    const data = await branchModel
+      .findOne({
+        _id: branchID,
+        deleteStatus: "false",
+      })
+      .select(
+        "branch_name streetAddress city stateProvince postalCode country "
+      );
 
     if (data) {
       res.status(200).send(data);
@@ -403,8 +430,7 @@ const getBranchDetail = async (req, res) => {
   }
 };
 
-
-// update branch info 
+// update branch info
 const updateBranch = async (req, res) => {
   const { branchID } = req.params;
   const {
@@ -414,7 +440,6 @@ const updateBranch = async (req, res) => {
     postalCode,
     stateProvince,
     streetAddress,
-
   } = req.body;
 
   try {
@@ -454,5 +479,5 @@ module.exports = {
   getBranchesTable,
   barnchTableDelete,
   getBranchDetail,
-  updateBranch
+  updateBranch,
 };
