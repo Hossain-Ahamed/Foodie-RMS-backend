@@ -12,7 +12,6 @@ const createCoupon = async (req, res) => {
       to,
     } = req.body;
     const { res_id, branchID } = req.params;
-    console.log(req.body, req.params)
     const newCoupon = await Coupon({
       res_id,
       branchID,
