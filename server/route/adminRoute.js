@@ -105,6 +105,12 @@ const {
   showPrintingSetUp,
 } = require("../controller/printingSetUpController");
 
+const {
+  createCoupon,
+  getAllCoupons,
+  deleteCoupon,
+} = require("../controller/couponController");
+
 const router = express.Router();
 // http://localhost:5000/admin/login
 
@@ -123,7 +129,12 @@ router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
 router.get("/admin/get-all-dishes/:branchID", getDishesByBranchId);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
-router.get("/subscription-payment-for-extend-and-add-branch/:branchID", getPaymentDetailsForExtendAndAddBranch);
+router.get(
+  "/subscription-payment-for-extend-and-add-branch/:branchID",
+  getPaymentDetailsForExtendAndAddBranch
+);
+router.get("/admin/:res_id/branch/:branchID/coupon-list", getAllCoupons);
+
 // For Read => Public Route (Accessible for any admin)
 router.get("/admin/read/restaurant", getAllResturants); // Get all available restaurant
 router.get("/admin/:branchID/all-categories", allCategory); // Get all available Categories
@@ -139,6 +150,7 @@ router.get(
   "/restaurant/:res_id/existing-employee-data/:employeeId",
   getEmployeeById
 ); // Get Employee By Id
+router.post("/admin/:res_id/branch/:branchID/create-coupons", createCoupon);
 router.get(
   "/restaurant/:res_id/get-restaurant-name-and-all-branches",
   getAllBranch_And_ResturantData
@@ -169,7 +181,10 @@ router.delete(
   "/admin/restaurant/:res_id/branch/:branchID/delete/employee/:id",
   deleteEmployeeById
 ); //Delete An Employee
-
+router.delete(
+  "/admin/:res_id/branch/:branchID/delete-coupon/:_id",
+  deleteCoupon
+);
 //subcription package for dev
 router.get("/subscription-packages", getAllSubscriptionPackage); //get all packages
 router.patch("/edit-subscription-packages/:_id", updateSubscriptionPackage);
@@ -192,7 +207,10 @@ router.post("/search-employee-to-add", SearchEmployee);
 
 //
 router.get("/get-rms-employee-profile/:email", employeeRole);
-router.get("/all-branches-of-super-admin/:email/restaurant/:res_id", allBranchesOfSuperAdmin);
+router.get(
+  "/all-branches-of-super-admin/:email/restaurant/:res_id",
+  allBranchesOfSuperAdmin
+);
 
 //development side payment list
 router.delete(
@@ -292,7 +310,13 @@ router.get(
 );
 
 //get branch detail  and update   ///  super admin
-router.get("/restaurant/:res_id/branch/:branchID/get-branch-detail", getBranchDetail);  //get branch detail for edit
-router.patch("/restaurant/:res_id/branch/:branchID/get-branch-detail/edit", updateBranch);  // update branch data after edit
+router.get(
+  "/restaurant/:res_id/branch/:branchID/get-branch-detail",
+  getBranchDetail
+); //get branch detail for edit
+router.patch(
+  "/restaurant/:res_id/branch/:branchID/get-branch-detail/edit",
+  updateBranch
+); // update branch data after edit
 
 module.exports = router;
