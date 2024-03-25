@@ -131,12 +131,12 @@ router.post("/admin/add-an-employee-to-the-system", addEmployee); // Create a ne
 router.post("/admin/:res_id/add-new-dishes/:branchID", createDishes); //Create a new dish from the menu
 router.post("/create-payment-intent", CreatePaymentIntent);
 router.post("/admin/:res_id/branch/:branchID/create-coupons", createCoupon);
-router.post("",createVendor);
+router.post("/admin/:res_id/branch/:branchID/create-vendors",createVendor);
 
 router.get("/edit-restaurant/:_id", sendRestaurantData);
 router.get("/admin/get-all-categories-name/:branchID", getAllCategoryTitles);
 router.get("/admin/get-all-dishes/:branchID", getDishesByBranchId);
-router.get("",getAllVendors);
+router.get("/admin/:res_id/branch/:branchID/get-all-vendors",getAllVendors);
 router.get("/subscription-payment/:branchID", getPaymentDetails);
 router.get(
   "/subscription-payment-for-extend-and-add-branch/:branchID",

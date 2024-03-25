@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const customerSchema = new mongoose.Schema({
+const vendorSchema = new mongoose.Schema({
   res_id: {
     type: mongoose.ObjectId,
     ref: "Restaurants",
@@ -18,4 +18,4 @@ const customerSchema = new mongoose.Schema({
     type: String,
   },
 });
-module.exports = mongoose.model("Customer", customerSchema);
+module.exports = mongoose.model("Vendor", vendorSchema);
