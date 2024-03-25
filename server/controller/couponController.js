@@ -12,7 +12,8 @@ const createCoupon = async (req, res) => {
       to,
     } = req.body;
     const { res_id, branchID } = req.params;
-    const newCoupon = new Coupon({
+    console.log(req.body, req.params)
+    const newCoupon = await Coupon({
       res_id,
       branchID,
       name,
@@ -22,10 +23,10 @@ const createCoupon = async (req, res) => {
       maximumNumberOfUse,
       from,
       to,
-    });
-    await newCoupon.save();
+    }).save();
     res.status(201).send(true);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Internal server error" });
   }
 };
