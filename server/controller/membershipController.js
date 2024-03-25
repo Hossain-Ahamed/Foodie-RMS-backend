@@ -3,14 +3,15 @@ const membership = require("../model/membershipModel");
 const getMembershipDetailsById = async (req, res) => {
   try {
     const { res_id } = req.params;
-    if (res_id) {
-      let data = await membership.findOne({ res_id: res_id });
+    let data = await membership.findOne({ res_id: res_id });
+    if (data) {
       return res.status(200).send(data);
     } else {
-      const { res_id } = req.params;
-      await membership({
+      let data = await membership({
         res_id,
       }).save();
+      
+      res.status(200).send(data);
     }
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
@@ -27,7 +28,7 @@ const updateMembership = async (req, res) => {
       MinimumOrderAmountTillNow,
       singleTimeMinimumOrderAmount,
     } = req.body;
-    await vendor.findOneAndUpdate(
+    await membership.findOneAndUpdate(
       { res_id: res_id },
       {
         $set: {

@@ -25,10 +25,12 @@ const couponSchema = new mongoose.Schema(
     maximumNumberOfUse: {
       type: Number,
     },
-    userCount: {
-      type: mongoose.ObjectId,
-      ref: "users",
-    },
+    userCount: [
+      {
+        type: mongoose.ObjectId,
+        ref: "users",
+      }
+    ],
     from: {
       type: String,
     },
