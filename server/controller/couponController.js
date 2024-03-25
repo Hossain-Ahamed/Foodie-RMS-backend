@@ -25,7 +25,6 @@ const createCoupon = async (req, res) => {
     }).save();
     res.status(201).send(true);
   } catch (error) {
-    console.log(error)
     res.status(500).json({ error: "Internal server error" });
   }
 };
