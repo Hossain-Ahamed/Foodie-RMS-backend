@@ -1,16 +1,21 @@
 const mongoose = require("mongoose");
 const customerSchema = new mongoose.Schema({
+  res_id: {
+    type: mongoose.ObjectId,
+    ref: "Restaurants",
+  },
+  branchID: {
+    type: mongoose.ObjectId,
+    ref: "Branchs",
+  },
   name: {
     type: String,
-    required: true,
   },
   phone: {
     type: String,
-    required: true,
   },
   address: {
     type: String,
-    required: true,
   },
 });
 module.exports = mongoose.model("Customer", customerSchema);
