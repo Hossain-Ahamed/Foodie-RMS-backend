@@ -25,3 +25,18 @@ const getAllVendors = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+const updateVendor = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const { name, phone, address } = req.body;
+    await vendor.findByIdAndUpdate(
+      _id,
+      { name, phone, address },
+      { new: true }
+    );
+    res.status(200).send(true);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
