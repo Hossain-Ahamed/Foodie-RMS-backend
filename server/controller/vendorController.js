@@ -26,6 +26,17 @@ const getAllVendors = async (req, res) => {
   }
 };
 
+const getVendorById = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const vendorDetails = await vendor.findOne({ _id: _id });
+    if (!vendorDetails) return res.status(404).json({ message: "Not found" });
+    res.status(200).send(vendorDetails);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 const updateVendor = async (req, res) => {
   try {
     const { _id } = req.params;
@@ -56,4 +67,5 @@ module.exports = {
   getAllVendors,
   updateVendor,
   deleteVendor,
+  getVendorById
 };
