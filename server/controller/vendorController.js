@@ -40,3 +40,13 @@ const updateVendor = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+const deleteVendor = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    await vendor.findByIdAndDelete(_id);
+    res.status(200).send(true);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
