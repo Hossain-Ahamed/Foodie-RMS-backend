@@ -1,5 +1,7 @@
 const dishesModel = require("../model/dishesModel.js");
 const categoryModel = require("../model/categoryModel");
+const branchModel = require("../model/branchModel.js");
+const restaurantModel = require("../model/restaurantModel.js");
 
 // create dishes
 
@@ -221,6 +223,59 @@ const deleteDish = async (req, res) => {
   }
 };
 
+ const getRestaurantBranchDetailsWithCategoryAndDishes =  async(req,res)=> {
+  try {
+    const {res_id, branchID}= req.params;
+      // Find the restaurant
+      const restaurant = await restaurantModel.findOne({ _id: res_id });
+
+      // If restaurant not found, return null
+      if (!restaurant) {
+          console.log('Restaurant not found');
+          return null;
+      }
+
+      // Find the branch under the given restaurant
+      const branch = await branchModel.findOne({ res_id: restaurant._id, _id: branchID });
+
+      // If branch not found, return null
+      if (!branch) {
+          console.log('Branch not found');
+          return null;
+      }
+
+      // Find all categories for the branch
+      const categories = await categoryModel.find({ res_id: restaurant._id, branchID: branch._id });
+
+      // For each category, find all dishes
+      const categoriesWithDishes = [];
+      for (const category of categories) {
+          const dishes = await dishesModel.find({ res_id: restaurant._id, branchID: branch._id, category: category.title });
+          categoriesWithDishes.push({ category: category, dishes: dishes });
+      }
+
+      // Prepare and return the result
+      const result = {
+          restaurant_name: restaurant.res_name,
+          branch_id: branch._id,
+          branch_name: branch.branch_name,
+          address: {
+              streetAddress: branch.streetAddress,
+              city: branch.city,
+              stateProvince: branch.stateProvince,
+              postalCode: branch.postalCode,
+              country: branch.country
+          },
+          categories: categoriesWithDishes
+      };
+
+      res.status(200).send( result);
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send(error);
+  }
+}
+
 module.exports = {
   createDishes,
   updateDish,
@@ -228,4 +283,5 @@ module.exports = {
   getAllCategoryTitles,
   getDishesByBranchId,
   getDishById,
+  getRestaurantBranchDetailsWithCategoryAndDishes
 };
