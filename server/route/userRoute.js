@@ -16,6 +16,7 @@ const {
 
 const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPackage} = require("../controller/subscriptionPackagesController");
 const { employeeLogin } = require("../controller/employeeController");
+const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
 
 const router = express.Router();
 
@@ -31,6 +32,12 @@ router.post("/rms-employee-jwt",employeeLogin);
 
 //Route for create order
 
+
+
+router.get(
+  "/restaurant/:res_id/branch/:branchID/category/dishes",
+  getRestaurantBranchDetailsWithCategoryAndDishes
+);
 
 
 module.exports=router;
