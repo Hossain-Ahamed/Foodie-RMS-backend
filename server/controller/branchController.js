@@ -222,13 +222,7 @@ const addTables = async (req, res) => {
     if (!branch) {
       responseError(res, 404, error);
     } else {
-      const qrCodeData =
-        "/restaurant/ " +
-        branch.res_id +
-        "/branch/" +
-        branch._id +
-        "?table=" +
-        number;
+      const qrCodeData ="/onsite-order/restaurant/" +branch.res_id +"/branch/" +branch._id +"/table/" +number;
       const updateTable = await branchModel.findByIdAndUpdate(
         branch._id,
         {
