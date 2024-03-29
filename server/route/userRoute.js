@@ -34,10 +34,7 @@ router.post("/rms-employee-jwt",employeeLogin);
 
 
 
-router.get(
-  "/restaurant/:res_id/branch/:branchID/category/dishes",
-  getRestaurantBranchDetailsWithCategoryAndDishes
-);
+router.get("/restaurant/:res_id/branch/:branchID/single-restaurant-all-data",getRestaurantBranchDetailsWithCategoryAndDishes); //all data for a single restaurant
 
 
 module.exports=router;
