@@ -329,5 +329,5 @@ module.exports = {
   getDishesByBranchId,
   getDishById,
   getRestaurantBranchDetailsWithCategoryAndDishes,
-  categoriesWithDishes
+  get_All_Dish_Name_For_restaurant_For_Admin
 };
