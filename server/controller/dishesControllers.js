@@ -279,6 +279,48 @@ const deleteDish = async (req, res) => {
   }
 }
 
+
+const get_All_Dish_Name_For_restaurant_For_Admin = async(req,res)=> {
+  try {
+    const {res_id, branchID}= req.params;
+    console.log(req.params)
+      // Find the restaurant
+      const restaurant = await restaurantModel.findOne({ _id: res_id });
+
+      // If restaurant not found, return null
+      if (!restaurant) {
+         responseError(res,404,undefined,"restaurant not found" );
+         return;
+      }
+
+      // Find the branch under the given restaurant
+      const branch = await branchModel.findOne({ res_id: restaurant._id, _id: branchID });
+
+      // If branch not found, return null
+      if (!branch) {
+        responseError(res,404,undefined,"branch not found" );
+        return;
+      }
+
+      // Find all categories for the branch
+      const categories = await categoryModel.find({ res_id: restaurant._id, branchID: branch._id });
+
+      // For each category, find all dishes
+      const categoriesWithDishes = [];
+      for (const category of categories) {
+          const dishes = await dishesModel.find({ res_id: restaurant._id, branchID: branch._id, category: category.title });
+          categoriesWithDishes.push({ category: category, dishes: dishes });
+      }
+
+
+      res.status(200).send(categoriesWithDishes);
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send(error);
+  }
+}
+
+
 module.exports = {
   createDishes,
   updateDish,
@@ -286,5 +328,6 @@ module.exports = {
   getAllCategoryTitles,
   getDishesByBranchId,
   getDishById,
-  getRestaurantBranchDetailsWithCategoryAndDishes
+  getRestaurantBranchDetailsWithCategoryAndDishes,
+  get_All_Dish_Name_For_restaurant_For_Admin
 };

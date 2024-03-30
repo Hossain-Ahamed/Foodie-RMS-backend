@@ -222,7 +222,13 @@ const addTables = async (req, res) => {
     if (!branch) {
       responseError(res, 404, error);
     } else {
-      const qrCodeData ="/onsite-order/restaurant/" +branch.res_id +"/branch/" +branch._id +"/table/" +number;
+      const qrCodeData =
+        "/onsite-order/restaurant/" +
+        branch.res_id +
+        "/branch/" +
+        branch._id +
+        "/table/" +
+        number;
       const updateTable = await branchModel.findByIdAndUpdate(
         branch._id,
         {
@@ -459,6 +465,48 @@ const updateBranch = async (req, res) => {
   }
 };
 
+const getAllRestaurantOf_A_City = async (req, res) => {
+  try {
+    const { city } = req.params;
+    let list = await branchModel
+      .find({ deleteStatus: false, city: { $regex: city, $options: "i" } })
+      .populate("res_id");
+
+    // Transform the data
+    const response = list.map((item) => ({
+      branchID: item?._id,
+      res_id: item?.res_id?._id,
+      res_name: item?.res_id?.res_name,
+      res_email: item?.res_id?.res_email,
+      res_mobile: item?.res_id?.res_mobile,
+      res_Owner_Name: item?.res_id?.res_Owner_Name,
+      res_Owner_email: item?.res_id?.res_Owner_email,
+      res_Owner_mobile: item?.res_id?.res_Owner_mobile,
+      res_Owner_streetAddress: item?.res_id?.res_Owner_streetAddress,
+      res_Owner_city: item?.res_id?.res_Owner_city,
+      res_Owner_stateProvince: item?.res_id?.res_Owner_stateProvince,
+      res_Owner_postalCode: item?.res_id?.res_Owner_postalCode,
+      res_Owner_country: item?.res_id?.res_Owner_country,
+      img: item?.res_id?.img,
+      branch_name: item?.branch_name,
+      streetAddress: item?.streetAddress,
+      city: item?.city,
+      stateProvince: item?.stateProvince,
+      postalCode: item?.postalCode,
+      country: item?.country,
+      deleteStatus: item?.deleteStatus,
+      paymentTypes: item?.paymentTypes,
+      takewayCharge: item?.takewayCharge,
+      deliveryCharge: item?.deliveryCharge,
+      tables: item?.tables,
+    }));
+
+    res.status(200).send({restaurants:response});
+  } catch (error) {
+    responseError(res,500)
+  }
+};
+
 module.exports = {
   addTables,
   getAllBranch,
@@ -474,4 +522,5 @@ module.exports = {
   barnchTableDelete,
   getBranchDetail,
   updateBranch,
+  getAllRestaurantOf_A_City,
 };

@@ -30,6 +30,7 @@ const {
   getAllCategoryTitles,
   getDishesByBranchId,
   getDishById,
+  get_All_Dish_Name_For_restaurant_For_Admin,
 } = require("../controller/dishesControllers");
 
 const {
@@ -338,9 +339,16 @@ router.get(
   "/restaurant/:res_id/branch/:branchID/get-branch-detail",
   getBranchDetail
 ); //get branch detail for edit
-router.patch(
-  "/restaurant/:res_id/branch/:branchID/get-branch-detail/edit",
+router.patch("/restaurant/:res_id/branch/:branchID/get-branch-detail/edit",
   updateBranch
 ); // update branch data after edit
 
+
+/**
+ * 
+ * -------------------------------------------------------------------------------
+ *                    Order Management
+ */
+
+router.get("/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",get_All_Dish_Name_For_restaurant_For_Admin)
 module.exports = router;
