@@ -30,6 +30,7 @@ const {
   getAllCategoryTitles,
   getDishesByBranchId,
   getDishById,
+  get_All_Dish_Name_For_restaurant_For_Admin,
 } = require("../controller/dishesControllers");
 
 const {
@@ -193,7 +194,7 @@ router.patch("/admin/:branchID/edit-dishes/:dishID", updateDish); //Update The D
 router.patch("/admin/:res_id/branch/:branchID/edit-vendor/:_id", updateVendor);
 //For Delete => Admin Only (No one else can delete an account)
 router.delete("/admin/delete/restaurant/:id", deleteResturent); //Delete A restaurant By Its ID
-router.delete("/admin/delete/branch/:_id", deleteBranch); //Delete A branch By Its ID
+router.delete("/restaurant/:res_id/branch/:branchID/delete-branch", deleteBranch); //Delete A branch By Its ID
 router.delete("/admin/delete-categories/:id", deleteCategory); //Delete A Category By Its ID
 router.delete("/admin/delete-dishes/:_id", deleteDish); //Delete a dish by its id
 router.delete(
@@ -338,9 +339,16 @@ router.get(
   "/restaurant/:res_id/branch/:branchID/get-branch-detail",
   getBranchDetail
 ); //get branch detail for edit
-router.patch(
-  "/restaurant/:res_id/branch/:branchID/get-branch-detail/edit",
+router.patch("/restaurant/:res_id/branch/:branchID/get-branch-detail/edit",
   updateBranch
 ); // update branch data after edit
 
+
+/**
+ * 
+ * -------------------------------------------------------------------------------
+ *                    Order Management
+ */
+
+router.get("/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",get_All_Dish_Name_For_restaurant_For_Admin)
 module.exports = router;
