@@ -12,9 +12,12 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     DOB: {
-      type: Number,
+      type: Date,
     },
-    address: [
+    firebase_UID:{
+      type:String,
+    },
+    address: 
       {
         streetAddress: {
           type: String,
@@ -32,13 +35,16 @@ const userSchema = new mongoose.Schema(
           type: String,
         },
       },
-    ],
+    
     imgURL: {
       type: String,
     },
     gender: {
       type: String,
     },
+    OTP : {
+      type : String,
+    }
   },
   { timestamps: true }
 );
