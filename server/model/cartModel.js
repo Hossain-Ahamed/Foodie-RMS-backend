@@ -17,38 +17,47 @@ const cartSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    Items: [
-      {
-        dishID: { 
+
+    dish_id: { 
       type: mongoose.ObjectId, 
      ref: "dishes", 
      required: true 
     },
-        dishQuantity: { 
+    quantity: { 
       type: String 
     },
-        dishTotalPrice: { 
-      type: Number 
-    },
     addOn: [
-      {
-        name: {
+        {
         type: String,
-        required: true,
-        },
-        price: {
-        type: Number,
-        required: true,
         }
-      },
       ],
-      },
-    ],
     order_from:{
       type:String,
-      enum:["ONSHORE","OFFSHORE"],
+      enum:["ONSITE","OFFSITE"],
       default:"ONSHORE"
+    },
+    options : {
+      type: String,
+    },
+    img:{
+      type:String,
+    },
+    basePrice:{
+      type:Number
+    },
+    totalPrice:{
+      type:Number,
+    },
+    extraPrice:{
+      type:Number
+    },
+    order_note:{
+      type:String
+    },
+    VAT:{
+      type:Number
     }
+
   },
   { timestamps: true }
 );

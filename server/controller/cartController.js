@@ -1,177 +1,98 @@
 const Cart = require("../model/cartModel");
-const Table = require("../model/tableModel");
-const Dish = require("../model/dishesModel");
+const dishesModel = require("../model/dishesModel");
+const userModel = require("../model/userModel");
+const { responseError } = require("../utils/utility");
 
-const createCartForTable = async (req, res) => {
+const createCartForOnside = async (req,res)=>{
   try {
-    const {
-      res_id,
+    const {res_id,
       branchID,
-      user_id,
-      table_id,
-      dishID,
-      dishQuantity,
+      dish_id,
+      name,
       addOn,
-      phone,
+      options,
+      quantity,
       order_from,
-    } = req.body;
+      extra,
+      VAT,
+      totalPrice,
+      basePrice,
+      img,
+    email} =  req.body;
 
-    if (order_from == "ONSHORE") {
-      // Check if the table is vacant
-      const table = await Table.findById(table_id);
-      if (!table || table.status !== "Vacant") {
-        return res
-          .status(400)
-          .json({ msg: "Table not available or not vacant" });
-      }
+    await Cart.deleteMany({ branchID: { $ne:  branchID} }) 
 
-      // Check if a cart exists for the given phone number
-      const existingCart = await Cart.findOne({ user_id });
-
-      if (existingCart) {
-        // Update existing cart item
-        existingCart.Items.forEach((item) => {
-          if (
-            item.dishID.equals(dishID) &&
-            item.addOn.some((a) => a.name === addOn.name)
-          ) {
-            item.dishQuantity = dishQuantity;
-            // Update dishTotalPrice based on new quantity
-            item.dishTotalPrice = calculateDishTotalPrice(dishID, dishQuantity);
-          }
-        });
-
-        await existingCart.save();
-
-        return res.status(200).json(existingCart);
-      }
-
-      // Create a new cart
-      const newCart = new Cart({
-        res_id,
-        branchID,
-        user_id,
-        Items: [
-          {
-            dishID,
-            dishQuantity,
-            dishTotalPrice: calculateDishTotalPrice(dishID, dishQuantity),
-            addOn,
-          },
-        ],
-      });
-
-      await newCart.save();
-
-      // Update table status to 'Occupied'
-      table.status = "Occupied";
-      await table.save();
-
-      res.status(201).json(newCart);
+    const checkUser = await userModel.findOne({email:email})
+    if(!checkUser){
+        return res.status(401).send('Invalid User')
     }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
-};
-
-// Helper function to calculate dish total price
-const calculateDishTotalPrice = async (dishID, dishQuantity) => {
-  try {
-    const dish = await Dish.findById(dishID);
-    if (!dish) {
-      throw new Error(`Dish with ID ${dishID} not found`);
+    const checkDish = await dishesModel.findById(dish_id);
+    if (!checkDish) {
+      throw new Error("This Dish is not available!");
     }
+    // let addOns = checkDish.addOn || [];
+    // if (addOn.length > 0) {
+    //   // Calculate the total price of the add-ons provided in the dish data
+    //   const addOnTotalPrice = addOns.reduce((acc, addon) => {
+    //     if()
+    //     const addonPrice = addonPrices[addon]; // Get the price of the addon from the predefined mapping
+    //     return acc + (addonPrice || 0); // Add the price to the total, if it exists
+    //   }, 0);
+    //   totalPrice += addOnTotalPrice;
+    // }
 
-    // Calculate the total price based on dish price and quantity
-    const total = dish.price * parseInt(dishQuantity);
-    return total;
+    // let extraPrice = 
+    const saveCart = await new Cart ({res_id,
+      branchID,
+      user_id: checkUser._id,
+      dish_id,
+      addOn,
+      options,
+      totalPrice,
+      order_from,
+      extraPrice:extra,
+      VAT,
+      totalPrice : totalPrice*quantity,
+      basePrice,
+      order_from:"ONSITE",
+    img}).save();
+    res.status(200).send(saveCart);
+
   } catch (error) {
-    throw new Error(`Error calculating dish total price: ${error.message}`);
+    responseError(res,500, error);
   }
-};
+}
 
-const updateCart = async (req, res) => {
-    try {
-      const { user_id, dishID, dishQuantity, addOn } = req.body;
-  
-      // Check if the cart exists for the given user
-      const existingCart = await Cart.findOne({ user_id });
-  
-      if (existingCart) {
-        // Check if the product already exists in the cart
-        const existingItem = existingCart.Items.find(
-          (item) =>
-            item.dishID.equals(dishID) &&
-            item.addOn.some((a) => a.name === addOn.name)
-        );
-  
-        if (existingItem) {
-          // Product already exists, increase quantity
-          existingItem.dishQuantity += dishQuantity;
-          // Update dishTotalPrice based on new quantity
-          existingItem.dishTotalPrice = calculateDishTotalPrice(
-            dishID,
-            existingItem.dishQuantity
-          );
-        } else {
-          // Product doesn't exist, add a new item
-          existingCart.Items.push({
-            dishID,
-            dishQuantity,
-            dishTotalPrice: calculateDishTotalPrice(dishID, dishQuantity),
-            addOn,
-          });
-        }
-  
-        await existingCart.save();
-  
-        return res.status(200).json(existingCart);
-      } else {
-        return res.status(400).json({ msg: "Cart not found" });
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ msg: "Internal Server Error" });
+const getCart = async (req,res)=>{
+  try {
+    const {email}= req.params;
+    const checkUser =  await userModel.findOne({ email:email });
+    if (!checkUser){
+      responseError(res,401,"User not found");
     }
-  };
-  
-  const readCart = async (req, res) => {
-    try {
-      const { user_id } = req.body;
-  
-      // Check if the cart exists for the given user
-      const existingCart = await Cart.findOne({ user_id });
-  
-      if (existingCart) {
-        return res.status(200).json(existingCart);
-      } else {
-        return res.status(400).json({ msg: "Cart not found" });
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ msg: "Internal Server Error" });
-    }
-  };
-  
-  const deleteCart = async (req, res) => {
-    try {
-      const { user_id } = req.body;
-  
-      // Delete the cart for the given user
-      await Cart.findOneAndDelete({ user_id });
-  
-      return res.status(200).json({ msg: "Cart deleted successfully" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ msg: "Internal Server Error" });
-    }
-  };
-  
+    const getCarts= await Cart.find({user_id:checkUser._id});
+    res.status(200).send(getCarts)
+    //TODO get cart er somoy dish er sathe dish id check korbo valid ase kina
+
+  } catch (error) {
+    responseError(res,500);
+  }
+}
+
+const deleteCart = async (req,res) =>{
+  try {
+    const {cartId} = req.params;
+    const deleteCart =  await Cart.deleteOne({ _id: cartId });
+    res.status(200).json("Deleted Successfully");
+    
+  } catch (error) {
+    responseError(res,500);
+  }
+
+}
 
 module.exports = {
-  createCartForTable,
-  updateCart,
+  createCartForOnside,
   deleteCart,
-  readCart
-};
+  getCart,
+}

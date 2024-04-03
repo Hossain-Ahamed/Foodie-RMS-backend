@@ -1,14 +1,19 @@
-try {
-        const branch = await Branch.findOneAndUpdate(
-            { "tables.number": "2" }, // Find the branch containing the table with number = 2
-            { $pull: { tables: { number: "2" } } }, // Remove the table with number = 2
-            { new: true }
-        );
-        console.log("Branch after deletion:", branch);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}
+res_id
+branchID
+user_id
+dishID
+dishname
+addOn[]
+option
+img 
+dishQuantity
+baseprice
+totalPrice
+extraprice = addon+ options +  VAT
+VAT
+order_note,
+order_from
+
 
 0d138da2
 contact.hossainahamed@gmail.com
