@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const storySchema = new mongoose.Schema(
+const shortVideoSchema = new mongoose.Schema(
   {
     res_id: {
       type: mongoose.ObjectId,
@@ -23,4 +23,4 @@ const storySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("story", storySchema);
+module.exports = mongoose.model("shortVideo", shortVideoSchema);
