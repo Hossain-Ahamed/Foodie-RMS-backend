@@ -24,7 +24,7 @@ const deleteStoryByID = async (req, res) => {
     if (!story) {
       return res.status(404).json({ message: "Story not found" });
     }
-    await story.remove();
+    await story.deleteOne();
     return res.status(200).json({ message: "Story deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -34,10 +34,10 @@ const deleteStoryByID = async (req, res) => {
 const allStoriesByBranch = async (req, res) => {
   try {
     const { branchID } = req.params;
-    const stories = await stories
+    const Stories = await stories
       .find({ branchID: branchID })
-      .sort([["created_date", "descending"]]);
-    return res.status(200).send(stories);
+      .sort({ created_date: -1 });
+    return res.status(200).send(Stories);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -5,10 +5,14 @@ const deleteExpiredStories = async (req, res, next) => {
     const expiredStories = await stories.find({
       remove_date: { $lt: Date.now() },
     });
-    for (const story of expiredStories) {
-      await story.remove();
+    if (!expiredStories) {
+      next();
+    } else {
+      for (const story of expiredStories) {
+        await story.remove();
+      }
+      next();
     }
-    next();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

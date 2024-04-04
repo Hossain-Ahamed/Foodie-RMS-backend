@@ -134,9 +134,9 @@ const router = express.Router();
 // http://localhost:5000/admin/login
 
 //create stories
-router.post("/admin/:res_id/branch/:branchID/create-stories", createStories);
+router.post("/admin/restaurant/:res_id/branch/:branchID/create-stories", createStories);
 router.delete(
-  "/admin/restaurant/:res_id/branch/:branchID/delete-stories/_id",
+  "/admin/restaurant/:res_id/branch/:branchID/delete-stories/:_id",
   deleteStoryByID
 );
 router.get(
