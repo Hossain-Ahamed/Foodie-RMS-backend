@@ -17,7 +17,7 @@ const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPac
 const { employeeLogin } = require("../controller/employeeController");
 const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
 const { getAllRestaurantOf_A_City } = require("../controller/branchController");
-const { signUp, signIn, JWTtoken } = require("../controller/userController");
+const { signUp, signIn, JWTtoken, signout, getProfile } = require("../controller/userController");
 
 const router = express.Router();
 
@@ -45,9 +45,11 @@ router.get("/get-my-cart/:email",getCart);
 
 
 //User Management
-router.post("/create-new-user-by-sign-up",signUp);
-router.post("/sign-in",signIn);
+// router.post("/create-new-user-by-sign-up",signUp);
+// router.post("/sign-in",signIn);
 router.post("/user-jwt",JWTtoken);
+router.delete("/sign-out-user",signout);
+router.get('/get-profile/:email',getProfile)
 
 
 
