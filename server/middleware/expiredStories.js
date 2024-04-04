@@ -3,7 +3,7 @@ const stories = require("../model/storiesModel");
 const deleteExpiredStories = async (req, res, next) => {
   try {
     const expiredStories = await stories.find({
-      created_date: { $gt: "$remove_date" },
+      remove_date: { $lt: Date.now() },
     });
     for (const story of expiredStories) {
       await story.remove();
