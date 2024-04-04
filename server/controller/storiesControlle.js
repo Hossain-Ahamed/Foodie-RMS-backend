@@ -20,7 +20,6 @@ const createStories = async (req, res) => {
 const deleteStoryByID = async (req, res) => {
   try {
     const { _id } = req.params;
-    console.log(_id);
     const story = await stories.findById(_id);
     if (!story) {
       return res.status(404).json({ message: "Story not found" });
