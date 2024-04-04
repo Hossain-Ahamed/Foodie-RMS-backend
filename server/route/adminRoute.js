@@ -130,11 +130,32 @@ const {
 } = require("../controller/storiesControlle");
 const { deleteExpiredStories } = require("../middleware/expiredStories");
 
+const {
+  createVideo,
+  deleteVideoById,
+  getStoriesByBranchID,
+} = require("../controller/shortVideoController");
+
 const router = express.Router();
 // http://localhost:5000/admin/login
 
+//create videos
+router.post(
+  "/admin/restaurant/:res_id/branch/:branchID/create-reels",
+  createVideo
+);
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/all-reels",
+  getStoriesByBranchID
+);
+
+router.delete("", deleteVideoById);
+
 //create stories
-router.post("/admin/restaurant/:res_id/branch/:branchID/create-stories", createStories);
+router.post(
+  "/admin/restaurant/:res_id/branch/:branchID/create-stories",
+  createStories
+);
 router.delete(
   "/admin/restaurant/:res_id/branch/:branchID/delete-stories/:_id",
   deleteStoryByID
