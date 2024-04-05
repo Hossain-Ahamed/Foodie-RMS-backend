@@ -209,10 +209,28 @@ const deletePreviousCart = async (req, res) => {
   }
 };
 
+const getCartforSingle = async (req, res) => {
+  try {
+    const {_id}= req.params;
+    const checkCart = await  Cart.findOne({_id : _id });
+    if(checkCart){
+      const getDish = await dishesModel.findOne({_id: checkCart?.dish_id});
+      
+      if(!getDish) throw new Error('No Dish Found');
+      else{
+        res.status(200).send({getDish,checkCart});
+      }
+    }
+  } catch (error) {
+    responseError(res, 500);
+  }
+};
+
 module.exports = {
   Add_To_Cart_Onsite_order,
   Add_To_Cart_Offsite_order,
   deleteCart,
   deletePreviousCart,
   getCart,
+  getCartforSingle,
 };
