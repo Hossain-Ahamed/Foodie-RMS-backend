@@ -221,10 +221,15 @@ const getCartforSingle = async (req, res) => {
     if(checkCart){
       const getDish = await dishesModel.findOne({_id: checkCart?.dish_id});
       
-      if(!getDish) throw new Error('No Dish Found');
-      else{
-        res.status(200).send({getDish,checkCart});
+      if(!getDish){
+        responseError(res, 404);
+        return;
+      }else{
+        res.status(200).send({DishData : getDish,cartData : checkCart});
       }
+    }else{
+      responseError(res, 404);
+      return;
     }
   } catch (error) {
     responseError(res, 500);
