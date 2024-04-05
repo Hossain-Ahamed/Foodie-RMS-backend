@@ -24,7 +24,7 @@ const cartSchema = new mongoose.Schema(
      required: true 
     },
     quantity: { 
-      type: String 
+      type: Number 
     },
     addOn: [
         {
