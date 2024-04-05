@@ -37,7 +37,6 @@ const signIn = async (req, res) => {
 
   if (!user) {
     responseError(res, 200, "Invalid Email or Password");
-  
   } else {
     res.status(200).send(user);
   }
@@ -60,17 +59,16 @@ const JWTtoken = async (req, res) => {
 
     let user = await userModel.findOne({ email: email });
     if (!user) {
-      user= await new userModel({
+      user = await new userModel({
         name,
         email,
         firebase_UID,
         password,
         phone,
       }).save();
-    
     }
 
-    const accesstoken =  await JWT.sign(
+    const accesstoken = await JWT.sign(
       { _id: user?._id, email: email, firebase_UID: firebase_UID },
       process.env.JWT_SECRET_TOKEN
     );
@@ -83,7 +81,6 @@ const JWTtoken = async (req, res) => {
 
     //const isAdmin = await adminModel.findOne({email: user?.email,  }).select('name');
 
-  
     res.status(200).send({
       success: true,
       message: "Loging successfully",
@@ -97,7 +94,7 @@ const JWTtoken = async (req, res) => {
         gender: user?.gender,
       },
     });
-      // release(); // Release the mutex lock
+    // release(); // Release the mutex lock
   } catch (error) {
     console.log(error);
     responseError(res, 500, "Internal server error");
@@ -141,12 +138,11 @@ const signout = async (req, res) => {
   }
 };
 const getProfile = async (req, res) => {
-  let user = await userModel
-    .findOne({ email: req.params.email }, "-password");
+  let user = await userModel.findOne({ email: req.params.email }, "-password");
   if (!user) {
     responseError(res, 401, null, "User not found");
   }
-  console.log(user)
+  console.log(user);
   res.status(200).send({
     _id: user?._id,
     name: user?.name,
@@ -159,7 +155,6 @@ const getProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-
   let { _id, name, phone, gender, email } = req.body;
   console.log(req.body);
   // Find the user based on _id and select only 'email' and 'phone' fields to reduce data retrieval
@@ -173,7 +168,7 @@ const updateProfile = async (req, res) => {
       $or: [
         { email: email }, // Check email only if it's empty in the user object
         // { phone: phone } // Check phone only if it's empty in the user object
-      ]
+      ],
     });
   }
   if (!user) {
@@ -191,24 +186,25 @@ const updateProfile = async (req, res) => {
       };
 
       // If a new image is uploaded, update the 'img' field in the update object
-     
-        await userModel.findByIdAndUpdate(user._id, updateUserProfile, { new: true });
 
-        // Retrieve the updated user after the update
-        const updatedUser = await userModel.findOne({ _id: _id });
+      await userModel.findByIdAndUpdate(user._id, updateUserProfile, {
+        new: true,
+      });
 
-        res.status(201).send({
-          _id: updatedUser?._id,
-          name: updatedUser?.name,
-          phone: updatedUser?.phone,
-          email: updatedUser?.email,
-          address: updatedUser.address ? JSON.parse(updatedUser.address) : updatedUser.address,
-          imgURL: updatedUser?.imgURL,
-          gender: updatedUser?.gender,
-        });
+      // Retrieve the updated user after the update
+      const updatedUser = await userModel.findOne({ _id: _id });
 
-
-
+      res.status(201).send({
+        _id: updatedUser?._id,
+        name: updatedUser?.name,
+        phone: updatedUser?.phone,
+        email: updatedUser?.email,
+        address: updatedUser.address
+          ? JSON.parse(updatedUser.address)
+          : updatedUser.address,
+        imgURL: updatedUser?.imgURL,
+        gender: updatedUser?.gender,
+      });
     } else {
       // User with the provided email or phone already exists, send an error response
       res.status(409).send({
@@ -220,46 +216,44 @@ const updateProfile = async (req, res) => {
 };
 
 const updateProfileAddress = async (req, res) => {
-  //console.log(req.body);
-  const {email} = req.params;
-  const { streetAddress,city ,stateProvince,postalCode,country} = req.body;
-  //console.log(decoded);
-  //const _id,address = req.body;
-//   {
-//     "streetAddress": "J A M T O L A",
-//     "city": "Narayanganj",
-//     "stateProvince": "Dhaka",
-//     "postalCode": "1400",
-//     "country": "Bangladesh"
-// }
+  try {
+    //console.log(req.body);
+    const { email } = req.params;
+    const { streetAddress, city, stateProvince, postalCode, country } =
+      req.body;
+    //console.log(decoded);
+    //const _id,address = req.body;
+    //   {
+    //     "streetAddress": "J A M T O L A",
+    //     "city": "Narayanganj",
+    //     "stateProvince": "Dhaka",
+    //     "postalCode": "1400",
+    //     "country": "Bangladesh"
+    // }
 
-  const user = await userModel.findOne({ email: email });
-  if (!user) {
-    res.status(404).send({
-      message: "User not found!",
-      status: false,
-    });
-  } else {
-    await userModel.findByIdAndUpdate(user._id, {
-      address:{
-        streetAddress, city, stateProvince, postalCode, country,
-      },
-    });
+    const user = await userModel.findOne({ email: email });
+    if (!user) {
+      res.status(404).send({
+        message: "User not found!",
+        status: false,
+      });
+    } else {
+      await userModel.findByIdAndUpdate(user._id, {
+        address: {
+          streetAddress,
+          city,
+          stateProvince,
+          postalCode,
+          country,
+        },
+      });
 
-    const updatedUser = await userModel.findOne({ _id: _id });
-
-    res.status(201).send({
-      _id: updatedUser?._id,
-      name: updatedUser?.name,
-      phone: updatedUser?.phone,
-      email: updatedUser?.email,
-      address: updatedUser.address ? JSON.parse(updatedUser.address) : updatedUser.address,
-      imgURL: updatedUser?.imgURL,
-      gender: updatedUser?.gender,
-    });
+      res.status(200).send({ message: "updated successfully" });
+    }
+  } catch (e) {
+    responseError(res, 500);
   }
 };
-
 
 module.exports = {
   signUp,
