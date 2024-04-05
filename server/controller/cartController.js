@@ -70,8 +70,30 @@ const getCart = async (req,res)=>{
     if (!checkUser){
       responseError(res,401,"User not found");
     }
-    const getCarts= await Cart.find({user_id:checkUser._id});
-    res.status(200).send(getCarts)
+    const getCarts = await Cart.find({ user_id: checkUser._id });
+
+// Map through each cart item and fetch dish_data
+const dishDataPromises = getCarts.map(async (cartItem, index) => {
+    const dishData = await dishesModel
+        .findById(cartItem.dish_id)
+        .select("title img");
+    
+    // Check if dishData is null, if so, delete the corresponding cart item
+    if (!dishData) {
+        console.log(`Dish not found for cart item at index ${index}. Deleting...`);
+        await Cart.findByIdAndDelete(cartItem._id);
+        return null; // Returning null if dishData is not found
+    }
+    
+    return { cartItem, dishData }; // Returning an object containing both cartItem and dishData
+});
+
+// Wait for all promises to resolve
+const allDishDataWithCarts = await Promise.all(dishDataPromises);
+
+console.log(allDishDataWithCarts); // This will contain both getCarts and dish_data for each cart item
+const validDishDataWithCarts = allDishDataWithCarts.filter(item => item.dishData !== null);
+    res.status(200).send(validDishDataWithCarts)
     //TODO get cart er somoy dish er sathe dish id check korbo valid ase kina
 
   } catch (error) {
