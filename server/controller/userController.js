@@ -159,64 +159,31 @@ const getProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-
-  let { _id, name, phone, gender, email } = req.body;
+try {
+  const {email}= req.params;
+  let { name, phone, gender,img } = req.body;
   console.log(req.body);
-  // Find the user based on _id and select only 'email' and 'phone' fields to reduce data retrieval
-  const user = await userModel.findOne({ _id: _id });
+  const user = await userModel.findOne({ email: email });
   // console.log(user);
-  // Combine email and phone checks into a single query using $or
-  let user_Check;
-  if (!user.email || !user.phone) {
-    user_Check = await userModel.findOne({
-      _id: { $ne: _id }, // Exclude the current user's _id
-      $or: [
-        { email: email }, // Check email only if it's empty in the user object
-        // { phone: phone } // Check phone only if it's empty in the user object
-      ]
-    });
-  }
-  if (!user) {
-    res.status(401).send({
-      message: "User not found!",
-      status: false,
-    });
-  } else {
-    if (!user_Check) {
-      const updateUserProfile = {
-        name,
-        phone: user.phone || phone, // Use the existing phone if available, otherwise use the provided one
-        gender,
-        email: user.email || email, // Use the existing email if available, otherwise use the provided one
-      };
 
-      // If a new image is uploaded, update the 'img' field in the update object
-     
-        await userModel.findByIdAndUpdate(user._id, updateUserProfile, { new: true });
+  if (user) {
+   const updatedUser = await userModel.findByIdAndUpdate(user._id,{
+    name, phone, gender,img 
+   },{new:true});
 
-        // Retrieve the updated user after the update
-        const updatedUser = await userModel.findOne({ _id: _id });
-
-        res.status(201).send({
-          _id: updatedUser?._id,
-          name: updatedUser?.name,
-          phone: updatedUser?.phone,
-          email: updatedUser?.email,
-          address: updatedUser.address ? JSON.parse(updatedUser.address) : updatedUser.address,
-          imgURL: updatedUser?.imgURL,
-          gender: updatedUser?.gender,
-        });
-
-
+   res.status(200).send(updatedUser);
 
     } else {
       // User with the provided email or phone already exists, send an error response
       res.status(409).send({
-        message: "Already exists.",
+        message: "user Not Found",
         status: false,
       });
     }
-  }
+} catch (error) {
+  responseError(res,500,error,"Internal Server Error")
+  
+}
 };
 
 const updateProfileAddress = async (req, res) => {
