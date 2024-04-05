@@ -61,6 +61,7 @@ const Add_To_Cart_Onsite_order = async (req, res) => {
       VAT,
       totalPrice: totalPrice * quantity,
       basePrice,
+      quantity,
       order_from: "ONSITE",
       img,
     }).save();
@@ -128,7 +129,8 @@ const Add_To_Cart_Offsite_order = async (req, res) => {
       VAT,
       totalPrice: totalPrice * quantity,
       basePrice,
-      order_from: "ONSITE",
+      quantity,
+      order_from: "OFFSITE",
       img,
     }).save();
     res.status(200).send(saveCart);
@@ -162,7 +164,10 @@ const getCart = async (req, res) => {
         return null; // Returning null if dishData is not found
       }
 
-      return { ...cartItem.toObject(), ...dishData.toObject() }; // Merge cartItem and dishData
+      return { ...cartItem.toObject(), 
+        dishId: dishData._id,
+        title: dishData.title,
+        img: dishData.img }; // Merge cartItem and dishData
     });
 
     // Wait for all promises to resolve
@@ -216,10 +221,15 @@ const getCartforSingle = async (req, res) => {
     if(checkCart){
       const getDish = await dishesModel.findOne({_id: checkCart?.dish_id});
       
-      if(!getDish) throw new Error('No Dish Found');
-      else{
-        res.status(200).send({getDish,checkCart});
+      if(!getDish){
+        responseError(res, 404);
+        return;
+      }else{
+        res.status(200).send({DishData : getDish,cartData : checkCart});
       }
+    }else{
+      responseError(res, 404);
+      return;
     }
   } catch (error) {
     responseError(res, 500);
