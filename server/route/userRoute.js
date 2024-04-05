@@ -17,7 +17,7 @@ const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPac
 const { employeeLogin } = require("../controller/employeeController");
 const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
 const { getAllRestaurantOf_A_City } = require("../controller/branchController");
-const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress } = require("../controller/userController");
+const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile } = require("../controller/userController");
 
 const router = express.Router();
 
@@ -52,6 +52,7 @@ router.delete("/sign-out-user",signout);
 router.get('/get-profile/:email',getProfile);
 
 router.post("/user-profile-update-address/:email",updateProfileAddress);
+router.patch("/edit-my-profile/:email",updateProfile);
 
 
 
