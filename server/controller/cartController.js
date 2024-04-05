@@ -167,7 +167,7 @@ const getCart = async (req, res) => {
       return { ...cartItem.toObject(), 
         dishId: dishData._id,
         title: dishData.title,
-        img: dishData.img }; // Merge cartItem and dishData
+      }; // Merge cartItem and dishData
     });
 
     // Wait for all promises to resolve
@@ -184,7 +184,7 @@ const getCart = async (req, res) => {
   }
 };
 
-const deleteCart = async (req, res) => {
+const deleteSingleCart = async (req, res) => {
   try {
     const { cartId } = req.params;
     const deleteCart = await Cart.deleteOne({ _id: cartId });
@@ -225,7 +225,7 @@ const getCartforSingle = async (req, res) => {
         responseError(res, 404);
         return;
       }else{
-        res.status(200).send({DishData : getDish,cartData : checkCart});
+        res.status(200).send({dishData : getDish,cartData : checkCart});
       }
     }else{
       responseError(res, 404);
@@ -239,7 +239,7 @@ const getCartforSingle = async (req, res) => {
 module.exports = {
   Add_To_Cart_Onsite_order,
   Add_To_Cart_Offsite_order,
-  deleteCart,
+  deleteSingleCart,
   deletePreviousCart,
   getCart,
   getCartforSingle,
