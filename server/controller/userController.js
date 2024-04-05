@@ -158,10 +158,115 @@ const getProfile = async (req, res) => {
   });
 };
 
+const updateProfile = async (req, res) => {
+
+  let { _id, name, phone, gender, email } = req.body;
+  console.log(req.body);
+  // Find the user based on _id and select only 'email' and 'phone' fields to reduce data retrieval
+  const user = await userModel.findOne({ _id: _id });
+  // console.log(user);
+  // Combine email and phone checks into a single query using $or
+  let user_Check;
+  if (!user.email || !user.phone) {
+    user_Check = await userModel.findOne({
+      _id: { $ne: _id }, // Exclude the current user's _id
+      $or: [
+        { email: email }, // Check email only if it's empty in the user object
+        // { phone: phone } // Check phone only if it's empty in the user object
+      ]
+    });
+  }
+  if (!user) {
+    res.status(401).send({
+      message: "User not found!",
+      status: false,
+    });
+  } else {
+    if (!user_Check) {
+      const updateUserProfile = {
+        name,
+        phone: user.phone || phone, // Use the existing phone if available, otherwise use the provided one
+        gender,
+        email: user.email || email, // Use the existing email if available, otherwise use the provided one
+      };
+
+      // If a new image is uploaded, update the 'img' field in the update object
+     
+        await userModel.findByIdAndUpdate(user._id, updateUserProfile, { new: true });
+
+        // Retrieve the updated user after the update
+        const updatedUser = await userModel.findOne({ _id: _id });
+
+        res.status(201).send({
+          _id: updatedUser?._id,
+          name: updatedUser?.name,
+          phone: updatedUser?.phone,
+          email: updatedUser?.email,
+          address: updatedUser.address ? JSON.parse(updatedUser.address) : updatedUser.address,
+          imgURL: updatedUser?.imgURL,
+          gender: updatedUser?.gender,
+        });
+
+
+
+    } else {
+      // User with the provided email or phone already exists, send an error response
+      res.status(409).send({
+        message: "Already exists.",
+        status: false,
+      });
+    }
+  }
+};
+
+const updateProfileAddress = async (req, res) => {
+  //console.log(req.body);
+  const {email} = req.params;
+  const { streetAddress,city ,stateProvince,postalCode,country} = req.body;
+  //console.log(decoded);
+  //const _id,address = req.body;
+//   {
+//     "streetAddress": "J A M T O L A",
+//     "city": "Narayanganj",
+//     "stateProvince": "Dhaka",
+//     "postalCode": "1400",
+//     "country": "Bangladesh"
+// }
+
+  const user = await userModel.findOne({ email: email });
+  if (!user) {
+    res.status(404).send({
+      message: "User not found!",
+      status: false,
+    });
+  } else {
+    await userModel.findByIdAndUpdate(user._id, {
+      address:{
+        streetAddress, city, stateProvince, postalCode, country,
+      },
+    });
+
+    const updatedUser = await userModel.findOne({ _id: _id });
+
+    res.status(201).send({
+      _id: updatedUser?._id,
+      name: updatedUser?.name,
+      phone: updatedUser?.phone,
+      email: updatedUser?.email,
+      address: updatedUser.address ? JSON.parse(updatedUser.address) : updatedUser.address,
+      imgURL: updatedUser?.imgURL,
+      gender: updatedUser?.gender,
+    });
+  }
+};
+
+
 module.exports = {
   signUp,
   signIn,
   JWTtoken,
   getProfile,
   signout,
+  updateProfileAddress,
+  updateProfile,
 };
