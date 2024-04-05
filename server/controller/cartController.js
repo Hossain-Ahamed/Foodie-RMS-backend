@@ -236,6 +236,52 @@ const getCartforSingle = async (req, res) => {
   }
 };
 
+const updateSingleCart = async (req,res) =>{
+  try {
+    const {_id,email} = req.params;
+    const {dish_id,
+      name,
+      addOn,
+      options,
+      quantity,
+      order_from,
+      extra,
+      VAT,
+      totalPrice,
+      basePrice
+    }= req.body
+    let cartData =await Cart.findById( _id );
+    
+    if (!cartData) {
+      responseError(res, 404,"No Data Found!");
+      return;
+    }else{
+      const checkUser = await userModel.findOne({email:email});
+      if (!checkUser._id.equals(cartData.user_id)){
+         responseError(res, 401,'You are not Authorized to perform this action');
+         return ;
+      }
+      //update dishes in the cart
+      const updateCart = await Cart.findByIdAndUpdate(cartData._id ,{dish_id,
+        addOn,
+        options,
+        quantity,
+        order_from,
+        extra,
+        VAT,
+        totalPrice,
+        basePrice
+      })
+
+      res.status(200).send(true);
+      
+
+    }
+  } catch (error) {
+    responseError(res, 500);
+  }
+}
+
 module.exports = {
   Add_To_Cart_Onsite_order,
   Add_To_Cart_Offsite_order,
@@ -243,4 +289,5 @@ module.exports = {
   deletePreviousCart,
   getCart,
   getCartforSingle,
+  updateSingleCart,
 };
