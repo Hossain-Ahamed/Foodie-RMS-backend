@@ -15,7 +15,8 @@ const {
     deletePreviousCart,
     Add_To_Cart_Offsite_order,
     getCartforSingle,
-    deleteSingleCart
+    deleteSingleCart,
+    updateSingleCart
   }  = require('../controller/cartController')
 
 const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPackage} = require("../controller/subscriptionPackagesController");
@@ -65,5 +66,6 @@ router.delete("/delete-my-previous-carts/:email",deletePreviousCart) //delete ex
 router.post("/add-to-cart-onsite/:email",Add_To_Cart_Onsite_order)  //onsite add to cart function
 router.post("/add-to-cart-offsite/:email",Add_To_Cart_Offsite_order)  //offsite add to cart function
 router.get("/get-cart-data-detail-for-edit/:email/cartID/:_id",getCartforSingle) // get dish data & cart data for edit 
-router.delete("/delete-cart-item/:email/cart-id/:cartId",deleteSingleCart) 
+router.delete("/delete-cart-item/:email/cart-id/:cartId",deleteSingleCart) //delete a cart item
+router.patch("/update-cart-item-onsite/:email/:_id",updateSingleCart) //update a cart item
 module.exports=router;

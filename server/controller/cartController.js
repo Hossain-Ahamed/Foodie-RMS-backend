@@ -173,7 +173,7 @@ const getCart = async (req, res) => {
     // Wait for all promises to resolve
     const allDishDataWithCarts = await Promise.all(dishDataPromises);
 
-    console.log(allDishDataWithCarts); // This will contain merged properties of getCarts and dish_data for each cart item
+    // console.log(allDishDataWithCarts); // This will contain merged properties of getCarts and dish_data for each cart item
 
     const validDishDataWithCarts = allDishDataWithCarts.filter(
       (item) => item !== null
@@ -225,7 +225,7 @@ const getCartforSingle = async (req, res) => {
         responseError(res, 404);
         return;
       }else{
-        res.status(200).send({dishData : getDish,cartData : checkCart});
+        res.status(200).send({dish : getDish,selectedItemCartData : checkCart});
       }
     }else{
       responseError(res, 404);
@@ -239,6 +239,7 @@ const getCartforSingle = async (req, res) => {
 const updateSingleCart = async (req,res) =>{
   try {
     const {_id,email} = req.params;
+    // console.log(req.body)
     const {dish_id,
       name,
       addOn,
