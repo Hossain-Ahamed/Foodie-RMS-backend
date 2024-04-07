@@ -5,10 +5,6 @@ const membershipSchema = new mongoose.Schema({
     type: mongoose.ObjectId,
     ref: "Restaurants",
   },
-  branchID: {
-    type: mongoose.ObjectId,
-    ref: "Branchs",
-  },
   singleTimeMinimumOrderAmount: {
     type: Number,
     default: 0,
@@ -31,12 +27,17 @@ const membershipSchema = new mongoose.Schema({
   },
   memberShip: [
     {
-      member: {
-        type: mongoose.ObjectId,
-        ref: "users",
-      },
-    },
-  ],
+    type: mongoose.ObjectId,
+    ref: "users",
+    }],
+  // memberShip: [
+  //   {
+  //     member: {
+  //       type: mongoose.ObjectId,
+  //       ref: "users",
+  //     },
+  //   },
+  // ],
 });
 
 module.exports = mongoose.model("membership", membershipSchema);

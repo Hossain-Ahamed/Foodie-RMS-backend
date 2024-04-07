@@ -24,6 +24,7 @@ const { employeeLogin } = require("../controller/employeeController");
 const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
 const { getAllRestaurantOf_A_City } = require("../controller/branchController");
 const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile } = require("../controller/userController");
+const { deleteMembership } = require("../controller/membershipController");
 
 const router = express.Router();
 
@@ -68,4 +69,14 @@ router.post("/add-to-cart-offsite/:email",Add_To_Cart_Offsite_order)  //offsite 
 router.get("/get-cart-data-detail-for-edit/:email/cartID/:_id",getCartforSingle) // get dish data & cart data for edit 
 router.delete("/delete-cart-item/:email/cart-id/:cartId",deleteSingleCart) //delete a cart item
 router.patch("/update-cart-item-onsite/:email/:_id",updateSingleCart) //update a cart item
+
+
+
+//Membership Manage
+router.delete("/delete-membership/:res_id/:_id",deleteMembership);
+
+
+
+
+
 module.exports=router;
