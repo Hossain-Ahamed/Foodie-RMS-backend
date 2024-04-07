@@ -62,8 +62,9 @@ const deleteOrder = async (req, res) => {
   
 
 module.exports = {
-    createOrderForTable,
+    createOrderForOffsite,
     updateOrder,
     deleteOrder,
     readOrder,
+    getOrderDetailsBeforeCheckout
 };
