@@ -126,6 +126,7 @@ const getMembershipUserData = async (req,res)=>{
       path: "memberShip",
       select: "_id  name email phone imgURL firebase_UID"
     });
+    res.status(200).send(userData?.memberShip)
   } catch (error) {
     responseError(res, 500, error, "Internal server error");
   }
