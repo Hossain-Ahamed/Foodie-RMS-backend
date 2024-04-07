@@ -139,7 +139,7 @@ const purchaseHistory = async(req,res)=>{
       if(!purchases){
         res.status(404).send(false);
       }
-      res.status(500).send(true);
+      res.status(200).send(purchases);
     } catch (error) {
       res.status(500).json({ msg: "Internal Server Error" });
     }
