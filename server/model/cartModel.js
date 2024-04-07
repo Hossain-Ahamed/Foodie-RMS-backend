@@ -34,7 +34,7 @@ const cartSchema = new mongoose.Schema(
     order_from:{
       type:String,
       enum:["ONSITE","OFFSITE"],
-      default:"ONSHORE"
+      default:"ONSITE"
     },
     options : {
       type: String,
