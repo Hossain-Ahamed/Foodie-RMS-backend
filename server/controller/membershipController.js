@@ -1,4 +1,5 @@
 const membership = require("../model/membershipModel");
+const User = require("../model/userModel");
 
 const getMembershipDetailsById = async (req, res) => {
   try {
@@ -17,6 +18,24 @@ const getMembershipDetailsById = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+const searchMember = async(req,res)=>{
+  try {
+    const {res_id} = req.params;
+    const {phone} = req.query;
+    if(!phone){
+      res.status(400).send(false);
+    }
+    const regexPattern = new RegExp(phone,'i');
+    const users = await User.find({phone:{$regex : regexPattern}});
+    if(!users){
+      res.status(404).send(false);
+    }
+    res.status(200).send(users);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 const updateMembership = async (req, res) => {
   try {
@@ -50,4 +69,5 @@ const updateMembership = async (req, res) => {
 module.exports = {
   updateMembership,
   getMembershipDetailsById,
+  searchMember
 };

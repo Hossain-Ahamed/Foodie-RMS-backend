@@ -121,6 +121,7 @@ const {
 const {
   getMembershipDetailsById,
   updateMembership,
+  searchMember
 } = require("../controller/membershipController");
 
 const {
@@ -293,6 +294,7 @@ router.patch(
   notifyOwnerFromDev
 );
 router.patch("/restaurant/:res_id/membership-rules", updateMembership);
+router.get("/restaurant/:res_id/memberSearch", searchMember);
 
 //development side employee list
 router.post("/dev/create", CreateDev);

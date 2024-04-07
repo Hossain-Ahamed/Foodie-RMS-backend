@@ -9,7 +9,7 @@ const deleteExpiredStories = async (req, res, next) => {
       next();
     } else {
       for (const story of expiredStories) {
-        await story.remove();
+        await story.deleteOne();
       }
       next();
     }
