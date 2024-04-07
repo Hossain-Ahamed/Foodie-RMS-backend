@@ -108,4 +108,5 @@ module.exports = {
     updateOrder,
     deleteOrder,
     readOrder,
+    getOrderDetailsBeforeCheckout
 };

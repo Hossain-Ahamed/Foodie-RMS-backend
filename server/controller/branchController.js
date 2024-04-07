@@ -60,7 +60,7 @@ const createBranch = async (req, res) => {
       country,
     }).save();
 
-    const newSubscription = new subscriptionModel({
+    const newSubscription = await new subscriptionModel({
       res_id: check_res._id,
       branchID: branch._id,
       packageType,
