@@ -18,32 +18,31 @@ const orderSchema = new Schema({
   token: {
     type: String,
   },
-
-  status: {
-    type: String,
-  },
   totalAmount: {
     type: String,
   },
   Items: [
     {
-      dishID: {
+      dish_id: {
         type: mongoose.ObjectId,
         ref: "dishes",
       },
-      dishQuantity: {
+      quantity: {
         type: String,
       },
       title: {
         type: String,
       },
-      dishTotalPrice: {
+      img:{
+        type:String,
+      },
+      totalPrice: {
         type: Number,
       },
       dishStatus: {
         type: String,
-        default: "Accepted",
-        enum: ["Accepted", "Processing", "Processed", "Delivered", "Cancelled"],
+        default: "Order-Placed",
+        enum: ["Order-Placed","Approved", "Processing", "Processed", "Delivered", "Cancelled"],
       },
       addOn: [
         {
@@ -104,6 +103,7 @@ const orderSchema = new Schema({
       "Shipped",
       "Ready To Delivery",
       "Delivered",
+      "Completed",
       "Cancelled",
     ],
   },
@@ -115,6 +115,12 @@ const orderSchema = new Schema({
   type_of_payment: {
     type: String,
     enum: ["Bkash", "Roket", "Nagad", "Card", "Cash On Delivery (COD)"],
+    default: "Cash On Delivery (COD)",
+  },
+  order_from:{
+    type:String,
+    enum:["ONSITE","OFFSITE"],
+    default:"ONSITE"
   },
   transactionId: {
     type: String,
