@@ -19,7 +19,7 @@ const inventorySchema = new mongoose.Schema(
     unit: {
       type: Number,
     },
-    unitPrize: {
+    unitPrice: {
       type: Number,
     },
   },
