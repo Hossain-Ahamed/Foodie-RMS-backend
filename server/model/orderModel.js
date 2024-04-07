@@ -16,7 +16,7 @@ const orderSchema = new Schema({
     ref: "users",
   },
   token: {
-    type: String,
+    type: Number,
   },
   totalAmount: {
     type: String,
@@ -162,6 +162,8 @@ const orderSchema = new Schema({
       },
     },
   ],
-});
+}
+,
+  { timestamps: true });
 
 module.exports = mongoose.model("order", orderSchema);
