@@ -29,6 +29,14 @@ const membershipSchema = new mongoose.Schema({
     type: String,
     default: "Modification restricted to Super-admin only.",
   },
+  memberShip: [
+    {
+      member: {
+        type: mongoose.ObjectId,
+        ref: "users",
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("membership", membershipSchema);
