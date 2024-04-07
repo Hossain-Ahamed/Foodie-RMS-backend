@@ -122,7 +122,10 @@ const {
 const {
   getMembershipDetailsById,
   updateMembership,
-  searchMember
+  searchMember,
+  getMembershipUserData,
+  addNewMembership,
+  deleteMembership
 } = require("../controller/membershipController");
 
 const {
@@ -295,6 +298,9 @@ router.patch(
   notifyOwnerFromDev
 );
 router.patch("/restaurant/:res_id/membership-rules", updateMembership);
+router.get("/restaurant/:res_id/all-member-list", getMembershipUserData);
+router.post("/restaurant/:res_id/add-new-member", addNewMembership);
+router.delete("/restaurant/:res_id/userID/:_id", deleteMembership);
 router.get("/restaurant/:res_id/memberSearch", searchMember);
 
 //development side employee list
