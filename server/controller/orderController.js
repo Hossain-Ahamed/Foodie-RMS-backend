@@ -62,7 +62,6 @@ const getOrderDetailsBeforeCheckout = async (req, res) => {
     });
 
 
-
     let discount;
     if(checkMembership){
       discount=((checkMembership.percentageOffer)/100)*totalPrice;
@@ -82,12 +81,11 @@ const getOrderDetailsBeforeCheckout = async (req, res) => {
       subtotal : parseFloat(totalPrice.toFixed(2)), 
       discount : parseFloat(discount.toFixed(2)), 
       total : parseFloat((totalPrice - discount).toFixed(2)),
-      percentage: checkMembership.percentageOffer
     })
 
 
    } catch (error) {
-    responseError(res, 500);
+    responseError(res, 500,error);
    }
 };
 
