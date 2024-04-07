@@ -125,9 +125,25 @@ const deleteExpense = async (req, res) => {
     );
     res.status(200).send(true);
   } catch (err) {
-    res.status(400).send(false);
+    res.status(500).send(false);
   }
 };
+
+const purchaseHistory = async(req,res)=>{
+    try {
+      const { branchID } = req.params;
+      if(!branchID){
+        res.status(400).send(false);
+      }
+      const purchases = await Expense.find({branchID: branchID,category:"Purchase"});
+      if(!purchases){
+        res.status(404).send(false);
+      }
+      res.status(500).send(true);
+    } catch (error) {
+      res.status(500).json({ msg: "Internal Server Error" });
+    }
+}
 
 module.exports = {
   createExpense,
@@ -135,4 +151,5 @@ module.exports = {
   deleteExpense,
   updateExpense,
   getExpenseById,
+  purchaseHistory
 };

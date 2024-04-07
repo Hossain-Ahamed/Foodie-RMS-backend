@@ -84,6 +84,7 @@ const {
   deleteExpense,
   updateExpense,
   getExpenseById,
+  purchaseHistory
 } = require("../controller/expenseController");
 const {
   CreateDev,
@@ -339,6 +340,7 @@ router.delete(
   "/admin/:res_id/branch/:branchID/delete-expenses/:_id",
   deleteExpense
 );
+router.get("/admin/all-purchase/:branchID",purchaseHistory);
 router.get("/admin/:res_id/branch/:branchID/get-expenses/:_id", getExpenseById);
 router.patch(
   "/admin/:res_id/branch/:branchID/edit-expenses/:_id",
