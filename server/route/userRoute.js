@@ -4,6 +4,7 @@ const {
     updateOrder,
     deleteOrder,
     readOrder,
+    getOrderDetailsBeforeCheckout,
 } =  require('../controller/orderController');
 
 
@@ -69,6 +70,8 @@ router.post("/add-to-cart-offsite/:email",Add_To_Cart_Offsite_order)  //offsite 
 router.get("/get-cart-data-detail-for-edit/:email/cartID/:_id",getCartforSingle) // get dish data & cart data for edit 
 router.delete("/delete-cart-item/:email/cart-id/:cartId",deleteSingleCart) //delete a cart item
 router.patch("/update-cart-item-onsite/:email/:_id",updateSingleCart) //update a cart item
+
+router.get("/restuarant/:res_id/branch/:branchID/email/:email",getOrderDetailsBeforeCheckout)
 
 
 
