@@ -126,6 +126,15 @@ const deleteOrder = async (req, res) => {
         if(paymentTypesOfTheBranch == "PayLater"){
           const PreviousIncompletedOrder = await orderModel.findOne({res_id : res_id, branchID : branchID, user_id : user?._id});
           if(PreviousIncompletedOrder){
+            const push_data = {
+              finalPrice: data?.finalPrice +  PreviousIncompletedOrder.finalPrice,
+              Items : [...PreviousIncompletedOrder?.Items , ...data?.Items],
+              subTotalPrice : data?.subTotalPrice + PreviousIncompletedOrder.subTotalPrice,
+              discountedPrice : data?.discountedPrice +  PreviousIncompletedOrder.discountedPrice,
+              finalPrice : data?.finalPrice +  PreviousIncompletedOrder.finalPrice,
+              table : table_id,}
+
+              order = await orderModel.findByIdAndUpdate(PreviousIncompletedOrder._id ,{$set :push_data},{new:true});
 
           }else{
             order = await  new orderModel({
@@ -146,6 +155,7 @@ const deleteOrder = async (req, res) => {
               type_of_payment: "Cash On Delivery (COD)",
               order_from : "ONSITE",
               table : table_id,
+              
             }).save();
 
 
@@ -172,6 +182,7 @@ const deleteOrder = async (req, res) => {
           }).save();
 
         }
+        // const deleteCart = await cartModel.deleteMany({user_id : user?._id});
         res.status(200).send(order);
     
       } catch (error) {
@@ -292,5 +303,5 @@ module.exports = {
     updateOrder,
     deleteOrder,
     readOrder,
-    getOrderDetailsBeforeCheckout
+    createOrderForOnsite,
 };
