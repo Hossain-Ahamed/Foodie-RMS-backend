@@ -147,7 +147,7 @@ const createOrderForOnsite = async (req, res) => {
           token = ` #Token-${PreviousIncompletedOrder?.token}`
         } else {
           console.log("pay Later+ no prev order");
-          const genratedToken = await generateToken()
+          const genratedToken = await generateToken(res_id,branchID)
           order = await new orderModel({
             res_id,
             branchID,
@@ -172,7 +172,7 @@ const createOrderForOnsite = async (req, res) => {
         }
       } else {
         console.log("pay first");
-        const genratedToken = await generateToken()
+        const genratedToken = await generateToken(res_id,branchID)
         order = await new orderModel({
           res_id,
           branchID,
@@ -195,7 +195,7 @@ const createOrderForOnsite = async (req, res) => {
         message = `🌟 Get ready to pay as our Customer Service arrives. Remember, we have pay first policy. 🍽️`
         token = ` #Token-${genratedToken}`
       }
-      const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
+      // const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
       res.status(200).send({order,message : message, token : token });
     } catch (error) {
       return responseError(res, 500, error);
@@ -278,30 +278,18 @@ async function generateToken(res_id, branchID) {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    const result = await orderModel.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: today }, // Filter orders for today or later
-          branchID : branchID
-        },
-      },
-      {
-        $sort: { createdAt: -1 }, // Sort in descending order based on createdAt timestamp
-      },
-      {
-        $limit: 1, // Limit to only one result (the latest order)
-      },
-      {
-        $project: {
-          token: 1, // Include only the 'token' field in the result
-        },
-      },
-    ]);
+    
+    const result = await orderModel .find({
+      createdAt: { $gte: today }, // Filter orders for today or later
+      branchID: branchID // Match the branchID
+    })
+    .sort({ createdAt: -1 }) // Sort in descending order based on createdAt timestamp
+    .limit(1) // Limit to only one result (the latest order)
+    .select('token'); // Include only the 'token' field in the result
 
 
 
-        console.log(result)
+        console.log(1,result)
   
         let token;
   
