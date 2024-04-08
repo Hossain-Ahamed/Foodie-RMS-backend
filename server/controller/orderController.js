@@ -119,13 +119,15 @@ const deleteOrder = async (req, res) => {
       try {
         const user = await userModel.findOne({email: email});
         const checkCart = await cartModel.find({user_id : user?._id ,branchID:branchID});
-        const data = await totalPriceAndItems(res_id, branchID,checkCart);
+        const data = await totalPriceAndItems(res_id, branchID,checkCart,user);
 
-        const paymentTypesOfTheBranch = await branchModel.findById(branchID).select("paymentTypes")?.paymentTypes;
+        const paymentTypesOfTheBranch = await branchModel.findById(branchID).select("paymentTypes");
+        console.log(paymentTypesOfTheBranch)
         let order ;
-        if(paymentTypesOfTheBranch == "PayLater"){
+        if(paymentTypesOfTheBranch?.paymentTypes == "PayLater"){
           const PreviousIncompletedOrder = await orderModel.findOne({res_id : res_id, branchID : branchID, user_id : user?._id});
           if(PreviousIncompletedOrder){
+            console.log('pay Later+ prev order')
             const push_data = {
               finalPrice: data?.finalPrice +  PreviousIncompletedOrder.finalPrice,
               Items : [...PreviousIncompletedOrder?.Items , ...data?.Items],
@@ -137,6 +139,7 @@ const deleteOrder = async (req, res) => {
               order = await orderModel.findByIdAndUpdate(PreviousIncompletedOrder._id ,{$set :push_data},{new:true});
 
           }else{
+            console.log('pay Later+ no prev order')
             order = await  new orderModel({
               res_id,
               branchID,
@@ -161,6 +164,7 @@ const deleteOrder = async (req, res) => {
 
           }
         }else{
+          console.log('pay first')
           order = await  new orderModel({
             res_id,
             branchID,
@@ -197,7 +201,7 @@ const deleteOrder = async (req, res) => {
      
   };
 
-  const totalPriceAndItems = async (res_id,branchID,cartItems)=>{
+  const totalPriceAndItems = async (res_id,branchID,cartItems,user)=>{
     const dishDataPromises = cartItems.map(async (cartItem, index) => {
       const dishData = await Dish
         .findById(cartItem.dish_id)
@@ -242,7 +246,7 @@ const deleteOrder = async (req, res) => {
     }
     const checkMembership = await membershipModel.findOne({ 
       res_id: res_id,
-      'memberShip': { $elemMatch: { $eq: checkUser._id } } 
+      'memberShip': { $elemMatch: { $eq: user._id } } 
     });
 
 
@@ -267,24 +271,40 @@ const deleteOrder = async (req, res) => {
       finalPrice :  totalPrice - discount,
     }
   }
-  async function generateToken(res_id,branchID) {
+  async function generateToken(res_id, branchID) {
     try {
-        // Get the current date
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // Month is zero-based, so add 1
-        const day = currentDate.getDate();
-  
-        // Find the last order for the current date
-        const lastOrder = await orderModel.findOne({res_id: res_id ,branchID : branchID, createdAt: { $gte: new Date(year, month - 1, day) } })
-            .sort({ token: -1 })
-            .limit(1);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+
+        const result = await orderModel.aggregate([
+          {
+            $match: {
+              createdAt: { $gte: today }, // Filter orders for today or later
+            },
+          },
+          {
+            $sort: { createdAt: -1 }, // Sort in descending order based on createdAt timestamp
+          },
+          {
+            $limit: 1, // Limit to only one result (the latest order)
+          },
+          {
+            $project: {
+              token: 1, // Include only the 'token' field in the result
+            },
+          },
+        ]);
+
+
+
+        console.log(result)
   
         let token;
   
-        if (lastOrder) {
+        if (result.length>0) {
             // If there is a previous order for the day, increment its token
-            token = lastOrder.token + 1;
+            token = result[0].token+ 1;
         } else {
             // If there are no previous orders for the day, start from 1
             token = 1;
@@ -292,11 +312,10 @@ const deleteOrder = async (req, res) => {
   
         return token;
     } catch (error) {
-        console.error("Error generating token:", error);
-        // Handle error appropriately, e.g., return a default token or throw an error
-        throw error;
+      responseError(res,500,error);
     }
-  }
+}
+
 
 module.exports = {
   getOrderDetailsBeforeCheckout,
