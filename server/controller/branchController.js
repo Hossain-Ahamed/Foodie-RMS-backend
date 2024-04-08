@@ -80,8 +80,13 @@ const createBranch = async (req, res) => {
       ],
     }).save();
 
-    const employee = await employeeModel.findOneAndUpdate(
-      { "permitted.res_id": res_id, "permitted.role": "Super-Admin" },
+    const ExistingSuperAdminProfile = await employeeModel.findOne({ "permitted.res_id": res_id, "permitted.role": "Super-Admin" });
+    console.log(ExistingSuperAdminProfile)
+    if(!ExistingSuperAdminProfile){
+      return responseError(res,404,{msg : "search failed"},"No super admin profile found")
+    }
+    const employee = await employeeModel.findByIdAndUpdate(
+      ExistingSuperAdminProfile._id,
       {
         $push: {
           permitted: {
