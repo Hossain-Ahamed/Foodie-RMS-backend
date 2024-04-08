@@ -205,6 +205,8 @@ const createOrderForOnsite = async (req, res) => {
   }
 };
 
+
+
 const totalPriceAndItems = async (res_id, branchID, cartItems, user) => {
   const dishDataPromises = cartItems.map(async (cartItem, index) => {
     const dishData = await Dish.findById(cartItem.dish_id).select("title img");
@@ -296,28 +298,30 @@ async function generateToken(res_id, branchID) {
       },
     ]);
 
-    console.log(result);
 
-    let token;
 
-    if (result.length > 0) {
-      // If there is a previous order for the day, increment its token
-      token = result[0].token + 1;
-    } else {
-      // If there are no previous orders for the day, start from 1
-      token = 1;
+        console.log(result)
+  
+        let token;
+  
+        if (result.length>0) {
+            // If there is a previous order for the day, increment its token
+            token = result[0].token+ 1;
+        } else {
+            // If there are no previous orders for the day, start from 1
+            token = 1;
+        }
+  
+        return token;
+    } catch (error) {
+      responseError(res,500,error);
     }
-
-    return token;
-  } catch (error) {
-    responseError(res, 500, error);
-  }
 }
 
 module.exports = {
   getOrderDetailsBeforeCheckout,
-  updateOrder,
-  deleteOrder,
-  readOrder,
-  createOrderForOnsite,
+    updateOrder,
+    deleteOrder,
+    readOrder,
+    createOrderForOnsite,
 };
