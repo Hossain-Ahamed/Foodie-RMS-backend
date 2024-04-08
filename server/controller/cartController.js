@@ -270,7 +270,7 @@ const updateSingleCart = async (req,res) =>{
         order_from,
         extra,
         VAT,
-        totalPrice,
+        totalPrice : totalPrice*quantity,
         basePrice
       })
 
