@@ -201,6 +201,8 @@ const deleteOrder = async (req, res) => {
      
   };
 
+
+
   const totalPriceAndItems = async (res_id,branchID,cartItems,user)=>{
     const dishDataPromises = cartItems.map(async (cartItem, index) => {
       const dishData = await Dish
@@ -316,11 +318,35 @@ const deleteOrder = async (req, res) => {
     }
 }
 
+const onGoingOrderForOnSite = async (req,res)=>{
+  try {
+    const {res_id,branchID,email} = req.params;
+    const user = await userModel.findOne({ email : email });
+    const allOrderOngoing = await orderModel.find({user_id:user?._id, status: { $ne: "Completed" } });
+    res.status(200).send(allOrderOngoing);
+  } catch (error) {
+    responseError(res,500,error);
+  }
+}
+
+const allCompleteOrderForOnSite = async (req,res)=>{
+  try {
+    const {res_id,branchID,email} = req.params;
+    const user = await userModel.findOne({ email : email });
+    const allOrderComplete = await orderModel.find({user_id:user?._id,status: "Completed"  });
+    res.status(200).send(allOrderComplete);
+  } catch (error) {
+    responseError(res,500,error);
+  }
+}
+
 
 module.exports = {
-  getOrderDetailsBeforeCheckout,
+    getOrderDetailsBeforeCheckout,
     updateOrder,
     deleteOrder,
     readOrder,
     createOrderForOnsite,
+    onGoingOrderForOnSite,
+    allCompleteOrderForOnSite,
 };

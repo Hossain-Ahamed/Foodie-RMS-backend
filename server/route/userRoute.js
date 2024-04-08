@@ -6,6 +6,8 @@ const {
     readOrder,
     getOrderDetailsBeforeCheckout,
     createOrderForOnsite,
+    onGoingOrderForOnSite,
+    allCompleteOrderForOnSite,
 } =  require('../controller/orderController');
 
 
@@ -75,8 +77,10 @@ router.patch("/update-cart-item-onsite/:email/:_id",updateSingleCart) //update a
 router.get("/restuarant/:res_id/branch/:branchID/email/:email",getOrderDetailsBeforeCheckout);
 
 
-//order ROute
+//order Route
 router.post("/create-an-onsite-order/:email", createOrderForOnsite) ;   //create onsite order
+router.get("/ongoing-order/restuarant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
+router.get("/completed-order/restuarant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
 
 
 
