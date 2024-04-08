@@ -283,6 +283,7 @@ async function generateToken(res_id, branchID) {
       {
         $match: {
           createdAt: { $gte: today }, // Filter orders for today or later
+          branchID : branchID
         },
       },
       {
@@ -318,10 +319,34 @@ async function generateToken(res_id, branchID) {
     }
 }
 
+const onGoingOrderForOnSite = async (req,res)=>{
+  try {
+    const {res_id,branchID,email} = req.params;
+    const user = await userModel.findOne({ email : email });
+    const allOrderOngoing = await orderModel.find({user_id:user?._id, status: { $ne: "Completed" }, branchID: branchID });
+    res.status(200).send(allOrderOngoing);
+  } catch (error) {
+    responseError(res,500,error);
+  }
+}
+
+const allCompleteOrderForOnSite = async (req,res)=>{
+  try {
+    const {res_id,branchID,email} = req.params;
+    const user = await userModel.findOne({ email : email });
+    const allOrderComplete = await orderModel.find({user_id:user?._id,status: "Completed",branchID: branchID  });
+    res.status(200).send(allOrderComplete);
+  } catch (error) {
+    responseError(res,500,error);
+  }
+}
+
 module.exports = {
   getOrderDetailsBeforeCheckout,
     updateOrder,
     deleteOrder,
     readOrder,
     createOrderForOnsite,
+    onGoingOrderForOnSite,
+    allCompleteOrderForOnSite
 };
