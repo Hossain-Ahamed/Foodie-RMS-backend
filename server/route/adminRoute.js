@@ -84,7 +84,8 @@ const {
   deleteExpense,
   updateExpense,
   getExpenseById,
-  purchaseHistory
+  purchaseHistory,
+  vendorAndEmployeeNameInDropdown,
 } = require("../controller/expenseController");
 const {
   CreateDev,
@@ -125,7 +126,7 @@ const {
   searchMember,
   getMembershipUserData,
   addNewMembership,
-  deleteMembership
+  deleteMembership,
 } = require("../controller/membershipController");
 
 const {
@@ -346,7 +347,11 @@ router.delete(
   "/admin/:res_id/branch/:branchID/delete-expenses/:_id",
   deleteExpense
 );
-router.get("/admin/all-purchase/:branchID",purchaseHistory);
+router.get("/admin/all-purchase/:branchID", purchaseHistory);
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-expenses",
+  vendorAndEmployeeNameInDropdown
+);
 router.get("/admin/:res_id/branch/:branchID/get-expenses/:_id", getExpenseById);
 router.patch(
   "/admin/:res_id/branch/:branchID/edit-expenses/:_id",

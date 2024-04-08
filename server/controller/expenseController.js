@@ -1,5 +1,6 @@
 const Expense = require("../model/expenseModel");
-
+const Employee = require("../model/employeeModel");
+const Vendor = require("../model/vendorModel");
 //creation of a new expense
 const createExpense = async (req, res) => {
   try {
@@ -129,21 +130,45 @@ const deleteExpense = async (req, res) => {
   }
 };
 
-const purchaseHistory = async(req,res)=>{
-    try {
-      const { branchID } = req.params;
-      if(!branchID){
-        res.status(400).send(false);
-      }
-      const purchases = await Expense.find({branchID: branchID,category:"Purchase"});
-      if(!purchases){
-        res.status(404).send(false);
-      }
-      res.status(200).send(purchases);
-    } catch (error) {
-      res.status(500).json({ msg: "Internal Server Error" });
+const purchaseHistory = async (req, res) => {
+  try {
+    const { branchID } = req.params;
+    if (!branchID) {
+      res.status(400).send(false);
     }
-}
+    const purchases = await Expense.find({
+      branchID: branchID,
+      category: "Purchase",
+    });
+    if (!purchases) {
+      res.status(404).send(false);
+    }
+    res.status(200).send(purchases);
+  } catch (error) {
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+const vendorAndEmployeeNameInDropdown = async (req, res) => {
+  try {
+    const { category } = req.query;
+    const { branchID } = req.params;
+    if (category === "Purchase") {
+      const vendors = await Vendor.find({ branchID: branchID });
+      vendorNames = vendors.map((vendor) => vendor.name);
+      res.status(200).send(vendorNames);
+    }
+    if (category === "Salaries") {
+      const employees = await Employee.find({ branchID: branchID });
+      employeeNames = employees.map(
+        (employee) => `${employee.f_name} ${employee.l_name}`
+      );
+      res.status(200).send(employeeNames);
+    }
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
 
 module.exports = {
   createExpense,
@@ -151,5 +176,6 @@ module.exports = {
   deleteExpense,
   updateExpense,
   getExpenseById,
-  purchaseHistory
+  purchaseHistory,
+  vendorAndEmployeeNameInDropdown,
 };

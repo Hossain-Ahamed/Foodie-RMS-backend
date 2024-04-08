@@ -22,6 +22,9 @@ const inventorySchema = new mongoose.Schema(
     unitPrice: {
       type: Number,
     },
+    unitType: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
