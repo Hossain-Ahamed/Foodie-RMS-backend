@@ -16,10 +16,7 @@ const orderSchema = new Schema({
     ref: "users",
   },
   token: {
-    type: String,
-  },
-  totalAmount: {
-    type: String,
+    type: Number,
   },
   Items: [
     {
@@ -28,7 +25,7 @@ const orderSchema = new Schema({
         ref: "dishes",
       },
       quantity: {
-        type: String,
+        type: Number,
       },
       title: {
         type: String,
@@ -43,6 +40,18 @@ const orderSchema = new Schema({
         type: String,
         default: "Order-Placed",
         enum: ["Order-Placed","Approved", "Processing", "Processed", "Delivered", "Cancelled"],
+      },
+      basePrice:{
+        type:Number
+      },
+      totalPrice:{
+        type:Number,
+      },
+      extraPrice:{
+        type:Number
+      },
+      VAT:{
+        type:Number
       },
       addOn: [
         {
@@ -70,9 +79,24 @@ const orderSchema = new Schema({
   orderNote: {
     type: String,
   },
-  address: {
-    type: String,
-  },
+  address: 
+      {
+        streetAddress: {
+          type: String,
+        },
+        city: {
+          type: String,
+        },
+        stateProvince: {
+          type: String,
+        },
+        postalCode: {
+          type: String,
+        },
+        country: {
+          type: String,
+        },
+      },
   vouchers: {
     type: String,
     default: "",
@@ -162,6 +186,8 @@ const orderSchema = new Schema({
       },
     },
   ],
-});
+}
+,
+  { timestamps: true });
 
 module.exports = mongoose.model("order", orderSchema);

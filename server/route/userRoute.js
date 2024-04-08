@@ -5,6 +5,7 @@ const {
     deleteOrder,
     readOrder,
     getOrderDetailsBeforeCheckout,
+    createOrderForOnsite,
 } =  require('../controller/orderController');
 
 
@@ -71,7 +72,11 @@ router.get("/get-cart-data-detail-for-edit/:email/cartID/:_id",getCartforSingle)
 router.delete("/delete-cart-item/:email/cart-id/:cartId",deleteSingleCart) //delete a cart item
 router.patch("/update-cart-item-onsite/:email/:_id",updateSingleCart) //update a cart item
 
-router.get("/restuarant/:res_id/branch/:branchID/email/:email",getOrderDetailsBeforeCheckout)
+router.get("/restuarant/:res_id/branch/:branchID/email/:email",getOrderDetailsBeforeCheckout);
+
+
+//order ROute
+router.post("/create-an-onsite-order/:email", createOrderForOnsite) ;   //create onsite order
 
 
 
