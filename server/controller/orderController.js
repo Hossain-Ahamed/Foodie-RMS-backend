@@ -186,7 +186,7 @@ const deleteOrder = async (req, res) => {
           }).save();
 
         }
-        // const deleteCart = await cartModel.deleteMany({user_id : user?._id});
+        const deleteCart = await cartModel.deleteMany({user_id : user?._id});
         res.status(200).send(order);
     
       } catch (error) {
