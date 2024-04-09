@@ -151,20 +151,19 @@ const purchaseHistory = async (req, res) => {
 
 const vendorAndEmployeeNameInDropdown = async (req, res) => {
   try {
-    const { category } = req.query;
+    const { expenseCategory } = req.query;
     const { branchID } = req.params;
-    if (category === "Purchase") {
-      const vendors = await Vendor.find({ branchID: branchID });
-      vendorNames = vendors.map((vendor) => vendor.name);
-      res.status(200).send(vendorNames);
-    }
-    if (category === "Salaries") {
-      const employees = await Employee.find({ branchID: branchID });
-      employeeNames = employees.map(
-        (employee) => `${employee.f_name} ${employee.l_name}`
-      );
-      res.status(200).send(employeeNames);
-    }
+    const vendors = await Vendor.find({ branchID: branchID });
+    vendorNames = vendors.map((vendor) => ({
+      name: vendor.name,
+      id: vendor._id.toString().substr(0, 8),
+    }));
+    const employees = await Employee.find({ branchID: branchID });
+    const employeeNames = employees.map((employee) => ({
+      name: `${employee.f_name} ${employee.l_name}`,
+      id: employee._id.toString().substr(0, 8),
+    }));
+    res.status(200).json({ vendorNames, employeeNames });
   } catch (error) {
     res.status(500).json({ error });
   }
