@@ -44,7 +44,7 @@ const signIn = async (req, res) => {
 const JWTtoken = async (req, res) => {
   const { name, email, firebase_UID, password, phone, imgURL } = req.body;
   try {
-    // const release = await mutex.acquire();
+    const release = await mutex.acquire();
     console.log(req.body);
 
     // console.log(email);
@@ -94,7 +94,7 @@ const JWTtoken = async (req, res) => {
         gender: user?.gender,
       },
     });
-    // release(); // Release the mutex lock
+    release(); // Release the mutex lock
   } catch (error) {
     console.log(error);
     responseError(res, 500, "Internal server error");
