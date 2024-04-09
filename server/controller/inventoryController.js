@@ -18,11 +18,11 @@ const giveVendorName = async (req, res) => {
 const getInventoryByBranchId = async (req, res) => {
   try {
     const { branchID } = req.params;
-    const vendorData = await Vendor.find({ branchID: branchID });
-    if (!vendorData) {
+    const inventoryData = await Inventory.find({ branchID: branchID });
+    if (!inventoryData) {
       res.status(404).json({ message: "No vendors found" });
     }
-    res.status(201).send(vendorData);
+    res.status(201).send(inventoryData);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
@@ -41,8 +41,14 @@ const addNewItemToInventory = async (req, res) => {
 const oldDataOfItem = async (req, res) => {
   try {
     const { id } = req.params;
+    const { branchID } = req.params;
+    const vendorData = await Vendor.find({ branchID: branchID });
+    if (!vendorData) {
+      res.status(404).json({ message: "No vendors found" });
+    }
+    vendorNames = vendorData.map((vendor) => vendor.name);
     const itemData = await Inventory.findById(id);
-    res.status(200).send(itemData);
+    res.status(200).send({itemData, vendorNames});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

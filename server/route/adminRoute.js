@@ -416,7 +416,7 @@ router.get(
   giveVendorName
 );
 router.get(
-  "/admin/restaurant/:res_id/branch/:branchID/get-inventory-data",
+  "/admin/restaurant/:res_id/branch/:branchID/inventory-report/",
   getInventoryByBranchId
 );
 router.post("/admin/add-to-inventory", addNewItemToInventory);
