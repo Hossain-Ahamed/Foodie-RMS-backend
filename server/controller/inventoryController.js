@@ -38,6 +38,16 @@ const addNewItemToInventory = async (req, res) => {
   }
 };
 
+const oldDataOfItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const itemData = await Inventory.findById(id);
+    res.status(200).send(itemData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const updateInventoryItem = async (req, res) => {
   try {
     const { id } = req.params;
@@ -74,4 +84,5 @@ module.exports = {
   deleteInventoryItem,
   getInventoryByBranchId,
   giveVendorName,
+  oldDataOfItem,
 };

@@ -409,6 +409,7 @@ const {
   deleteInventoryItem,
   getInventoryByBranchId,
   giveVendorName,
+  oldDataOfItem,
 } = require("../controller/inventoryController");
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
@@ -426,6 +427,10 @@ router.patch(
 router.delete(
   "/admin/:res_id/branch/:branchID/delete-inventory/:id",
   deleteInventoryItem
+);
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-inventory-data/:id",
+  oldDataOfItem
 );
 
 /**
