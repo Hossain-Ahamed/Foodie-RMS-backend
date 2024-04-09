@@ -402,6 +402,32 @@ router.patch(
   updateBranch
 ); // update branch data after edit
 
+//inventory and resipe
+const {
+  addNewItemToInventory,
+  updateInventoryItem,
+  deleteInventoryItem,
+  getInventoryByBranchId,
+  giveVendorName,
+} = require("../controller/inventoryController");
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
+  giveVendorName
+);
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-inventory-data",
+  getInventoryByBranchId
+);
+router.post("/admin/add-to-inventory", addNewItemToInventory);
+router.patch(
+  "/admin/restaurant/:res_id/branch/:branchID/edit-inventory/:id",
+  updateInventoryItem
+);
+router.delete(
+  "/admin/:res_id/branch/:branchID/delete-inventory/:id",
+  deleteInventoryItem
+);
+
 /**
  *
  * -------------------------------------------------------------------------------
