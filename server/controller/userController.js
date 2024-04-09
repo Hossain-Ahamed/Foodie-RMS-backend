@@ -1,8 +1,8 @@
-// const { Mutex } = require("async-mutex");
+const { Mutex } = require("async-mutex");
 const userModel = require("../model/userModel");
 const { responseError } = require("../utils/utility");
 const JWT = require("jsonwebtoken");
-// const mutex = new Mutex();
+const mutex = new Mutex();
 const signUp = async (req, res) => {
   try {
     const { name, email, firebase_UID, password, phone } = req.body;
