@@ -158,7 +158,11 @@ const vendorAndEmployeeNameInDropdown = async (req, res) => {
       name: vendor.name,
       id: vendor._id.toString().substr(0, 8),
     }));
-    const employees = await Employee.find({ branchID: branchID });
+    const employees = await Employee.find({
+      permitted: {
+        $elemMatch: { branchID: branchID },
+      },
+    });
     const employeeNames = employees.map((employee) => ({
       name: `${employee.f_name} ${employee.l_name}`,
       id: employee._id.toString().substr(0, 8),
