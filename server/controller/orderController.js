@@ -10,6 +10,7 @@ const orderModel = require("../model/orderModel");
 const { query } = require("express");
 const branchModel = require("../model/branchModel");
 const couponModel = require("../model/couponModel");
+const restaurantModel = require("../model/restaurantModel");
 
 const getOrderDetailsBeforeCheckout = async (req, res) => {
   try {
@@ -101,6 +102,9 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
     const checkCart = await cartModel.find({
       user_id: checkUser._id,
     });
+    if(checkCart.length <= 0){
+      return responseError(res,404,"cart Not found")
+    }
 
     const dishDataPromises = checkCart.map(async (cartItem, index) => {
       const dishData = await Dish.findById(cartItem.dish_id).select(
@@ -137,6 +141,8 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
     for (const item of validDishDataWithCarts) {
       totalPrice += item.totalPrice;
     }
+    const res_data = await restaurantModel.findById(checkCart[0]?.res_id).select("res_name");
+    const branch_data = await branchModel.findById(checkCart[0]?.branchID).select("branch_name")
 
 
 
@@ -146,6 +152,8 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
       subtotal: parseFloat(totalPrice.toFixed(2)),
       res_id: checkCart[0]?.res_id,
       branchID : checkCart[0]?.branchID ,
+      res_name : res_data?.res_name,
+      branch_name : branch_data?.branch_name,
     });
   } catch (error) {
     responseError(res, 500, error);
@@ -269,12 +277,14 @@ const createOrderForOnsite = async (req, res) => {
 const createOrderForOffsite = async (req, res) => {
   try {
     const { email } = req.params;
-    const {couponCode} = req.body;
-
+    const {couponCode,branchID} = req.body;
+ console.log(req.body)
     try {
       const user = await userModel.findOne({ email: email });
       const checkCart = await cartModel.find({
         user_id: user?._id,
+        branchID : branchID,
+        
       });
 
       if(checkCart.length == 0){
@@ -284,7 +294,7 @@ const createOrderForOffsite = async (req, res) => {
       const data = await totalPriceAndItemsForOffsite(checkCart[0].res_id, checkCart[0].branchID, checkCart, user);
       let discountAmmount = 0;
       if(couponCode){
-      discountAmmount = await discountByApplyingCoupon(checkCart[0].res_id, checkCart[0].branchID , couponCode , data?.subTotalPrice||0 , email)
+      discountAmmount = (await discountByApplyingCoupon(checkCart[0].res_id, checkCart[0].branchID , couponCode , data?.subTotalPrice||0 , email)).discountedPrice;
     }
 
 
@@ -296,7 +306,7 @@ const createOrderForOffsite = async (req, res) => {
           address: user?.address,
           phone: user?.phone,
           token: genratedToken,
-          finalPrice: data?.subTotalPrice - discountAmmount,
+          finalPrice: (data?.subTotalPrice - discountAmmount).toFixed(1),
           Items: data?.Items,
           vouchers: couponCode || "",
           subTotalPrice: data?.subTotalPrice,
@@ -305,10 +315,17 @@ const createOrderForOffsite = async (req, res) => {
           cash_status: "Not Paid",
           type_of_payment: "Card",
           order_from: "OFFSITE",
+          orderStatus : [
+            {
+              name : "Payment Pending",
+              massage : "",
+              time : Date.now(),
+            }
+          ]
         }).save();
         message = `🌟 Get ready to pay Remember, we have pay first policy. 🍽️`
         token = ` #Token-${genratedToken}`
-      // const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
+      const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
       res.status(200).send({order,message : message, token : token });
     } catch (error) {
       return responseError(res, 500, error);
@@ -336,9 +353,15 @@ const discountByApplyingCoupon = async ( res_id,branchID,couponCode,totalPrice,e
           discountedPrice : 0,
         };
       }
+      if(couponData.from > new Date() || couponData.to < new Date()) {
+        return {
+          message : "This Coupon has been expired.",
+          discountedPrice : 0,
+        };
+      }
         let discountedPrice = totalPrice * (couponData?.percentage/100);
         if(discountedPrice> couponData?.maximumDiscountLimit){
-          discountedPrice = maximumDiscountLimit;
+          discountedPrice = couponData?.maximumDiscountLimit;
         }
         return {
           message : "YAY! You got a Discount.",
@@ -347,7 +370,7 @@ const discountByApplyingCoupon = async ( res_id,branchID,couponCode,totalPrice,e
     }
 
   }catch(error){
-   throw new error(error);
+    throw error;
 
   }
 }
@@ -473,7 +496,7 @@ const totalPriceAndItemsForOffsite = async (res_id, branchID, cartItems, user) =
   return {
     Items: validDishDataWithCarts,
     subTotalPrice: totalPrice,
-    finalPrice: totalPrice - discount,
+   
   };
 };
 async function generateToken(res_id, branchID) {
@@ -531,12 +554,12 @@ const allCompleteOrderForOnSite = async (req,res)=>{
   }
 }
 
-const checkCoupon = async (req,res)=>{
+const getDiscountByCoupon = async (req,res)=>{
   try {
     const {res_id,branchID,couponCode,totalPrice,email} = req.body;
-    const discountAmmount = await discountByApplyingCoupon(res_id,branchID,couponCode,totalPrice,email);
+    const discountData = await discountByApplyingCoupon(res_id,branchID,couponCode,totalPrice,email);
 
-    res.status(200).send( discountAmmount);
+    res.status(200).send(discountData);
 
   } catch (error) {
     responseError(res,500,error);
@@ -549,7 +572,9 @@ module.exports = {
     deleteOrder,
     readOrder,
     createOrderForOnsite,
+  createOrderForOffsite,
     onGoingOrderForOnSite,
     allCompleteOrderForOnSite,
-    checkCoupon
+    getDiscountByCoupon,
+    getOrderDetailsBeforeCheckoutForOffsite
 };
