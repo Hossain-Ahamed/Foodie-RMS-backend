@@ -32,10 +32,10 @@ const couponSchema = new mongoose.Schema(
       }
     ],
     from: {
-      type: String,
+      type: Date,
     },
     to: {
-      type: String,
+      type: Date,
     },
   },
   { timestamps: true }

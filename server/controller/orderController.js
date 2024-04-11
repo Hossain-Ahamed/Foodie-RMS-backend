@@ -9,11 +9,8 @@ const { responseError } = require("../utils/utility");
 const orderModel = require("../model/orderModel");
 const { query } = require("express");
 const branchModel = require("../model/branchModel");
+const couponModel = require("../model/couponModel");
 
-const createOrderForOffsite = async (req, res) => {
-  try {
-  } catch (error) {}
-};
 const getOrderDetailsBeforeCheckout = async (req, res) => {
   try {
     const { email, branchID, res_id } = req.params;
@@ -92,6 +89,69 @@ const getOrderDetailsBeforeCheckout = async (req, res) => {
   }
 };
 
+
+const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
+  try {
+    const { email} = req.params;
+
+    const checkUser = await userModel.findOne({ email: email });
+    if (!checkUser) {
+      return res.status(401).json("Invalid User");
+    }
+    const checkCart = await cartModel.find({
+      user_id: checkUser._id,
+    });
+
+    const dishDataPromises = checkCart.map(async (cartItem, index) => {
+      const dishData = await Dish.findById(cartItem.dish_id).select(
+        "title img"
+      );
+
+      // Check if dishData is null, if so, delete the corresponding cart item
+      if (!dishData) {
+        console.log(
+          `Dish not found for cart item at index ${index}. Deleting...`
+        );
+        await cartModel.findByIdAndDelete(cartItem._id);
+        return null; // Returning null if dishData is not found
+      }
+
+      return {
+        ...cartItem.toObject(),
+        dishId: dishData._id,
+        title: dishData.title,
+      }; // Merge cartItem and dishData
+    });
+
+    // Wait for all promises to resolve
+    const allDishDataWithCarts = await Promise.all(dishDataPromises);
+
+    // console.log(allDishDataWithCarts); // This will contain merged properties of getCarts and dish_data for each cart item
+
+    const validDishDataWithCarts = allDishDataWithCarts.filter(
+      (item) => item !== null
+    );
+
+    // Calculate the total price for all items
+    let totalPrice = 0;
+    for (const item of validDishDataWithCarts) {
+      totalPrice += item.totalPrice;
+    }
+
+
+
+
+    res.status(200).send({
+      dishes: validDishDataWithCarts,
+      subtotal: parseFloat(totalPrice.toFixed(2)),
+      res_id: checkCart[0]?.res_id,
+      branchID : checkCart[0]?.branchID ,
+    });
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
 const updateOrder = async (req, res) => {};
 
 const readOrder = async (req, res) => {};
@@ -123,6 +183,8 @@ const createOrderForOnsite = async (req, res) => {
           res_id: res_id,
           branchID: branchID,
           user_id: user?._id,
+          order_from: "ONSITE",
+          $ne:{status:"Completed"},
         });
 
         if (PreviousIncompletedOrder) {
@@ -160,7 +222,6 @@ const createOrderForOnsite = async (req, res) => {
             vouchers: data?.vouchers,
             subTotalPrice: data?.subTotalPrice,
             discountedPrice: data?.discountedPrice,
-            finalPrice: data?.finalPrice,
             status: "Payment Pending",
             cash_status: "Not Paid",
             type_of_payment: "Cash On Delivery (COD)",
@@ -185,7 +246,6 @@ const createOrderForOnsite = async (req, res) => {
           vouchers: data?.vouchers,
           subTotalPrice: data?.subTotalPrice,
           discountedPrice: data?.discountedPrice,
-          finalPrice: data?.finalPrice,
           status: "Payment Pending",
           cash_status: "Not Paid",
           type_of_payment: "Cash On Delivery (COD)",
@@ -204,6 +264,93 @@ const createOrderForOnsite = async (req, res) => {
     responseError(res, 500, error);
   }
 };
+
+
+const createOrderForOffsite = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const {couponCode} = req.body;
+
+    try {
+      const user = await userModel.findOne({ email: email });
+      const checkCart = await cartModel.find({
+        user_id: user?._id,
+      });
+
+      if(checkCart.length == 0){
+        res.status(404).send({ message:"Your Cart is Empty"});
+      }
+
+      const data = await totalPriceAndItemsForOffsite(checkCart[0].res_id, checkCart[0].branchID, checkCart, user);
+      let discountAmmount = 0;
+      if(couponCode){
+      discountAmmount = await discountByApplyingCoupon(checkCart[0].res_id, checkCart[0].branchID , couponCode , data?.subTotalPrice||0 , email)
+    }
+
+
+        const genratedToken = await generateToken(checkCart[0].res_id,checkCart[0].branchID)
+        let order = await new orderModel({
+          res_id: checkCart[0].res_id,
+          branchID: checkCart[0].branchID,
+          user_id: user?._id,
+          address: user?.address,
+          phone: user?.phone,
+          token: genratedToken,
+          finalPrice: data?.subTotalPrice - discountAmmount,
+          Items: data?.Items,
+          vouchers: couponCode || "",
+          subTotalPrice: data?.subTotalPrice,
+          discountedPrice: discountAmmount,
+          status: "Payment Pending",
+          cash_status: "Not Paid",
+          type_of_payment: "Card",
+          order_from: "OFFSITE",
+        }).save();
+        message = `🌟 Get ready to pay Remember, we have pay first policy. 🍽️`
+        token = ` #Token-${genratedToken}`
+      // const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
+      res.status(200).send({order,message : message, token : token });
+    } catch (error) {
+      return responseError(res, 500, error);
+    }
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+const discountByApplyingCoupon = async ( res_id,branchID,couponCode,totalPrice,email ) =>{
+  try {
+    
+    var couponData = await  couponModel.findOne({ name : couponCode , res_id : res_id , branchID:branchID})
+    if(!couponData){
+      return {
+        message : "No Coupon Found",
+        discountedPrice : 0,
+      };
+    }else{
+      const User_Data = await userModel.findOne({email:email});
+      const numberOfUsesCoupon = couponData.userCount.filter(i => i ==  User_Data?._id );
+      if(numberOfUsesCoupon.length > couponData.maximumNumberOfUse ){
+        return {
+          message : "Maximum Number of Use is Exceeded.",
+          discountedPrice : 0,
+        };
+      }
+        let discountedPrice = totalPrice * (couponData?.percentage/100);
+        if(discountedPrice> couponData?.maximumDiscountLimit){
+          discountedPrice = maximumDiscountLimit;
+        }
+        return {
+          message : "YAY! You got a Discount.",
+          discountedPrice : discountedPrice}
+
+    }
+
+  }catch(error){
+   throw new error(error);
+
+  }
+}
 
 
 
@@ -274,6 +421,61 @@ const totalPriceAndItems = async (res_id, branchID, cartItems, user) => {
     finalPrice: totalPrice - discount,
   };
 };
+
+const totalPriceAndItemsForOffsite = async (res_id, branchID, cartItems, user) => {
+  const dishDataPromises = cartItems.map(async (cartItem, index) => {
+    const dishData = await Dish.findById(cartItem.dish_id).select("title img");
+
+    // Check if dishData is null, if so, delete the corresponding cart item
+    if (!dishData) {
+      console.log(
+        `Dish not found for cart item at index ${index}. Deleting...`
+      );
+      await cartModel.findByIdAndDelete(cartItem._id);
+      return null; // Returning null if dishData is not found
+    }
+
+    return {
+      dishId: dishData?._id,
+      title: dishData?.title,
+      img: dishData?.img,
+      addOn: cartItem?.addons,
+      options: cartItem?.options,
+      quantity: cartItem?.quantity,
+      basePrice: cartItem?.basePrice,
+      extraPrice: cartItem?.extraPrice || 0,
+      VAT: cartItem?.VAT,
+      totalPrice: cartItem?.totalPrice,
+      dishStatus: "Order-Placed",
+    }; // Merge cartItem and dishData
+  });
+
+  // Wait for all promises to resolve
+  const allDishDataWithCarts = await Promise.all(dishDataPromises);
+
+  // console.log(allDishDataWithCarts); // This will contain merged properties of getCarts and dish_data for each cart item
+
+  const validDishDataWithCarts = allDishDataWithCarts.filter(
+    (item) => item !== null
+  );
+  // Calculate the total price for all items
+  let totalPrice = 0;
+  for (const item of validDishDataWithCarts) {
+    totalPrice += item.totalPrice;
+  }
+  const checkMembership = await membershipModel.findOne({
+    res_id: res_id,
+    memberShip: { $elemMatch: { $eq: user._id } },
+  });
+
+  
+
+  return {
+    Items: validDishDataWithCarts,
+    subTotalPrice: totalPrice,
+    finalPrice: totalPrice - discount,
+  };
+};
 async function generateToken(res_id, branchID) {
   try {
     const today = new Date();
@@ -329,6 +531,18 @@ const allCompleteOrderForOnSite = async (req,res)=>{
   }
 }
 
+const checkCoupon = async (req,res)=>{
+  try {
+    const {res_id,branchID,couponCode,totalPrice,email} = req.body;
+    const discountAmmount = await discountByApplyingCoupon(res_id,branchID,couponCode,totalPrice,email);
+
+    res.status(200).send( discountAmmount);
+
+  } catch (error) {
+    responseError(res,500,error);
+  }
+}
+
 module.exports = {
   getOrderDetailsBeforeCheckout,
     updateOrder,
@@ -336,5 +550,6 @@ module.exports = {
     readOrder,
     createOrderForOnsite,
     onGoingOrderForOnSite,
-    allCompleteOrderForOnSite
+    allCompleteOrderForOnSite,
+    checkCoupon
 };
