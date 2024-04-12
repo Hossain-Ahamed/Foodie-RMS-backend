@@ -82,6 +82,8 @@ router.get("/restuarant/:res_id/branch/:branchID/email/:email",getOrderDetailsBe
 
 //order Route
 router.post("/create-an-onsite-order/:email", createOrderForOnsite) ;   //create onsite order
+router.get("/ongoing-order/restaurant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
+router.get("/completed-order/restaurant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
 router.post("/create-an-offsite-order/:email", createOrderForOffsite) ;   //create offsite order
 router.get("/ongoing-order/restuarant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
 router.get("/completed-order/restuarant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
