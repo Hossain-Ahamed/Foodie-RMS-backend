@@ -402,14 +402,48 @@ router.patch(
   updateBranch
 ); // update branch data after edit
 
+//inventory and resipe
+const {
+  addNewItemToInventory,
+  updateInventoryItem,
+  deleteInventoryItem,
+  getInventoryByBranchId,
+  giveVendorName,
+  oldDataOfItem,
+} = require("../controller/inventoryController");
+const { searchUserByPhone } = require("../controller/userController");
+const { adminPlaceOrder } = require("../controller/orderController");
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
+  giveVendorName
+);
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/inventory-report/",
+  getInventoryByBranchId
+);
+router.post("/admin/add-to-inventory", addNewItemToInventory);
+router.patch(
+  "/admin/restaurant/:res_id/branch/:branchID/edit-inventory/:id",
+  updateInventoryItem
+);
+router.delete(
+  "/admin/:res_id/branch/:branchID/delete-inventory/:id",
+  deleteInventoryItem
+);
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-inventory-data/:id",
+  oldDataOfItem
+);
+
 /**
  *
  * -------------------------------------------------------------------------------
  *                    Order Management
  */
 
-router.get(
-  "/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",
-  get_All_Dish_Name_For_restaurant_For_Admin
-);
+router.get("/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",get_All_Dish_Name_For_restaurant_For_Admin);
+
+router.get("/search-user-by-phone",searchUserByPhone) //search user by phone for onsite place order by admin custom order 
+
+router.post("/restaurant/:res_id/branch/:branchID/place-an-order-by-admin",adminPlaceOrder) //admin place an order
 module.exports = router;

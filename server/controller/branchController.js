@@ -512,6 +512,50 @@ const getAllRestaurantOf_A_City = async (req, res) => {
   }
 };
 
+const checkBusinessHours  = async (req, res) => {
+  try {
+    const {branchID,res_id}= req.params;
+    const  businessHour= await branchModel.findOne({ _id : branchID , res_id : res_id});
+    const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }); // Get current day
+    const today = businessHour.shift[dayOfWeek];
+    if(isTimeBetween(today.openingTime,today.closingTime))//check if it is open
+    {
+      res.status(200).send({available : true});
+
+    }else{
+      res.status(200).send({available : false});
+    }
+  } catch (error) {
+    responseError(res,500,error);
+    
+  }
+}
+
+
+function isTimeBetween(startTime, endTime) {
+  // Get current time in local time zone
+  var now = new Date();
+  var bdTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Dhaka"}));
+
+console.log(bdTime)
+  var currentTime = bdTime.getHours() + bdTime.getMinutes() / 60; // Convert current time to hours
+
+  // Parse start time
+  var startParts = startTime.split(":");
+  var startHour = parseInt(startParts[0]);
+  var startMinutes = parseInt(startParts[1]);
+  var startTime = startHour + startMinutes / 60; // Convert start time to hours
+
+  // Parse end time
+  var endParts = endTime.split(":");
+  var endHour = parseInt(endParts[0]);
+  var endMinutes = parseInt(endParts[1]);
+  var endTime = endHour + endMinutes / 60; // Convert end time to hours
+
+  // Check if current time is between start and end time
+  return currentTime >= startTime && currentTime <= endTime;
+}
+
 module.exports = {
   addTables,
   getAllBranch,
@@ -528,4 +572,5 @@ module.exports = {
   getBranchDetail,
   updateBranch,
   getAllRestaurantOf_A_City,
+  checkBusinessHours,
 };

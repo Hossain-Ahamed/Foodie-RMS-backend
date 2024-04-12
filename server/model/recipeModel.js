@@ -13,6 +13,9 @@ const recipeSchema = new mongoose.Schema(
     dish: {
       type: String,
     },
+    dishId: {
+      type: String,
+    },
     ingredients: [
       {
         itemName: {
@@ -20,6 +23,9 @@ const recipeSchema = new mongoose.Schema(
         },
         unit: {
           type: Number,
+        },
+        unitType: {
+          type: String,
         },
       },
     ],

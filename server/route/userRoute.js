@@ -8,6 +8,9 @@ const {
     createOrderForOnsite,
     onGoingOrderForOnSite,
     allCompleteOrderForOnSite,
+    getOrderDetailsBeforeCheckoutForOffsite,
+    getDiscountByCoupon,
+    createOrderForOffsite,
 } =  require('../controller/orderController');
 
 
@@ -26,7 +29,7 @@ const {
 const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPackage} = require("../controller/subscriptionPackagesController");
 const { employeeLogin } = require("../controller/employeeController");
 const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
-const { getAllRestaurantOf_A_City } = require("../controller/branchController");
+const { getAllRestaurantOf_A_City, checkBusinessHours } = require("../controller/branchController");
 const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile } = require("../controller/userController");
 const { deleteMembership } = require("../controller/membershipController");
 
@@ -81,8 +84,15 @@ router.get("/restuarant/:res_id/branch/:branchID/email/:email",getOrderDetailsBe
 router.post("/create-an-onsite-order/:email", createOrderForOnsite) ;   //create onsite order
 router.get("/ongoing-order/restaurant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
 router.get("/completed-order/restaurant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
+router.post("/create-an-offsite-order/:email", createOrderForOffsite) ;   //create offsite order
+router.get("/ongoing-order/restuarant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
+router.get("/completed-order/restuarant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
 
+router.get("/get-all-pricing-detail-before-offsite-order-checkout/:email",getOrderDetailsBeforeCheckoutForOffsite);
+router.get("/offsite-order-taking-place-check/:res_id/:branchID",checkBusinessHours)
 
+// coupon 
+router.post("/get-discount-by-applying-coupon",getDiscountByCoupon) //get discount by applying coupon for user
 
 //Membership Manage
 router.delete("/delete-membership/:res_id/:_id",deleteMembership);
