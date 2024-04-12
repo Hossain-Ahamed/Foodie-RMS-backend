@@ -263,7 +263,7 @@ const createOrderForOnsite = async (req, res) => {
         message = `🌟 Get ready to pay as our Customer Service arrives. Remember, we have pay first policy. 🍽️`;
         token = ` #Token-${genratedToken}`;
       }
-      // const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
+      const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
       res.status(200).send({ order, message: message, token: token });
     } catch (error) {
       return responseError(res, 500, error);
@@ -487,7 +487,7 @@ const totalPriceAndItemsForOffsite = async (
       dishId: dishData?._id,
       title: dishData?.title,
       img: dishData?.img,
-      addOn: cartItem?.addons,
+      addOn: cartItem?.addOn,
       options: cartItem?.options,
       quantity: cartItem?.quantity,
       basePrice: cartItem?.basePrice,
@@ -605,7 +605,7 @@ const adminPlaceOrder = async (req, res) => {
     const { res_id, branchID } = req.params;
     const { userData, dish, tableNo } = req.body;
     const data = {};
-    let discount;
+    let discount = 0;
     let vouchers = "";
     if (!(userData?._id == "" || userData?._id == "null")) {
       data.address = await userModel.findById(userData?._id);
@@ -656,26 +656,27 @@ const adminPlaceOrder = async (req, res) => {
       0
     );
 
-    const check_branch_payment_type = await branchModel.findById(branchID).select("paymentTypes");
+    const check_branch_payment_type = await branchModel
+      .findById(branchID)
+      .select("paymentTypes");
 
-    if(check_branch_payment_type.paymentTypes != "PayLater"){
+    if (check_branch_payment_type.paymentTypes != "PayLater") {
       data.cash_status = "Cash Recieved";
     }
 
     data.subTotalPrice = subtotal;
     data.finalPrice = subtotal - discount;
     data.table = tableNo;
-   
 
     const order = await new orderModel(data).save();
-
+    
     res.status(200).send({
       order: order,
       message: `🌟 Bill ${subtotal - discount} 🍽️`,
       token: ` #Token-${token}`,
     });
   } catch (error) {
-    responseError(res, error);
+    responseError(res, 500, error);
   }
 };
 
@@ -690,5 +691,5 @@ module.exports = {
   allCompleteOrderForOnSite,
   getDiscountByCoupon,
   getOrderDetailsBeforeCheckoutForOffsite,
-  adminPlaceOrder
+  adminPlaceOrder,
 };
