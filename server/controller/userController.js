@@ -227,6 +227,24 @@ const updateProfileAddress = async (req, res) => {
   }
 };
 
+const searchUserByPhone = async(req,res)=>{
+  try {
+    const {phone} = req.query;
+    if(!phone){
+      return res.status(200).send([{ _id: "null", name: 'Anonymous', phone: '000-000-000' }]);
+    }
+    const regexPattern = new RegExp(phone,'i');
+    const users = await userModel.find({phone:{$regex : regexPattern}}).select("_id name phone").limit(8).exec() ;
+    if(users.length==0){
+     return res.status(200).send([{ _id: "null", name: 'Anonymous', phone: '000-000-000' }]);
+    }
+    res.status(200).send(users);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   signUp,
   signIn,
@@ -235,4 +253,5 @@ module.exports = {
   signout,
   updateProfileAddress,
   updateProfile,
+  searchUserByPhone
 };
