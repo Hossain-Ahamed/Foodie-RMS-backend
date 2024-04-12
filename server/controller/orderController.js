@@ -414,7 +414,7 @@ const totalPriceAndItems = async (res_id, branchID, cartItems, user) => {
       dishId: dishData?._id,
       title: dishData?.title,
       img: dishData?.img,
-      addOn: cartItem?.addons,
+      addOn: cartItem?.addOn,
       options: cartItem?.options,
       quantity: cartItem?.quantity,
       basePrice: cartItem?.basePrice,
