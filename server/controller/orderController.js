@@ -11,6 +11,7 @@ const { query } = require("express");
 const branchModel = require("../model/branchModel");
 const couponModel = require("../model/couponModel");
 const restaurantModel = require("../model/restaurantModel");
+const restaurantOnlineTransactionBillModel = require("../model/restaurantOnlineTransactionBillModel");
 
 const getOrderDetailsBeforeCheckout = async (req, res) => {
   try {
@@ -92,7 +93,7 @@ const getOrderDetailsBeforeCheckout = async (req, res) => {
 
 const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
   try {
-    const { email } = req.params;
+    const { email ,type} = req.params;
 
     const checkUser = await userModel.findOne({ email: email });
     if (!checkUser) {
@@ -145,7 +146,14 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
       .select("res_name");
     const branch_data = await branchModel
       .findById(checkCart[0]?.branchID)
-      .select("branch_name");
+      .select("branch_name takewayCharge deliveryCharge");
+
+      let shippingCharge = 0
+      if(type == "Delivery"){
+        shippingCharge = branch_data?.deliveryCharge;
+      }else{
+        shippingCharge =  branch_data?.takewayCharge;
+      }
 
     res.status(200).send({
       dishes: validDishDataWithCarts,
@@ -154,6 +162,7 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
       branchID: checkCart[0]?.branchID,
       res_name: res_data?.res_name,
       branch_name: branch_data?.branch_name,
+      shippingCharge
     });
   } catch (error) {
     responseError(res, 500, error);
@@ -206,6 +215,7 @@ const createOrderForOnsite = async (req, res) => {
               data?.discountedPrice + PreviousIncompletedOrder.discountedPrice,
             finalPrice: data?.finalPrice + PreviousIncompletedOrder.finalPrice,
             table: table_id,
+            status: "New Dish Added",
           };
 
           order = await orderModel.findByIdAndUpdate(
@@ -312,6 +322,7 @@ const createOrderForOffsite = async (req, res) => {
         checkCart[0].res_id,
         checkCart[0].branchID
       );
+      console.log(user);
       let order = await new orderModel({
         res_id: checkCart[0].res_id,
         branchID: checkCart[0].branchID,
@@ -661,7 +672,7 @@ const adminPlaceOrder = async (req, res) => {
       .select("paymentTypes");
 
     if (check_branch_payment_type.paymentTypes != "PayLater") {
-      data.cash_status = "Cash Recieved";
+      data.cash_status = "Paid";
     }
 
     data.subTotalPrice = subtotal;
@@ -669,14 +680,239 @@ const adminPlaceOrder = async (req, res) => {
     data.table = tableNo;
 
     const order = await new orderModel(data).save();
-    
+
     res.status(200).send({
       order: order,
-      message: `🌟 Bill ${subtotal - discount} 🍽️`,
+      message: `🌟${
+        check_branch_payment_type.paymentTypes != "PayLater"
+          ? "Pay First Service"
+          : "Pay Later"
+      }- Bill  ${subtotal - discount} 🍽️`,
       token: ` #Token-${token}`,
     });
   } catch (error) {
     responseError(res, 500, error);
+  }
+};
+
+const OngoingOrderList = async (req, res) => {
+  try {
+    const {
+      typeOfRange,
+      startingDate,
+      endingDate,
+      currentPage,
+      numberOfSizeInTableData,
+      search,
+    } = req.query;
+    const { res_id, branchID } = req.params;
+
+    let selectData = "-__v -OTP -shippingCharge";
+
+    const filter = {
+      res_id: res_id,
+      branchID: branchID,
+      status: { $nin: ["Delivered", "Cancelled"] },
+    };
+
+    // if (req.role === "Delivery Man") {
+    //     filter["deliveryPartner._id"] = req.adminID;
+    //     selectData = '-__v -OTP -shippingCharge -order_item -address';
+    // }
+
+    if (typeOfRange === "Last 7 Days") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      filter.createdAt = { $gte: sevenDaysAgo };
+    } else if (typeOfRange === "Last 30 Days") {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      filter.createdAt = { $gte: thirtyDaysAgo };
+    } else if (typeOfRange === "Custom" && startingDate && endingDate) {
+      // If Custom range selected, check the startDate and endingDate
+      const endDate = new Date(endingDate);
+      endDate.setHours(23, 59, 59); // Set the time to the end of the day
+      filter.createdAt = {
+        $gte: new Date(startingDate),
+        $lte: endDate,
+      };
+    }
+
+    if (search) {
+      filter.$or = [
+        { phone: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+        { cash_status: { $regex: search, $options: "i" } },
+      ];
+    }
+    const page = parseInt(currentPage) || 0;
+    const size = parseInt(numberOfSizeInTableData) || 15;
+    const skipCount = page * size;
+
+    const [arrayData, totalCount] = await Promise.all([
+      orderModel
+        .find(filter)
+        .select(selectData)
+        .sort({ updatedAt: -1 })
+        .skip(skipCount)
+        .limit(size)
+        .populate("user_id"),
+      orderModel.countDocuments(filter),
+    ]);
+
+    if (!arrayData || arrayData.length === 0) {
+      return res.status(200).send({ DataArrayList: [], count: 0 });
+    }
+    const branchData = await branchModel
+      .findById(branchID)
+      .select("paymentTypes");
+
+    res
+      .status(200)
+      .json({
+        DataArrayList: arrayData,
+        count: totalCount,
+        paymentTypes: branchData?.paymentTypes,
+      });
+  } catch (error) {
+    console.error("Error while fetching orders", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateOrderSingleItem = async (req, res) => {
+  try {
+    const { itemId, newStatus } = req.body; // Assuming you receive itemId and newStatus from the request body
+
+    // Validate itemId and newStatus
+    if (!itemId || !newStatus) {
+      return res
+        .status(400)
+        .json({ message: "itemId and newStatus are required." });
+    }
+
+    // Update the dishStatus of the specified item
+    const updatedOrder = await orderModel.findOneAndUpdate(
+      { "Items._id": itemId }, // Find the order with the specified itemId in the Items array
+      { $set: { "Items.$.dishStatus": newStatus } }, // Update the dishStatus of the found item
+      { new: true } // Return the modified document
+    );
+
+    if (!updatedOrder) {
+      return res
+        .status(404)
+        .json({ message: "Order not found or item not updated." });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Item dishStatus updated successfully.", updatedOrder });
+  } catch (error) {
+    console.error("Error while updating item dishStatus:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const dataForPayment = async (req, res) => {
+  try {
+    const { order_id } = req.params;
+    const get_order_data = await orderModel.findById(order_id);
+    if (get_order_data) {
+      res
+        .status(200)
+        .send({ Details: get_order_data, price: get_order_data.finalPrice });
+    }
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+const updateOrderByIdForPayment = async (req, res) => {
+  try {
+    const { orderID, transactionID, intent_methodID, methodID, price } =
+      req.body;
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderID,
+      {
+        $set: {
+          transactionId: transactionID,
+          cash_status: "Paid",
+          status: "Processing",
+        },
+        $push: {
+          orderStatus: {
+            name: "Paid",
+            time: new Date().toISOString(),
+            message: `Transaction ID : ${transactionID}`,
+          },
+        },
+      },
+      { new: true }
+    );
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString("default", { month: "long", timeZone: "Asia/Dhaka" });
+    const currentYear = currentDate.getFullYear();
+    
+    const existingMonth = await restaurantOnlineTransactionBillModel.findOne({
+      branchID: updatedOrder?.branchID,
+      month: currentMonth,
+      year: currentYear,
+    });
+    if (!existingMonth) {
+      const save = await new restaurantOnlineTransactionBillModel({
+        res_id: updatedOrder?.res_id,
+        branchID: updatedOrder?.branchID,
+        month: currentMonth,
+        year: currentYear,
+        NeedToPay: updatedOrder?.finalPrice,
+        billHistory: [
+          {
+            orderID: updatedOrder?._id,
+            transactionID: transactionID,
+            intent_methodID,
+            methodID,
+            price,
+          },
+        ],
+      }).save();
+    } else {
+      existingMonth.NeedToPay += updatedOrder?.finalPrice;
+      existingMonth.billHistory.push({
+        orderID: updatedOrder?._id,
+        transactionID: transactionID,
+        intent_methodID,
+        methodID,
+        price,
+      });
+      existingMonth.save();
+    }
+
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+const UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order = async (req , res) => {
+  try {
+    const { orderID } = req.params;
+  
+    // Update the dishStatus of all items
+    const result = await orderModel.findByIdAndUpdate(
+      orderID,
+      {
+        $set: {
+          "Items.$[].dishStatus": "Approved",
+          status: "Processing",
+          cash_status: "Paid",
+        },
+      } ,// Update the dishStatus of all items
+      {new:true}
+    );
+
+    res.status(200).send(result);
+  } catch (error) {
+    console.error("Error while updating dishStatus:", error);
   }
 };
 
@@ -692,4 +928,9 @@ module.exports = {
   getDiscountByCoupon,
   getOrderDetailsBeforeCheckoutForOffsite,
   adminPlaceOrder,
+  OngoingOrderList, //for admin
+  updateOrderSingleItem,
+  dataForPayment,
+  updateOrderByIdForPayment,
+  UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order,
 };
