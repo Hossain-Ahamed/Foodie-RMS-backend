@@ -124,12 +124,13 @@ const orderSchema = new Schema(
         "Delivered",
         "Completed",
         "Cancelled",
+        "New Dish Added"
       ],
     },
     cash_status: {
       type: String,
       default: "Not Paid",
-      enum: ["Not Paid", "Cash Recieved", "Not Refunded", "Refunded"],
+      enum: ["Not Paid", "Paid", "Not Refunded", "Refunded"],
     },
     type_of_payment: {
       type: String,

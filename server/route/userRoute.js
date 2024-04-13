@@ -88,7 +88,7 @@ router.post("/create-an-offsite-order/:email", createOrderForOffsite) ;   //crea
 router.get("/ongoing-order/restuarant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
 router.get("/completed-order/restuarant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
 
-router.get("/get-all-pricing-detail-before-offsite-order-checkout/:email",getOrderDetailsBeforeCheckoutForOffsite);
+router.get("/get-all-pricing-detail-before-offsite-order-checkout/:email/type/:type",getOrderDetailsBeforeCheckoutForOffsite);
 router.get("/offsite-order-taking-place-check/:res_id/:branchID",checkBusinessHours)
 
 // coupon 
