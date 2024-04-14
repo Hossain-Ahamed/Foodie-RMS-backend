@@ -2,6 +2,7 @@ const { Mutex } = require("async-mutex");
 const userModel = require("../model/userModel");
 const { responseError } = require("../utils/utility");
 const JWT = require("jsonwebtoken");
+const membershipModel = require("../model/membershipModel");
 const mutex = new Mutex();
 const signUp = async (req, res) => {
   try {
@@ -245,6 +246,29 @@ const searchUserByPhone = async(req,res)=>{
   }
 }
 
+const viewMemberShipForUser = async(req,res) =>{
+  try {
+    const {email} = req.params;
+    const user = await  userModel.findOne({ email });
+    if( !user ) throw new Error('User not found!')
+    else{
+      const memberShip = await  membershipModel.find({memberShip : user?._id}).populate("res_id");
+      if(memberShip.length == 0) {
+        return res.status(200).send({});
+      }
+      const formattedData =  memberShip.map((item) => ({
+        res_name : item?.res_id?.res_name || '' ,
+        res_img: item?.res_id?.img || ''
+      }))
+      res.status(200).send(formattedData) ;
+    }
+
+  } catch (error) {
+    responseError(res,500,error,"Internal server error");
+    
+  }
+}
+
 module.exports = {
   signUp,
   signIn,
@@ -253,5 +277,6 @@ module.exports = {
   signout,
   updateProfileAddress,
   updateProfile,
-  searchUserByPhone
+  searchUserByPhone,
+  viewMemberShipForUser
 };

@@ -30,7 +30,7 @@ const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPac
 const { employeeLogin } = require("../controller/employeeController");
 const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
 const { getAllRestaurantOf_A_City, checkBusinessHours } = require("../controller/branchController");
-const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile } = require("../controller/userController");
+const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile, viewMemberShipForUser } = require("../controller/userController");
 const { deleteMembership } = require("../controller/membershipController");
 
 const router = express.Router();
@@ -97,7 +97,7 @@ router.post("/get-discount-by-applying-coupon",getDiscountByCoupon) //get discou
 //Membership Manage
 router.delete("/delete-membership/:res_id/:_id",deleteMembership);
 
-
+router.get('/get-my-membership/:email',viewMemberShipForUser)
 
 
 
