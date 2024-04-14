@@ -413,22 +413,7 @@ const {
 } = require("../controller/inventoryController");
 const { dishName, createRecipe } = require("../controller/recipeController");
 const { searchUserByPhone } = require("../controller/userController");
-const {
-  adminPlaceOrder,
-  OngoingOrderList,
-  dataForPayment,
-  updateOrderByIdForPayment,
-  UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order,
-} = require("../controller/orderController");
-
-router.get(
-  "/admin/restaurant/:res_id/branch/:branchID/get-dishes/:dishID",
-  dishName
-);
-router.post(
-  "/admin/restaurant/:res_id/branch/:branchID/add-new-dishes/:dishId",
-  createRecipe
-);
+const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order } = require("../controller/orderController");
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
   giveVendorName
@@ -475,13 +460,8 @@ router.post(
   adminPlaceOrder
 ); //admin place an order
 
-router.get(
-  "/admin/restaurant/:res_id/branch/:branchID/active-orders-list",
-  OngoingOrderList
-); //ongoing order list for admin
+router.get("/admin/restaurant/:res_id/branch/:branchID/active-orders-list",OngoingOrderList) //ongoing order list for admin
 
-router.patch(
-  "/update-an-onsite-pay-first-order-by-clicking-money-bag-by-admin/:orderID",
-  UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order
-); //Update Order Received Money PayFirst branches Onsite  Order
+
+router.patch('/update-an-onsite-pay-first-order-by-clicking-money-bag-by-admin/:orderID',UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order)   //Update Order Received Money PayFirst branches Onsite  Order
 module.exports = router;
