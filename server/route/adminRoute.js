@@ -14,6 +14,7 @@ const {
   getEmployeeData_ByID_ForCurrentEmployeeEdit,
   getAllBranch_And_ResturantData,
   allBranchesOfSuperAdmin,
+  allDeliveryBoyForBranch,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -518,6 +519,8 @@ router.patch(
   "/approve-to-ready-to-serve/:orderID",
   order_Prepared_and_ready_to_serve_By_KOT_Approval
 ); //kitchen staff completed the food cooking
+
+router.get("/restaurant/:res_id/branch/:branchID/delivery-man-list",  allDeliveryBoyForBranch)
 module.exports = router;
 
 
