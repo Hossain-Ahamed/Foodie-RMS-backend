@@ -1476,6 +1476,45 @@ const AllOrderList_For_DeliveryPartner = async (req,res)=> {
     responseError(res, 500, error);
   }
 }
+const generateOTP = () => {
+  const characters = "0123456789";
+  return Array.from(
+    { length: 4 },
+    () => characters[Math.floor(Math.random() * characters.length)]
+  ).join("");
+};
+const handleProceedTOReadyToDelivery = async (req,res)=>{
+  try {
+    const {orderID} = req.params;
+    // Generate a new OTP
+    const OTP = generateOTP();
+
+    const order = await orderModel.findById(orderID).populate("branchID res_id");
+
+
+    const phone = order?.phone;
+    let cleanedNumber = phone.replace(/^\+88/, '');
+
+    // Send the OTP via SMS
+    let message = `Your OTP for the order at ${order?.res_id?.res_name || ''} ${order?.branchID?.branch_name || ''} is: ${OTP}.\nDelivery Partner: ${order?.deliveryPartner?.name || ''} (Phone: ${order?.deliveryPartner?.phone || ''})\nEnjoy your meal!`
+    await orderModel.findByIdAndUpdate(order._id,
+      {$set:{status:"Ready To Delivery",
+      OTP:OTP},
+      $push:{orderStatus:{name : "Ready To Delivery" , 
+      message: `Order is Ready to delivery`,
+      time: new  Date().toISOString()
+    }}
+    
+    },{new:true});
+    const smsResponse = await axios.post(
+      `https://bulksmsbd.net/api/smsapi?api_key=${process.env.BULK_MESSAGE_API}&type=text&number=${cleanedNumber}&senderid=${process.env.BULK_MESSAGE_SENDER}&message=${message}`
+    );
+    console.log(smsResponse.data); // Log the response from the SMS API
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+}
 
 module.exports = {
   getOrderDetailsBeforeCheckout,
