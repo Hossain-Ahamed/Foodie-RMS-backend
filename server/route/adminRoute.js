@@ -519,3 +519,8 @@ router.patch(
   order_Prepared_and_ready_to_serve_By_KOT_Approval
 ); //kitchen staff completed the food cooking
 module.exports = router;
+
+
+/**
+ * Please pathul ==> when u try to solve any conflict, do that with brain
+ */
