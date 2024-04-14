@@ -20,7 +20,11 @@ const getMonthAbbreviation = (monthIndex) => {
 const takeAttendense = async (req, res) => {
   try {
     const { res_id, branchID } = req.params;
-    const { attendence } = req.body;
+    const { attendance } = req.body;
+    const attendence = attendance.map(({ user_id, status }) => ({
+      user_id,
+      status,
+    }));
     const today = new Date();
     const date = today.toISOString().split("T")[0];
     const monthAbbreviation = getMonthAbbreviation(today.getMonth());
