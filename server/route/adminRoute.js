@@ -525,7 +525,7 @@ router.patch(
 //attendance 
 const {takeAttendense,attendancePerEmployee} = require('../controller/attendenseController')
 router.post('/admin/restaurant/:res_id/branch/:branchID/upload-attendence', takeAttendense)
-router.get("/restaurant/${res_id}/branch/:branchID/get-attendance/:user_id/month/:currentMonth",attendancePerEmployee)
+router.get("/restaurant/:res_id/branch/:branchID/get-attendance/:user_id/month/:currentMonth",attendancePerEmployee)
 router.get("/restaurant/:res_id/branch/:branchID/delivery-man-list",  allDeliveryBoyForBranch)
 router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignDeliveryPartnerForOffsiteOrder);
 router.patch("/onsite-pay-first-order-delivered/:orderID",Onsite_Order_Update_Status_for_completed)
