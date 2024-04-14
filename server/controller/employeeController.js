@@ -803,6 +803,62 @@ const employeeLogin = async (req, res) => {
   }
 };
 
+const allDeliveryBoyForBranch = async(req,res)=>{
+  try {
+    const {branchID,res_id} = req.params;
+    const employees = await Employee.find({
+      "permitted.res_id": res_id,
+      "permitted.branchID": branchID,
+      "permitted.role" : "Delivery Boy"
+    }).select("f_name l_name email profilePhoto nid _id mobile permitted");
+
+    const formattedEmployees = await Promise.all(
+      employees.map(async (employee) => {
+        const {
+          f_name,
+          l_name,
+          email,
+          profilePhoto,
+          nid,
+          _id,
+          mobile,
+          permitted,
+        } = employee;
+        const matchedPermitted = permitted.find(
+          (p) => p.res_id.toString() === res_id
+        );
+        const formattedPermitted = matchedPermitted
+          ? {
+              branchID: matchedPermitted.branchID,
+              role: matchedPermitted.role,
+            }
+          : null;
+        const data = await branchModel
+          .findById(formattedPermitted.branchID)
+          .select("branch_name");
+
+        const returnData = {
+          f_name,
+          l_name,
+          email,
+          profilePhoto,
+          nid,
+          _id,
+          mobile,
+          role: formattedPermitted?.role,
+          branchID: formattedPermitted?.branchID,
+          branchName: data?.branch_name,
+        };
+        return returnData;
+      })
+    );
+
+    res.status(200).send(formattedEmployees);
+  } catch (error) {
+    responseError( res, 500, error);
+  }
+}
+
 module.exports = {
   employeeRole,
   allEmployeeForRestaurent,
@@ -818,4 +874,5 @@ module.exports = {
   getEmployeeData_ByID_ForCurrentEmployeeEdit,
   getAllBranch_And_ResturantData,
   allBranchesOfSuperAdmin,
+  allDeliveryBoyForBranch,
 };
