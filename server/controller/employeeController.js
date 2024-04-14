@@ -9,6 +9,7 @@ const JWT = require("jsonwebtoken");
 const branchModel = require("../model/branchModel");
 const restaurantModel = require("../model/restaurantModel");
 const sendMail = require("../utils/sendEmail.js");
+const orderModel = require("../model/orderModel.js");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -859,6 +860,40 @@ const allDeliveryBoyForBranch = async(req,res)=>{
   }
 }
 
+const assignDeliveryPartnerForOffsiteOrder = async (req,res)=>{
+  try {
+    const {res_id,branchID} = req.params;
+    const {_id,massage,orderID }=req.body;
+
+    const employee = await Employee.findById(_id);
+    if(!employee){
+      return responseError(res, 400, "Employee not found!");
+    }
+
+    const  order = await orderModel.findByIdAndUpdate(orderID,{
+      $set:{
+        deliveryPartner:{
+          _id:employee?._id, 
+          name: employee?.f_name+" "+employee?.l_name, 
+          phone: employee?.mobile, 
+          email: employee?.email
+        },
+        status: "Shipped"
+    },
+      $push:{
+        orderStatus:{name: "Shipped" , massage: massage, time: new Date()},
+      }
+    },{new : true});
+
+    if(!order){
+      return responseError(res, 400, "Order not found!");
+    }
+
+  } catch (error) {
+    return responseError(res, 500, error);
+  }
+}
+
 module.exports = {
   employeeRole,
   allEmployeeForRestaurent,
@@ -875,4 +910,5 @@ module.exports = {
   getAllBranch_And_ResturantData,
   allBranchesOfSuperAdmin,
   allDeliveryBoyForBranch,
+  assignDeliveryPartnerForOffsiteOrder,
 };

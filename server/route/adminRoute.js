@@ -15,6 +15,7 @@ const {
   getAllBranch_And_ResturantData,
   allBranchesOfSuperAdmin,
   allDeliveryBoyForBranch,
+  assignDeliveryPartnerForOffsiteOrder,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -521,6 +522,7 @@ router.patch(
 ); //kitchen staff completed the food cooking
 
 router.get("/restaurant/:res_id/branch/:branchID/delivery-man-list",  allDeliveryBoyForBranch)
+router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignDeliveryPartnerForOffsiteOrder)
 module.exports = router;
 
 
