@@ -47,13 +47,14 @@ const attendancePerEmployee = async (req, res) => {
     const c_month = req.params.currentMonth.split("-")[0];
     const { user_id } = req.params;
     const data = await Attendense.find({ month: c_month });
-    const userAttendance = data.filter(({ attendense }) =>
-      attendense.some(
-        ({ user_id: user_id, status }) =>
-          user_id.toString() === user_id && status === "Yes"
-      )
-    );
-    const yesDates = userAttendance.map(({ date }) => date);
+    const yesDates = [];
+    data.forEach((attendance) => {
+      attendance.attendense.forEach(({ user_id: user_id, status, date }) => {
+        if (user_id.toString() === user_id && status === 'Yes') {
+          yesDates.push(date);
+        }
+      });
+    });
     res.status(200).json({ yesDates });
   } catch (error) {
     console.log(error);
