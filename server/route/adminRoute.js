@@ -521,6 +521,8 @@ router.patch(
 module.exports = router;
 
 
-/**
- * Please pathul ==> when u try to solve any conflict, do that with brain
- */
+
+
+//attendance 
+const {takeAttendense} = require('../controller/attendenseController')
+router.post('/admin/restaurant/:res_id/branch/:branchID/upload-attendence', takeAttendense)
