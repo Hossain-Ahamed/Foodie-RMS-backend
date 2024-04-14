@@ -173,6 +173,7 @@ const {
   order_Is_being_Prepared_By_KOT_Approval,
   order_Prepared_and_ready_to_serve_By_KOT_Approval,
   Onsite_Order_Update_Status_for_completed,
+  AllOrderList_For_DeliveryPartner,
 } = require("../controller/orderController");
 
 // http://localhost:5000/admin/login
@@ -501,6 +502,10 @@ router.get(
   "/admin/restaurant/:res_id/branch/:branchID/all-orders-list",
   AllOrderList
 ); //all order list for admin
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/all-orders-list/delivery-boy/:_id",
+  AllOrderList_For_DeliveryPartner
+); //all order list for delivery partner
 
 router.patch(
   "/update-an-onsite-pay-first-order-by-clicking-money-bag-by-admin/:orderID",
