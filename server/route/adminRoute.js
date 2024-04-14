@@ -414,7 +414,7 @@ const {
 const { dishName, createRecipe } = require("../controller/recipeController");
 const { searchUserByPhone } = require("../controller/userController");
 const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order } = require("../controller/orderController");
-router.get("/admin/restaurant/:res_id/branch/:branchID/get-dishes/:dishID",dishName);
+router.get("/admin/restaurant/:res_id/branch/:branchID/get-dishes/:id",dishName);
 router.post("/admin/restaurant/:res_id/branch/:branchID/add-new-dishes/:dishID",createRecipe);
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
