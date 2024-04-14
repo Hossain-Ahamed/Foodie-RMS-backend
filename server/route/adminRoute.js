@@ -413,8 +413,12 @@ const {
 } = require("../controller/inventoryController");
 const { dishName, createRecipe } = require("../controller/recipeController");
 const { searchUserByPhone } = require("../controller/userController");
+
 const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order } = require("../controller/orderController");
 router.get("/admin/restaurant/:res_id/branch/:branchID/get-dishes/:id",dishName);
+
+const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order, approveDishItem, UpdateOrder_ReceivedMoney_PayLast_branches_Onsite_Order, deleteOrder, AllOrderList, ProcessingOrderListForKitchenStaff, order_Is_being_Prepared_By_KOT_Approval, order_Prepared_and_ready_to_serve_By_KOT_Approval } = require("../controller/orderController");
+
 router.post("/admin/restaurant/:res_id/branch/:branchID/add-new-dishes/:dishID",createRecipe);
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
@@ -450,20 +454,25 @@ router.post("/pay-my-bill", updateOrderByIdForPayment);
  * -------------------------------------------------------------------------------
  *                    Order Management
  */
-router.get(
-  "/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",
-  get_All_Dish_Name_For_restaurant_For_Admin
-);
+router.get("/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",get_All_Dish_Name_For_restaurant_For_Admin);
 
-router.get("/search-user-by-phone", searchUserByPhone); //search user by phone for onsite place order by admin custom order
+router.get("/search-user-by-phone",searchUserByPhone) //search user by phone for onsite place order by admin custom order 
 
-router.post(
-  "/restaurant/:res_id/branch/:branchID/place-an-order-by-admin",
-  adminPlaceOrder
-); //admin place an order
+router.post("/restaurant/:res_id/branch/:branchID/place-an-order-by-admin",adminPlaceOrder) //admin place an order
+
+
 
 router.get("/admin/restaurant/:res_id/branch/:branchID/active-orders-list",OngoingOrderList) //ongoing order list for admin
+router.get("/admin/restaurant/:res_id/branch/:branchID/active-orders-list/kitchen-staff",ProcessingOrderListForKitchenStaff
+) //ongoing order list for kitchen stuff
+router.get("/admin/restaurant/:res_id/branch/:branchID/all-orders-list",AllOrderList) //all order list for admin
 
 
 router.patch('/update-an-onsite-pay-first-order-by-clicking-money-bag-by-admin/:orderID',UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order)   //Update Order Received Money PayFirst branches Onsite  Order
+router.patch('/update-an-onsite-pay-later-order-by-clicking-money-bag-by-admin/:orderID',UpdateOrder_ReceivedMoney_PayLast_branches_Onsite_Order)   //Update Order Received Money pay later branches Onsite  Order
+router.patch('/apporve-an-order/:orderID',approveDishItem) //admin approve dish item placed to approved for cook
+router.delete('/cancel-an-order/:orderID',  deleteOrder) //cancel an order
+
+router.patch("/approve-to-cook/:orderID",order_Is_being_Prepared_By_KOT_Approval);  ///kitchen staff is cooking the food
+router.patch("/approve-to-ready-to-serve/:orderID",order_Prepared_and_ready_to_serve_By_KOT_Approval); //kitchen staff completed the food cooking
 module.exports = router;
