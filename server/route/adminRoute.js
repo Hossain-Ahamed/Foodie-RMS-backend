@@ -528,7 +528,7 @@ router.post('/admin/restaurant/:res_id/branch/:branchID/upload-attendence', take
 
 router.get("/restaurant/:res_id/branch/:branchID/delivery-man-list",  allDeliveryBoyForBranch)
 router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignDeliveryPartnerForOffsiteOrder);
-router.patch("/restaurant/:res_id/branch/:branchID/onsite-pay-first-order-delivered/:orderID",Onsite_Order_Update_Status_for_completed)
+router.patch("/onsite-pay-first-order-delivered/:orderID",Onsite_Order_Update_Status_for_completed)
 module.exports = router;
 
 
