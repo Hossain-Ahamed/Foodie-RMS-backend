@@ -118,6 +118,8 @@ const orderSchema = new Schema(
       enum: [
         "Payment Pending",
         "Processing",
+        "In The Kitchen",
+        "Ready to serve",
         "Processed And Ready to Ship",
         "Shipped",
         "Ready To Delivery",

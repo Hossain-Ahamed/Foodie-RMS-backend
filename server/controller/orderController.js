@@ -93,7 +93,7 @@ const getOrderDetailsBeforeCheckout = async (req, res) => {
 
 const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
   try {
-    const { email ,type} = req.params;
+    const { email, type } = req.params;
 
     const checkUser = await userModel.findOne({ email: email });
     if (!checkUser) {
@@ -148,12 +148,12 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
       .findById(checkCart[0]?.branchID)
       .select("branch_name takewayCharge deliveryCharge");
 
-      let shippingCharge = 0
-      if(type == "Delivery"){
-        shippingCharge = branch_data?.deliveryCharge;
-      }else{
-        shippingCharge =  branch_data?.takewayCharge;
-      }
+    let shippingCharge = 0;
+    if (type == "Delivery") {
+      shippingCharge = branch_data?.deliveryCharge;
+    } else {
+      shippingCharge = branch_data?.takewayCharge;
+    }
 
     res.status(200).send({
       dishes: validDishDataWithCarts,
@@ -162,7 +162,7 @@ const getOrderDetailsBeforeCheckoutForOffsite = async (req, res) => {
       branchID: checkCart[0]?.branchID,
       res_name: res_data?.res_name,
       branch_name: branch_data?.branch_name,
-      shippingCharge
+      shippingCharge,
     });
   } catch (error) {
     responseError(res, 500, error);
@@ -173,8 +173,17 @@ const updateOrder = async (req, res) => {};
 
 const readOrder = async (req, res) => {};
 
-const deleteOrder = async (req, res) => {};
-
+const deleteOrder = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+    const deleteOrder = await orderModel.findByIdAndUpdate(orderID, {
+      status: "Cancelled",
+    });
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
 const createOrderForOnsite = async (req, res) => {
   try {
     const { email } = req.params;
@@ -286,7 +295,7 @@ const createOrderForOnsite = async (req, res) => {
 const createOrderForOffsite = async (req, res) => {
   try {
     const { email } = req.params;
-    const { couponCode, branchID } = req.body;
+    const { couponCode, branchID, orderNote } = req.body;
     console.log(req.body);
     try {
       const user = await userModel.findOne({ email: email });
@@ -322,6 +331,17 @@ const createOrderForOffsite = async (req, res) => {
         checkCart[0].res_id,
         checkCart[0].branchID
       );
+
+      const branch_data = await branchModel
+        .findById(branchID)
+        .select("takewayCharge deliveryCharge");
+
+      let shippingCharge = 0;
+      if (orderNote == "Delivery") {
+        shippingCharge = branch_data?.deliveryCharge;
+      } else {
+        shippingCharge = branch_data?.takewayCharge;
+      }
       console.log(user);
       let order = await new orderModel({
         res_id: checkCart[0].res_id,
@@ -330,7 +350,13 @@ const createOrderForOffsite = async (req, res) => {
         address: user?.address,
         phone: user?.phone,
         token: genratedToken,
-        finalPrice: (data?.subTotalPrice - discountAmmount).toFixed(1),
+        orderNote,
+        finalPrice: (
+          data?.subTotalPrice +
+          shippingCharge -
+          discountAmmount
+        ).toFixed(1),
+        shippingCharge: shippingCharge,
         Items: data?.Items,
         vouchers: couponCode || "",
         subTotalPrice: data?.subTotalPrice,
@@ -347,7 +373,7 @@ const createOrderForOffsite = async (req, res) => {
           },
         ],
       }).save();
-      message = `🌟 Get ready to pay Remember, we have pay first policy. 🍽️`;
+      message = `🌟 Get ready to pay Remember, we have pay first policy. 🍽`;
       token = ` #Token-${genratedToken}`;
       const deleteCart = await cartModel.deleteMany({ user_id: user?._id });
       res.status(200).send({ order, message: message, token: token });
@@ -674,7 +700,7 @@ const adminPlaceOrder = async (req, res) => {
     if (check_branch_payment_type.paymentTypes != "PayLater") {
       data.cash_status = "Paid";
     }
-
+    data.status = "Processing";
     data.subTotalPrice = subtotal;
     data.finalPrice = subtotal - discount;
     data.table = tableNo;
@@ -767,13 +793,93 @@ const OngoingOrderList = async (req, res) => {
       .findById(branchID)
       .select("paymentTypes");
 
-    res
-      .status(200)
-      .json({
-        DataArrayList: arrayData,
-        count: totalCount,
-        paymentTypes: branchData?.paymentTypes,
-      });
+    res.status(200).json({
+      DataArrayList: arrayData,
+      count: totalCount,
+      paymentTypes: branchData?.paymentTypes,
+    });
+  } catch (error) {
+    console.error("Error while fetching orders", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const AllOrderList = async (req, res) => {
+  try {
+    const {
+      typeOfRange,
+      startingDate,
+      endingDate,
+      currentPage,
+      numberOfSizeInTableData,
+      search,
+    } = req.query;
+    const { res_id, branchID } = req.params;
+
+    let selectData = "-__v -OTP -shippingCharge";
+
+    const filter = {
+      res_id: res_id,
+      branchID: branchID,
+    };
+
+    // if (req.role === "Delivery Man") {
+    //     filter["deliveryPartner._id"] = req.adminID;
+    //     selectData = '-__v -OTP -shippingCharge -order_item -address';
+    // }
+
+    if (typeOfRange === "Last 7 Days") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      filter.createdAt = { $gte: sevenDaysAgo };
+    } else if (typeOfRange === "Last 30 Days") {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      filter.createdAt = { $gte: thirtyDaysAgo };
+    } else if (typeOfRange === "Custom" && startingDate && endingDate) {
+      // If Custom range selected, check the startDate and endingDate
+      const endDate = new Date(endingDate);
+      endDate.setHours(23, 59, 59); // Set the time to the end of the day
+      filter.createdAt = {
+        $gte: new Date(startingDate),
+        $lte: endDate,
+      };
+    }
+
+    if (search) {
+      filter.$or = [
+        { phone: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+        { cash_status: { $regex: search, $options: "i" } },
+      ];
+    }
+    const page = parseInt(currentPage) || 0;
+    const size = parseInt(numberOfSizeInTableData) || 15;
+    const skipCount = page * size;
+
+    const [arrayData, totalCount] = await Promise.all([
+      orderModel
+        .find(filter)
+        .select(selectData)
+        .sort({ _id: -1 })
+        .skip(skipCount)
+        .limit(size)
+        .populate("user_id"),
+      orderModel.countDocuments(filter),
+    ]);
+
+    if (!arrayData || arrayData.length === 0) {
+      return res.status(200).send({ DataArrayList: [], count: 0 });
+    }
+    const branchData = await branchModel
+      .findById(branchID)
+      .select("paymentTypes");
+
+    res.status(200).json({
+      DataArrayList: arrayData,
+      count: totalCount,
+      paymentTypes: branchData?.paymentTypes,
+    });
   } catch (error) {
     console.error("Error while fetching orders", error);
     res.status(500).json({ message: "Server error" });
@@ -850,9 +956,12 @@ const updateOrderByIdForPayment = async (req, res) => {
       { new: true }
     );
     const currentDate = new Date();
-    const currentMonth = currentDate.toLocaleString("default", { month: "long", timeZone: "Asia/Dhaka" });
+    const currentMonth = currentDate.toLocaleString("default", {
+      month: "long",
+      timeZone: "Asia/Dhaka",
+    });
     const currentYear = currentDate.getFullYear();
-    
+
     const existingMonth = await restaurantOnlineTransactionBillModel.findOne({
       branchID: updatedOrder?.branchID,
       month: currentMonth,
@@ -893,10 +1002,13 @@ const updateOrderByIdForPayment = async (req, res) => {
   }
 };
 
-const UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order = async (req , res) => {
+const UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order = async (
+  req,
+  res
+) => {
   try {
     const { orderID } = req.params;
-  
+
     // Update the dishStatus of all items
     const result = await orderModel.findByIdAndUpdate(
       orderID,
@@ -906,13 +1018,283 @@ const UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order = async (req , re
           status: "Processing",
           cash_status: "Paid",
         },
-      } ,// Update the dishStatus of all items
-      {new:true}
+      }, // Update the dishStatus of all items
+      { new: true }
     );
 
     res.status(200).send(result);
   } catch (error) {
     console.error("Error while updating dishStatus:", error);
+  }
+};
+
+const UpdateOrder_ReceivedMoney_PayLast_branches_Onsite_Order = async (
+  req,
+  res
+) => {
+  try {
+    const { orderID } = req.params;
+    console.log("pay later go money");
+    const result = await orderModel.findByIdAndUpdate(
+      orderID,
+      {
+        $set: {
+          status: "Delivered",
+          cash_status: "Paid",
+        },
+      }, // Update the dishStatus of all items
+      { new: true }
+    );
+    res.status(200).send(result);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+const approveDishItem = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+    const result = await orderModel.findOneAndUpdate(
+      {
+        _id: orderID,
+        "Items.dishStatus": "Order-Placed", // Match orders with at least one item with "Order-Placed" status
+      },
+      {
+        $set: {
+          "Items.$[item].dishStatus": "Approved", // Update all items with "Order-Placed" status to "Approved"
+          status: "Processing",
+        },
+      },
+      {
+        arrayFilters: [{ "item.dishStatus": "Order-Placed" }], // Filter array elements to only update those with "Order-Placed" status
+        new: true,
+      }
+    );
+
+    if (!result) {
+      return res
+        .status(400)
+        .json({ error: "Order not found or items already approved." });
+    }
+
+    // Send the updated order back to the client
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error approving dish item:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const order_Prepared_and_ready_to_serve_By_KOT_Approval = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+    const order_data = await orderModel.findOne({ _id: orderID });
+    if (!order_data) {
+      return responseError(res, 404, "No such Order exist");
+    }
+    const branch = await branchModel
+      .findById(order_data?.branchID)
+      .select("paymentTypes");
+    let result;
+    if (order_data?.order_from == "ONSITE") {
+      if (!branch.paymentTypes == "PayLater") {
+        result = await orderModel.findOneAndUpdate(
+          {
+            _id: orderID,
+            "Items.dishStatus": "Processing", // Match orders with at least one item with "Order-Placed" status
+          },
+          {
+            $set: {
+              "Items.$[item].dishStatus": "Processed", // Update all items with "Order-Placed" status to "Approved"
+              status: "Ready to serve",
+            },
+          },
+          {
+            arrayFilters: [{ "item.dishStatus": "Processing" }], // Filter array elements to only update those with "Order-Placed" status
+            new: true,
+          }
+        );
+      } else {
+        //onsite +  Pay later
+        result = await orderModel.findByIdAndUpdate(
+          orderID,
+          {
+            $set: {
+              "Items.$[].dishStatus": "Processed",
+              status: "Ready to serve",
+            },
+          }, // Update the dishStatus of all items
+          { new: true }
+        );
+      }
+    } else {
+      result = await orderModel.findByIdAndUpdate(
+        orderID,
+        {
+          $set: {
+            "Items.$[].dishStatus": "Processed",
+            status: "Processed And Ready to Ship",
+          },
+          $push: {
+            orderStatus: {
+              name: "Processed And Ready to Ship",
+              time: new Date(),
+              massage: "your meal is ready",
+            },
+          },
+        }, // Update the dishStatus of all items
+        { new: true }
+      );
+    }
+
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+const order_Is_being_Prepared_By_KOT_Approval = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+    const order_data = await orderModel.findById(orderID);
+    if(!order_data){
+      return responseError(res,404);
+    }
+    let result;
+    console.log(order_data,2)
+    if (order_data.order_from == "OFFSITE") {
+      result = await orderModel.findOneAndUpdate(
+        {
+          _id: orderID,
+          "Items.dishStatus": "Approved", // Match orders with at least one item with "Order-Placed" status
+        },
+        {
+          $set: {
+            "Items.$[item].dishStatus": "Processing", // Update all items with "Order-Placed" status to "Approved"
+            status: "In The Kitchen",
+          },
+          $push: {
+            orderStatus: {
+              name: "In The Kitchen",
+              time: new Date(),
+              massage: "Chef is preparing your meal",
+            },
+          },
+        },
+        {
+          arrayFilters: [{ "item.dishStatus": "Approved" }], // Filter array elements to only update those with "Order-Placed" status
+          new: true,
+        }
+      );
+    }else{
+      result = await orderModel.findOneAndUpdate(
+        {
+          _id: orderID,
+          "Items.dishStatus": "Approved", // Match orders with at least one item with "Order-Placed" status
+        },
+        {
+          $set: {
+            "Items.$[item].dishStatus": "Processing", // Update all items with "Order-Placed" status to "Approved"
+            status: "In The Kitchen",
+          },
+        },
+        {
+          arrayFilters: [{ "item.dishStatus": "Approved" }], // Filter array elements to only update those with "Order-Placed" status
+          new: true,
+        }
+      );
+    }
+
+    
+    res.status(200).send(result);
+
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
+const ProcessingOrderListForKitchenStaff = async (req, res) => {
+  try {
+    const {
+      typeOfRange,
+      startingDate,
+      endingDate,
+      currentPage,
+      numberOfSizeInTableData,
+      search,
+    } = req.query;
+    const { res_id, branchID } = req.params;
+
+    let selectData = "-__v -OTP -shippingCharge";
+
+    const filter = {
+      res_id: res_id,
+      branchID: branchID,
+      status:{ $in: ["Processing", "In The Kitchen"] },
+    };
+
+    // if (req.role === "Delivery Man") {
+    //     filter["deliveryPartner._id"] = req.adminID;
+    //     selectData = '-__v -OTP -shippingCharge -order_item -address';
+    // }
+
+    if (typeOfRange === "Last 7 Days") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      filter.createdAt = { $gte: sevenDaysAgo };
+    } else if (typeOfRange === "Last 30 Days") {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      filter.createdAt = { $gte: thirtyDaysAgo };
+    } else if (typeOfRange === "Custom" && startingDate && endingDate) {
+      // If Custom range selected, check the startDate and endingDate
+      const endDate = new Date(endingDate);
+      endDate.setHours(23, 59, 59); // Set the time to the end of the day
+      filter.createdAt = {
+        $gte: new Date(startingDate),
+        $lte: endDate,
+      };
+    }
+
+    if (search) {
+      filter.$or = [
+        { phone: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+        { cash_status: { $regex: search, $options: "i" } },
+      ];
+    }
+    const page = parseInt(currentPage) || 0;
+    const size = parseInt(numberOfSizeInTableData) || 15;
+    const skipCount = page * size;
+
+    const [arrayData, totalCount] = await Promise.all([
+      orderModel
+        .find(filter)
+        .select(selectData)
+        .sort({ updatedAt: -1 })
+        .skip(skipCount)
+        .limit(size)
+        .populate("user_id"),
+      orderModel.countDocuments(filter),
+    ]);
+
+    if (!arrayData || arrayData.length === 0) {
+      return res.status(200).send({ DataArrayList: [], count: 0 });
+    }
+    const branchData = await branchModel
+      .findById(branchID)
+      .select("paymentTypes");
+
+    res
+      .status(200)
+      .json({
+        DataArrayList: arrayData,
+        count: totalCount,
+        paymentTypes: branchData?.paymentTypes,
+      });
+  } catch (error) {
+    console.error("Error while fetching orders", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -928,9 +1310,15 @@ module.exports = {
   getDiscountByCoupon,
   getOrderDetailsBeforeCheckoutForOffsite,
   adminPlaceOrder,
+  AllOrderList,
   OngoingOrderList, //for admin
   updateOrderSingleItem,
   dataForPayment,
   updateOrderByIdForPayment,
   UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order,
+  UpdateOrder_ReceivedMoney_PayLast_branches_Onsite_Order,
+  approveDishItem, //admin approve dish item placed to approved for cook
+  order_Prepared_and_ready_to_serve_By_KOT_Approval,
+  order_Is_being_Prepared_By_KOT_Approval,
+  ProcessingOrderListForKitchenStaff,
 };
