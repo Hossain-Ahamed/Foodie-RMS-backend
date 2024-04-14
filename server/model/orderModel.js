@@ -10,7 +10,7 @@ const orderSchema = new Schema(
     },
     branchID: {
       type: mongoose.ObjectId,
-      ref: "Branchs",
+      ref: "Branches",
     },
     user_id: {
       type: mongoose.ObjectId,
