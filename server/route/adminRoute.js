@@ -411,8 +411,24 @@ const {
   giveVendorName,
   oldDataOfItem,
 } = require("../controller/inventoryController");
+const { dishName, createRecipe } = require("../controller/recipeController");
 const { searchUserByPhone } = require("../controller/userController");
-const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order } = require("../controller/orderController");
+const {
+  adminPlaceOrder,
+  OngoingOrderList,
+  dataForPayment,
+  updateOrderByIdForPayment,
+  UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order,
+} = require("../controller/orderController");
+
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/get-dishes/:dishID",
+  dishName
+);
+router.post(
+  "/admin/restaurant/:res_id/branch/:branchID/add-new-dishes/:dishId",
+  createRecipe
+);
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
   giveVendorName
@@ -435,12 +451,11 @@ router.get(
   oldDataOfItem
 );
 
-
 /**
  *                user payment gateway
-*/
-router.get("/pay-my-bill/:order_id",dataForPayment)
-router.post("/pay-my-bill",updateOrderByIdForPayment)
+ */
+router.get("/pay-my-bill/:order_id", dataForPayment);
+router.post("/pay-my-bill", updateOrderByIdForPayment);
 // ----------------------------------------------------------------
 
 /**
@@ -448,16 +463,25 @@ router.post("/pay-my-bill",updateOrderByIdForPayment)
  * -------------------------------------------------------------------------------
  *                    Order Management
  */
-router.get("/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",get_All_Dish_Name_For_restaurant_For_Admin);
+router.get(
+  "/restaurant/:res_id/branch/:branchID/dishes-for-custom-order-for-admin",
+  get_All_Dish_Name_For_restaurant_For_Admin
+);
 
-router.get("/search-user-by-phone",searchUserByPhone) //search user by phone for onsite place order by admin custom order 
+router.get("/search-user-by-phone", searchUserByPhone); //search user by phone for onsite place order by admin custom order
 
-router.post("/restaurant/:res_id/branch/:branchID/place-an-order-by-admin",adminPlaceOrder) //admin place an order
+router.post(
+  "/restaurant/:res_id/branch/:branchID/place-an-order-by-admin",
+  adminPlaceOrder
+); //admin place an order
 
+router.get(
+  "/admin/restaurant/:res_id/branch/:branchID/active-orders-list",
+  OngoingOrderList
+); //ongoing order list for admin
 
-
-router.get("/admin/restaurant/:res_id/branch/:branchID/active-orders-list",OngoingOrderList) //ongoing order list for admin
-
-
-router.patch('/update-an-onsite-pay-first-order-by-clicking-money-bag-by-admin/:orderID',UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order)   //Update Order Received Money PayFirst branches Onsite  Order
+router.patch(
+  "/update-an-onsite-pay-first-order-by-clicking-money-bag-by-admin/:orderID",
+  UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order
+); //Update Order Received Money PayFirst branches Onsite  Order
 module.exports = router;
