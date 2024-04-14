@@ -172,6 +172,7 @@ const {
   ProcessingOrderListForKitchenStaff,
   order_Is_being_Prepared_By_KOT_Approval,
   order_Prepared_and_ready_to_serve_By_KOT_Approval,
+  Onsite_Order_Update_Status_for_completed,
 } = require("../controller/orderController");
 
 // http://localhost:5000/admin/login
@@ -521,13 +522,15 @@ router.patch(
   order_Prepared_and_ready_to_serve_By_KOT_Approval
 ); //kitchen staff completed the food cooking
 
+//attendance 
+const {takeAttendense} = require('../controller/attendenseController')
+router.post('/admin/restaurant/:res_id/branch/:branchID/upload-attendence', takeAttendense)
+
 router.get("/restaurant/:res_id/branch/:branchID/delivery-man-list",  allDeliveryBoyForBranch)
-router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignDeliveryPartnerForOffsiteOrder)
+router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignDeliveryPartnerForOffsiteOrder);
+router.patch("/restaurant/:res_id/branch/:branchID/onsite-pay-first-order-delivered/:orderID",Onsite_Order_Update_Status_for_completed)
 module.exports = router;
 
 
 
 
-//attendance 
-const {takeAttendense} = require('../controller/attendenseController')
-router.post('/admin/restaurant/:res_id/branch/:branchID/upload-attendence', takeAttendense)
