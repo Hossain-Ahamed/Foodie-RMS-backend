@@ -1,10 +1,10 @@
 const Recipe = require("../model/recipeModel");
-const Dish = require("../model/recipeModel");
+const Dish = require("../model/dishesModel");
 
 const dishName = async (req, res) => {
   try {
-    const id = req.params;
-    const name = await Dish.findById(id);
+    const {id} = req.params;
+    const name = await Dish.findOne({_id: id});
     res.status(200).send(name);
   } catch (error) {
     res.status(500).json({
@@ -17,16 +17,16 @@ const createRecipe = async (req, res) => {
   try {
     const { res_id, branchID, dishId } = req.params;
     const { dish, ingredients } = req.body;
-    const newRecipe = new Recipe({
+    const newRecipe = await new Recipe({
       res_id,
       branchID,
       dish,
       dishId,
       ingredients,
-    });
-    const savedRecipe = await newRecipe.save();
+    }).save();
 
-    res.status(201).json(savedRecipe);
+
+    res.status(201).json(true);
   } catch (error) {
     res.status(500).json({ error: "Could not create recipe" });
   }

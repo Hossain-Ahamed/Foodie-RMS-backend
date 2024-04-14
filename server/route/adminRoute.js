@@ -413,8 +413,12 @@ const {
 } = require("../controller/inventoryController");
 const { dishName, createRecipe } = require("../controller/recipeController");
 const { searchUserByPhone } = require("../controller/userController");
+
+const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order } = require("../controller/orderController");
+router.get("/admin/restaurant/:res_id/branch/:branchID/get-dishes/:id",dishName);
+
 const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order, approveDishItem, UpdateOrder_ReceivedMoney_PayLast_branches_Onsite_Order, deleteOrder, AllOrderList, ProcessingOrderListForKitchenStaff, order_Is_being_Prepared_By_KOT_Approval, order_Prepared_and_ready_to_serve_By_KOT_Approval } = require("../controller/orderController");
-router.get("/admin/restaurant/:res_id/branch/:branchID/get-dishes/:dishID",dishName);
+
 router.post("/admin/restaurant/:res_id/branch/:branchID/add-new-dishes/:dishID",createRecipe);
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
