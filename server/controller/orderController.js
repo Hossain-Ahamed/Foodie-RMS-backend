@@ -12,6 +12,7 @@ const branchModel = require("../model/branchModel");
 const couponModel = require("../model/couponModel");
 const restaurantModel = require("../model/restaurantModel");
 const restaurantOnlineTransactionBillModel = require("../model/restaurantOnlineTransactionBillModel");
+const employeeModel = require("../model/employeeModel");
 
 const getOrderDetailsBeforeCheckout = async (req, res) => {
   try {
@@ -1335,23 +1336,144 @@ const ProcessingOrderListForKitchenStaff = async (req, res) => {
 const Onsite_Order_Update_Status_for_completed = async (req,res) =>{
   try {
     const {orderID} =  req.params;
-   const result = await orderModel.findByIdAndUpdate(
-      orderID,
-      {
-        $set: {
-          "Items.$[].dishStatus": "Delivered",
-          status: "Delivered",
+    const order_data = await orderModel.findById(orderID);
+    if(order_data?.order_from == "OFFSITE" && order_data?.orderNote == "Take-away"){
+      const result = await orderModel.findByIdAndUpdate(
+        orderID,
+        {
+          $set: {
+            "Items.$[].dishStatus": "Delivered",
+            status: "Delivered",
+          },
+          $push: {
+            orderStatus: {
+              name: "Delivered",
+              time: new Date().toISOString(),
+              message: "Food is Delivered !",
+            },
+          },
+
+        }, // Update the dishStatus of all items
+        { new: true }
+      );
+      if(!result){
+        responseError(res,400,"No Order Found!");
+        }else{
+          res.status(200).json(result);
         }
-      }, // Update the dishStatus of all items
-      { new: true }
-    );
-    if(!result){
-      responseError(res,400,"No Order Found!");
-      }else{
-        res.status(200).send(result);
-      }
+    }else{
+      const result = await orderModel.findByIdAndUpdate(
+        orderID,
+        {
+          $set: {
+            "Items.$[].dishStatus": "Delivered",
+            status: "Delivered",
+          }
+        }, // Update the dishStatus of all items
+        { new: true }
+      );
+      if(!result){
+        responseError(res,400,"No Order Found!");
+        }else{
+          res.status(200).json(result);
+        }
+    }
+   
   } catch (error) {
     responseError(res,500,"Internal Server Error");
+  }
+}
+
+
+const AllOrderList_For_DeliveryPartner = async (req,res)=> {
+  try {
+    const {
+      typeOfRange,
+      startingDate,
+      endingDate,
+      currentPage,
+      numberOfSizeInTableData,
+      search,
+    } = req.query;
+    const { res_id, branchID,_id } = req.params;
+    const employee = await employeeModel.findById( _id );
+    if( !employee ) {
+      return responseError(res, 401, 'Invalid');
+    }
+
+    try {
+      
+  
+      let selectData = "-__v -OTP -shippingCharge";
+  
+      const filter = {
+        res_id: res_id,
+        branchID: branchID,
+        "deliveryPartner.Employee_id": employee?._id,
+      };
+  
+      // if (req.role === "Delivery Man") {
+      //     filter["deliveryPartner._id"] = req.adminID;
+      //     selectData = '-__v -OTP -shippingCharge -order_item -address';
+      // }
+  
+      if (typeOfRange === "Last 7 Days") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        filter.createdAt = { $gte: sevenDaysAgo };
+      } else if (typeOfRange === "Last 30 Days") {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        filter.createdAt = { $gte: thirtyDaysAgo };
+      } else if (typeOfRange === "Custom" && startingDate && endingDate) {
+        // If Custom range selected, check the startDate and endingDate
+        const endDate = new Date(endingDate);
+        endDate.setHours(23, 59, 59); // Set the time to the end of the day
+        filter.createdAt = {
+          $gte: new Date(startingDate),
+          $lte: endDate,
+        };
+      }
+  
+      if (search) {
+        filter.$or = [
+          { phone: { $regex: search, $options: "i" } },
+          { status: { $regex: search, $options: "i" } },
+          { cash_status: { $regex: search, $options: "i" } },
+        ];
+      }
+      const page = parseInt(currentPage) || 0;
+      const size = parseInt(numberOfSizeInTableData) || 15;
+      const skipCount = page * size;
+  
+      const [arrayData, totalCount] = await Promise.all([
+        orderModel
+          .find(filter)
+          .select(selectData)
+          .sort({ updatedAt: -1 })
+          .skip(skipCount)
+          .limit(size)
+          .populate("user_id"),
+        orderModel.countDocuments(filter),
+      ]);
+  
+      if (!arrayData || arrayData.length === 0) {
+        return res.status(200).send({ DataArrayList: [], count: 0 });
+      }
+     
+  
+      res
+        .status(200)
+        .json({
+          DataArrayList: arrayData,
+          count: totalCount,
+        });
+    } catch (error) {
+      console.error("Error while fetching orders", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  } catch (error) {
+    responseError(res, 500, error);
   }
 }
 
@@ -1379,4 +1501,5 @@ module.exports = {
   order_Is_being_Prepared_By_KOT_Approval,
   ProcessingOrderListForKitchenStaff,
   Onsite_Order_Update_Status_for_completed,
+  AllOrderList_For_DeliveryPartner
 };

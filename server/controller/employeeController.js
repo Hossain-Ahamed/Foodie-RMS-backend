@@ -878,7 +878,7 @@ const assignDeliveryPartnerForOffsiteOrder = async (req,res)=>{
     const  order = await orderModel.findByIdAndUpdate(orderID,{
       $set:{
         deliveryPartner:{
-          _id:employee?._id, 
+          Employee_id :employee?._id, 
           name: employee?.f_name+" "+employee?.l_name, 
           phone: employee?.mobile, 
           email: employee?.email
