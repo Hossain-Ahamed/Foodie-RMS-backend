@@ -47,16 +47,6 @@ const JWTtoken = async (req, res) => {
     const release = await mutex.acquire();
     console.log(req.body);
 
-    // console.log(email);
-
-    // let user = await userModel.findOne({ email: email });
-    // if (!user) {
-    //   user = await new userModel({
-    //       name,email,firebase_UID,phone,imgURL
-    //   }).save();
-    // }
-    // console.log(user?._id);
-
     let user = await userModel.findOne({ email: email });
     if (!user) {
       user = await new userModel({
@@ -79,11 +69,9 @@ const JWTtoken = async (req, res) => {
       sameSite: "none",
     });
 
-    //const isAdmin = await adminModel.findOne({email: user?.email,  }).select('name');
-
     res.status(200).send({
       success: true,
-      message: "Loging successfully",
+      message: "Logging in successfully",
       user: {
         _id: user?._id,
         name: user?.name,
@@ -138,20 +126,30 @@ const signout = async (req, res) => {
   }
 };
 const getProfile = async (req, res) => {
-  let user = await userModel.findOne({ email: req.params.email }, "-password");
-  if (!user) {
-    responseError(res, 401, null, "User not found");
+  try {
+    // const release = await mutex.acquire();
+    const email = req.params.email;
+    const user = await userModel.findOne({ email: email }, "-password");
+    console.log("hello", user, email)
+    if (!user) {
+      console.log(user, email);
+      responseError(res, 401, null, "User not found");
+      return
+    }
+    
+    res.status(200).send({
+      _id: user?._id,
+      name: user?.name,
+      phone: user?.phone,
+      email: user?.email,
+      address: user?.address,
+      imgURL: user?.imgURL,
+      gender: user?.gender,
+    });
+    // release();
+  } catch (error) {
+    responseError(res, 500, error);
   }
-  console.log(user);
-  res.status(200).send({
-    _id: user?._id,
-    name: user?.name,
-    phone: user?.phone,
-    email: user?.email,
-    address: user?.address,
-    imgURL: user?.imgURL,
-    gender: user?.gender,
-  });
 };
 
 const updateProfile = async (req, res) => {
