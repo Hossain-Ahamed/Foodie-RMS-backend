@@ -176,9 +176,36 @@ const readOrder = async (req, res) => {};
 const deleteOrder = async (req, res) => {
   try {
     const { orderID } = req.params;
+    const order_data = await orderModel.findById(orderID);
+    if (!order_data ){
+      return responseError(res,404,"No Order Found!");
+    }
+    if (order_data?.status == "Delivered" ){
+      return res.status(400).send({massage: "This Order is already Delivered!"})
+    }
+    
     const deleteOrder = await orderModel.findByIdAndUpdate(orderID, {
       status: "Cancelled",
     });
+    if(order_data.order_from == "OFFSITE" && order_data.cash_status == "Paid"){
+      await restaurantOnlineTransactionBillModel.findOneAndUpdate(
+        { branchID: order_data?.branchID }, // Find the document with this branchID
+        { // Update fields
+            NeedToPay: NeedToPay - order_data?.finalPrice, // Update NeedToPay field
+            $push: { // Push a new object into billHistory array
+                billHistory: {
+                    orderID: orderID,
+                    transactionID: "Refund",
+                    intent_methodID: "Refund",
+                    methodID: "Refund",
+                    price: order_data?.finalPrice
+                }
+            }
+        },
+        {new:true}
+    );
+      
+    }
     res.status(200).send(true);
   } catch (error) {
     responseError(res, 500, error);
@@ -730,6 +757,7 @@ const OngoingOrderList = async (req, res) => {
       currentPage,
       numberOfSizeInTableData,
       search,
+      role,
     } = req.query;
     const { res_id, branchID } = req.params;
 
@@ -738,8 +766,14 @@ const OngoingOrderList = async (req, res) => {
     const filter = {
       res_id: res_id,
       branchID: branchID,
-      status: { $nin: ["Delivered", "Cancelled"] },
+      
     };
+    if(role == "Admin" || role == "Super-Admin"){
+      filter.status = { $nin: ["Delivered", "Cancelled"] };
+    }else{
+      //for custommer service
+      filter.status =  { $nin: ["Delivered", "Cancelled", "Processed And Ready to Ship","Processing","Completed","Shipped"] };
+    }
 
     // if (req.role === "Delivery Man") {
     //     filter["deliveryPartner._id"] = req.adminID;
