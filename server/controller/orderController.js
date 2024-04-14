@@ -181,7 +181,7 @@ const deleteOrder = async (req, res) => {
       return responseError(res,404,"No Order Found!");
     }
     if (order_data?.status == "Delivered" ){
-      return res.status(400).send({massage: "This Order is already Delivered!"})
+      return res.status(400).send({message: "This Order is already Delivered!"})
     }
     
     const deleteOrder = await orderModel.findByIdAndUpdate(orderID, {
@@ -395,7 +395,7 @@ const createOrderForOffsite = async (req, res) => {
         orderStatus: [
           {
             name: "Payment Pending",
-            massage: "",
+            message: "",
             time: Date.now(),
           },
         ],
@@ -1173,7 +1173,7 @@ const order_Prepared_and_ready_to_serve_By_KOT_Approval = async (req, res) => {
             orderStatus: {
               name: "Processed And Ready to Ship",
               time: new Date(),
-              massage: "your meal is ready",
+              message: "Your meal is ready",
             },
           },
         }, // Update the dishStatus of all items
@@ -1211,7 +1211,7 @@ const order_Is_being_Prepared_By_KOT_Approval = async (req, res) => {
             orderStatus: {
               name: "In The Kitchen",
               time: new Date(),
-              massage: "Chef is preparing your meal",
+              message: "Chef is preparing your meal",
             },
           },
         },
