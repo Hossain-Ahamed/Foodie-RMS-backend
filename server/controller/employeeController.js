@@ -863,13 +863,18 @@ const allDeliveryBoyForBranch = async(req,res)=>{
 const assignDeliveryPartnerForOffsiteOrder = async (req,res)=>{
   try {
     const {res_id,branchID} = req.params;
-    const {_id,massage,orderID }=req.body;
+    const {_id,message,orderID }=req.body;
 
     const employee = await Employee.findById(_id);
     if(!employee){
       return responseError(res, 400, "Employee not found!");
     }
 
+    
+    const exist = await orderModel.findById(orderID);
+
+    console.log(exist)
+  
     const  order = await orderModel.findByIdAndUpdate(orderID,{
       $set:{
         deliveryPartner:{
@@ -881,13 +886,16 @@ const assignDeliveryPartnerForOffsiteOrder = async (req,res)=>{
         status: "Shipped"
     },
       $push:{
-        orderStatus:{name: "Shipped" , massage: massage, time: new Date()},
+        orderStatus:{name: "Shipped" , message: message, time: new Date()},
       }
     },{new : true});
 
+    console.log(order)
     if(!order){
       return responseError(res, 400, "Order not found!");
     }
+
+    res.status(200).send(order)
 
   } catch (error) {
     return responseError(res, 500, error);
