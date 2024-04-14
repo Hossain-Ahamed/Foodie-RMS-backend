@@ -1332,6 +1332,29 @@ const ProcessingOrderListForKitchenStaff = async (req, res) => {
   }
 };
 
+const Onsite_Order_Update_Status_for_completed = async (req,res) =>{
+  try {
+    const {orderID} =  req.params;
+   const result = await orderModel.findByIdAndUpdate(
+      orderID,
+      {
+        $set: {
+          "Items.$[].dishStatus": "Delivered",
+          status: "Delivered",
+        }
+      }, // Update the dishStatus of all items
+      { new: true }
+    );
+    if(!result){
+      responseError(res,400,"No Order Found!");
+      }else{
+        res.status(200).json(result);
+      }
+  } catch (error) {
+    responseError(res,500,"Internal Server Error");
+  }
+}
+
 module.exports = {
   getOrderDetailsBeforeCheckout,
   updateOrder,
@@ -1355,4 +1378,5 @@ module.exports = {
   order_Prepared_and_ready_to_serve_By_KOT_Approval,
   order_Is_being_Prepared_By_KOT_Approval,
   ProcessingOrderListForKitchenStaff,
+  Onsite_Order_Update_Status_for_completed,
 };
