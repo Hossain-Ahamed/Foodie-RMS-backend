@@ -11,6 +11,7 @@ const {
     getOrderDetailsBeforeCheckoutForOffsite,
     getDiscountByCoupon,
     createOrderForOffsite,
+    allOrderListForUser,
 } =  require('../controller/orderController');
 
 
@@ -98,6 +99,8 @@ router.post("/get-discount-by-applying-coupon",getDiscountByCoupon) //get discou
 router.delete("/delete-membership/:res_id/:_id",deleteMembership);
 
 router.get('/get-my-membership/:email',viewMemberShipForUser)
+
+router.get("/all-order-list-user/:email",allOrderListForUser)
 
 
 

@@ -1543,6 +1543,28 @@ const  verifyOtpAndCompleteOrder = async (req,res)=> {
  }
  }
 
+ const allOrderListForUser = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await userModel.findOne({ email: email });
+    const allOrder = await orderModel.find({
+      user_id: user?._id,
+    }).sort({_id:-1}).limit(10).populate("user_id branchID res_id") ;
+
+    const responseData = allOrder.map ((item) => ({
+      res_id :  item.res_id ? item.res_id._id : null,
+      res_name : item?.res_id?.res_name || "",
+
+      branchID : item.branchID?._id || null,
+      branchName : item.branchID?.branch_name || "" ,
+      ...item,
+    }))
+    res.status(200).send(responseData);
+  } catch (error) {
+    responseError(res, 500, error);
+  }
+};
+
 module.exports = {
   getOrderDetailsBeforeCheckout,
   updateOrder,
@@ -1569,5 +1591,6 @@ module.exports = {
   Onsite_Order_Update_Status_for_completed,
   AllOrderList_For_DeliveryPartner,
   handleProceedTOReadyToDelivery,
-  verifyOtpAndCompleteOrder
+  verifyOtpAndCompleteOrder,
+  allOrderListForUser
 };
