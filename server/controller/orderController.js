@@ -13,7 +13,7 @@ const couponModel = require("../model/couponModel");
 const restaurantModel = require("../model/restaurantModel");
 const restaurantOnlineTransactionBillModel = require("../model/restaurantOnlineTransactionBillModel");
 const employeeModel = require("../model/employeeModel");
-
+const axios = require("axios");
 const getOrderDetailsBeforeCheckout = async (req, res) => {
   try {
     const { email, branchID, res_id } = req.params;
@@ -1450,7 +1450,7 @@ const AllOrderList_For_DeliveryPartner = async (req,res)=> {
         orderModel
           .find(filter)
           .select(selectData)
-          .sort({ updatedAt: -1 })
+          .sort({ createdAt: -1 })
           .skip(skipCount)
           .limit(size)
           .populate("user_id"),
@@ -1540,5 +1540,6 @@ module.exports = {
   order_Is_being_Prepared_By_KOT_Approval,
   ProcessingOrderListForKitchenStaff,
   Onsite_Order_Update_Status_for_completed,
-  AllOrderList_For_DeliveryPartner
+  AllOrderList_For_DeliveryPartner,
+  handleProceedTOReadyToDelivery
 };
