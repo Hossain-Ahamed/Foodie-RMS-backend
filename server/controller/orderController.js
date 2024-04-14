@@ -1201,7 +1201,6 @@ const order_Is_being_Prepared_By_KOT_Approval = async (req, res) => {
       result = await orderModel.findOneAndUpdate(
         {
           _id: orderID,
-          "Items.dishStatus": "Approved", // Match orders with at least one item with "Order-Placed" status
         },
         {
           $set: {
@@ -1495,8 +1494,9 @@ const handleProceedTOReadyToDelivery = async (req,res)=>{
     const phone = order?.phone;
     let cleanedNumber = phone.replace(/^\+88/, '');
 
-    // Send the OTP via SMS
-    let message = `Your OTP for the order at ${order?.res_id?.res_name || ''} ${order?.branchID?.branch_name || ''} is: ${OTP}.\nDelivery Partner: ${order?.deliveryPartner?.name || ''} (Phone: ${order?.deliveryPartner?.phone || ''})\nEnjoy your meal!`
+  
+    let message = `Your OTP for the order at ${order?.res_id?.res_name || ''} ${order?.branchID?.branch_name || ''} is: ${OTP}%0A%0ADelivery partner: ${order?.deliveryPartner?.name || ''}%0APhone: ${order?.deliveryPartner?.phone || ''} %0AEnjoy your meal!`;
+
     await orderModel.findByIdAndUpdate(order._id,
       {$set:{status:"Ready To Delivery",
       OTP:OTP},
@@ -1509,12 +1509,39 @@ const handleProceedTOReadyToDelivery = async (req,res)=>{
     const smsResponse = await axios.post(
       `https://bulksmsbd.net/api/smsapi?api_key=${process.env.BULK_MESSAGE_API}&type=text&number=${cleanedNumber}&senderid=${process.env.BULK_MESSAGE_SENDER}&message=${message}`
     );
-    console.log(smsResponse.data); // Log the response from the SMS API
+    
+    console.log(smsResponse.data); 
     res.status(200).send(true);
   } catch (error) {
     responseError(res, 500, error);
   }
 }
+
+const  verifyOtpAndCompleteOrder = async (req,res)=> {
+  try{ 
+   const {orderID}=req.params;
+   const {otp}=req.body;
+   const order=await orderModel.findById(orderID);
+   console.log(otp,order)
+   
+    if(!order || otp !== order?.OTP){
+      return responseError(res,400,{},"OTP mismatched please try again")
+    };
+    await orderModel.findByIdAndUpdate(order._id,
+     {$set:{
+       "Items.$[].dishStatus": "Delivered",
+       status:"Delivered",
+     },
+     $push:{orderStatus:{name : "Delivered" , 
+     message: "Order is delivered to customer successfully",
+     time: new  Date().toISOString()
+     }}},{new:true});
+ 
+ res.status(200).send(true);
+ }catch(error){
+   responseError(res,500,"Internal Server Error");
+ }
+ }
 
 module.exports = {
   getOrderDetailsBeforeCheckout,
@@ -1541,5 +1568,6 @@ module.exports = {
   ProcessingOrderListForKitchenStaff,
   Onsite_Order_Update_Status_for_completed,
   AllOrderList_For_DeliveryPartner,
-  handleProceedTOReadyToDelivery
+  handleProceedTOReadyToDelivery,
+  verifyOtpAndCompleteOrder
 };

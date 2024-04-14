@@ -175,6 +175,7 @@ const {
   Onsite_Order_Update_Status_for_completed,
   AllOrderList_For_DeliveryPartner,
   handleProceedTOReadyToDelivery,
+  verifyOtpAndCompleteOrder,
 } = require("../controller/orderController");
 
 // http://localhost:5000/admin/login
@@ -535,7 +536,11 @@ router.get("/restaurant/:res_id/branch/:branchID/get-attendance/:user_id/month/:
 router.get("/restaurant/:res_id/branch/:branchID/delivery-man-list",  allDeliveryBoyForBranch)
 router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignDeliveryPartnerForOffsiteOrder);
 router.patch("/onsite-pay-first-order-delivered/:orderID",Onsite_Order_Update_Status_for_completed)
-router.patch("/handle-proceed-to-ready-to-delivery/:orderID",handleProceedTOReadyToDelivery)
+router.patch("/handle-proceed-to-ready-to-delivery/:orderID",handleProceedTOReadyToDelivery);
+router.patch("/handle-proceed-to-delivered/:orderID",verifyOtpAndCompleteOrder);
+
+
+
 module.exports = router;
 
 
