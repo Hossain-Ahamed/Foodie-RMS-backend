@@ -624,7 +624,7 @@ const onGoingOrderForOnSite = async (req, res) => {
     const user = await userModel.findOne({ email: email });
     const allOrderOngoing = await orderModel.find({
       user_id: user?._id,
-      status: { $ne: "Completed" },
+      status: { $ne: "Delivered" },
       branchID: branchID,
     });
     res.status(200).send(allOrderOngoing);
@@ -639,7 +639,7 @@ const allCompleteOrderForOnSite = async (req, res) => {
     const user = await userModel.findOne({ email: email });
     const allOrderComplete = await orderModel.find({
       user_id: user?._id,
-      status: "Completed",
+      status: "Delivered",
       branchID: branchID,
     });
     res.status(200).send(allOrderComplete);
@@ -1549,7 +1549,7 @@ const  verifyOtpAndCompleteOrder = async (req,res)=> {
     const user = await userModel.findOne({ email: email });
     const allOrder = await orderModel.find({
       user_id: user?._id,
-    }).sort({_id:-1}).limit(10).populate("user_id branchID res_id") ;
+    }).sort({_id:-1}).populate("user_id branchID res_id").limit(1).exec();
 
     const responseData = allOrder.map ((item) => ({
       res_id :  item.res_id ? item.res_id._id : null,
@@ -1557,7 +1557,23 @@ const  verifyOtpAndCompleteOrder = async (req,res)=> {
 
       branchID : item.branchID?._id || null,
       branchName : item.branchID?.branch_name || "" ,
-      ...item,
+      Items : item?.Items,
+       orderNote : item?.orderNote,
+       vouchers : item?.vouchers,
+       subTotalPrice : item?.subTotalPrice,
+       discountedPrice : item?.discountedPrice,
+       shippingCharge : item?.shippingCharge,
+       finalPrice : item?.finalPrice,
+       status : item?.status,
+       cash_status : item?.cash_status,
+       type_of_payment : item?.type_of_payment,
+       order_from : item?.order_from,
+       phone : item?.phone,
+       orderStatus : item?.orderStatus,
+       createdAt : item?.createdAt,
+       updatedAt : item?.updatedAt,
+       transactionId : item?.transactionId,
+       OTP : item?.OTP,
     }))
     res.status(200).send(responseData);
   } catch (error) {
