@@ -411,8 +411,15 @@ const {
   giveVendorName,
   oldDataOfItem,
 } = require("../controller/inventoryController");
+const { dishName, createRecipe } = require("../controller/recipeController");
 const { searchUserByPhone } = require("../controller/userController");
+
+const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order } = require("../controller/orderController");
+router.get("/admin/restaurant/:res_id/branch/:branchID/get-dishes/:id",dishName);
+
 const { adminPlaceOrder, OngoingOrderList, dataForPayment, updateOrderByIdForPayment, UpdateOrder_ReceivedMoney_PayFirst_branches_Onsite_Order, approveDishItem, UpdateOrder_ReceivedMoney_PayLast_branches_Onsite_Order, deleteOrder, AllOrderList, ProcessingOrderListForKitchenStaff, order_Is_being_Prepared_By_KOT_Approval, order_Prepared_and_ready_to_serve_By_KOT_Approval } = require("../controller/orderController");
+
+router.post("/admin/restaurant/:res_id/branch/:branchID/add-new-dishes/:dishID",createRecipe);
 router.get(
   "/admin/restaurant/:res_id/branch/:branchID/get-vendors-for-inventory",
   giveVendorName
@@ -435,12 +442,11 @@ router.get(
   oldDataOfItem
 );
 
-
 /**
  *                user payment gateway
-*/
-router.get("/pay-my-bill/:order_id",dataForPayment)
-router.post("/pay-my-bill",updateOrderByIdForPayment)
+ */
+router.get("/pay-my-bill/:order_id", dataForPayment);
+router.post("/pay-my-bill", updateOrderByIdForPayment);
 // ----------------------------------------------------------------
 
 /**
@@ -469,6 +475,4 @@ router.delete('/cancel-an-order/:orderID',  deleteOrder) //cancel an order
 
 router.patch("/approve-to-cook/:orderID",order_Is_being_Prepared_By_KOT_Approval);  ///kitchen staff is cooking the food
 router.patch("/approve-to-ready-to-serve/:orderID",order_Prepared_and_ready_to_serve_By_KOT_Approval); //kitchen staff completed the food cooking
-
-
 module.exports = router;
