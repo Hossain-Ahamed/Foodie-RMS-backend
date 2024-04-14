@@ -1348,7 +1348,7 @@ const Onsite_Order_Update_Status_for_completed = async (req,res) =>{
     if(!result){
       responseError(res,400,"No Order Found!");
       }else{
-        res.status(200).json(result);
+        res.status(200).send(result);
       }
   } catch (error) {
     responseError(res,500,"Internal Server Error");
