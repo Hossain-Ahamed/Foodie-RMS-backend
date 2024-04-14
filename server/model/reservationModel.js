@@ -14,6 +14,15 @@ const reservationSchema = new mongoose.Schema(
       type: mongoose.ObjectId,
       ref: "users",
     },
+    user_name: {
+      type: String,
+    },
+    user_phone: {
+      type: String,
+    },
+    table_number: {
+      type: String,
+    },
     date: {
       type: Date,
     },
