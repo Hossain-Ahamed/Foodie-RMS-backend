@@ -100,6 +100,7 @@ const {
   getAllDev,
   deleteDevAccount,
   devLogIn,
+  getRevenueAndOrderCount,
 } = require("../controller/devController");
 
 const {
@@ -553,7 +554,7 @@ router.get("/branch-wise-transactions-all-foodie-site",getTransactionForAllResta
 router.patch("/add-payment-to-res-owner",paidToRestaurantInRestaurantOnlineBill) // all transaction for dev site 
 
 
-
+router.get("/admin/restaurant/branch/:branchID/statistics",getRevenueAndOrderCount);
 
 
 module.exports = router;
