@@ -626,7 +626,7 @@ const onGoingOrderForOnSite = async (req, res) => {
       user_id: user?._id,
       status: { $ne: "Delivered" },
       branchID: branchID,
-    });
+    }).limit(10);
     res.status(200).send(allOrderOngoing);
   } catch (error) {
     responseError(res, 500, error);
@@ -641,7 +641,7 @@ const allCompleteOrderForOnSite = async (req, res) => {
       user_id: user?._id,
       status: "Delivered",
       branchID: branchID,
-    });
+    }).limit(10);
     res.status(200).send(allOrderComplete);
   } catch (error) {
     responseError(res, 500, error);
@@ -1549,7 +1549,7 @@ const  verifyOtpAndCompleteOrder = async (req,res)=> {
     const user = await userModel.findOne({ email: email });
     const allOrder = await orderModel.find({
       user_id: user?._id,
-    }).sort({_id:-1}).populate("user_id branchID res_id").limit(1).exec();
+    }).sort({_id:-1}).populate("user_id branchID res_id").limit(10).exec();
 
     const responseData = allOrder.map ((item) => ({
       res_id :  item.res_id ? item.res_id._id : null,
