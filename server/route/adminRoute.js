@@ -98,6 +98,7 @@ const {
   getAllDev,
   deleteDevAccount,
   devLogIn,
+  getRevenueAndOrderCount,
 } = require("../controller/devController");
 
 const {
@@ -543,6 +544,7 @@ router.patch("/handle-proceed-to-delivered/:orderID",verifyOtpAndCompleteOrder);
 
 router.get("/admin/restaurant/:res_id/all-customers",getUniqueUsersByRestaurant);
 router.get("/admin/restaurant/:res_id/branch/:branchID/transaction",getTransactionForSingleRestaurant)
+router.get("/admin/restaurant/branch/:branchID/statistics",getRevenueAndOrderCount)
 
 
 
