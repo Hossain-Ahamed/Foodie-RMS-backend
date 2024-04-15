@@ -1581,6 +1581,53 @@ const  verifyOtpAndCompleteOrder = async (req,res)=> {
   }
 };
 
+const getUniqueUsersByRestaurant = async (req,res)=> {
+  try {
+    const {res_id} = req.params;
+    console.log(res_id);
+    // const uniqueUsersByRestaurant = await orderModel.aggregate([
+    //   {
+    //     $match: { res_id: res_id }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: "$res_id",
+    //       uniqueUsers: { $addToSet: "$user_id" }
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "users",
+    //       localField: "uniqueUsers",
+    //       foreignField: "_id",
+    //       as: "users"
+    //     }
+    //   },
+    //   {
+    //     $project: {
+    //       restaurantId: "$_id",
+    //       users: 1
+    //     }
+    //   }
+    // ]);
+
+    const orders = await orderModel.find({ res_id });
+
+    // Extract unique user IDs from the orders
+    const uniqueUserIds = [...new Set(orders.map(order => order.user_id))];
+
+    // Find users corresponding to the unique user IDs
+    const users = await userModel.find({ _id: { $in: uniqueUserIds } });
+
+    // console.log("uniqueUsersByRestaurant", uniqueUsersByRestaurant);
+    res.status(200).send({res_id: res_id,
+                          users})
+  } catch (error) {
+    console.error("Error retrieving unique users by restaurant:", error);
+    responseError(res, 500, 'Server Error');
+  }
+}
+
 module.exports = {
   getOrderDetailsBeforeCheckout,
   updateOrder,
@@ -1608,5 +1655,6 @@ module.exports = {
   AllOrderList_For_DeliveryPartner,
   handleProceedTOReadyToDelivery,
   verifyOtpAndCompleteOrder,
-  allOrderListForUser
+  allOrderListForUser,
+  getUniqueUsersByRestaurant
 };

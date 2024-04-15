@@ -176,6 +176,7 @@ const {
   AllOrderList_For_DeliveryPartner,
   handleProceedTOReadyToDelivery,
   verifyOtpAndCompleteOrder,
+  getUniqueUsersByRestaurant,
 } = require("../controller/orderController");
 
 // http://localhost:5000/admin/login
@@ -538,6 +539,8 @@ router.patch("/restaurant/:res_id/branch/:branchID/assign-delivery-boy", assignD
 router.patch("/onsite-pay-first-order-delivered/:orderID",Onsite_Order_Update_Status_for_completed)
 router.patch("/handle-proceed-to-ready-to-delivery/:orderID",handleProceedTOReadyToDelivery);
 router.patch("/handle-proceed-to-delivered/:orderID",verifyOtpAndCompleteOrder);
+
+router.get("/admin/restaurant/:res_id/all-customers",getUniqueUsersByRestaurant);
 
 
 
