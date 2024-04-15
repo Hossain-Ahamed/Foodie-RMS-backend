@@ -4,6 +4,8 @@ const { responseError } = require("../utils/utility");
 const JWT = require("jsonwebtoken");
 const membershipModel = require("../model/membershipModel");
 const mutex = new Mutex();
+const axios = require("axios");
+const { E_updatePassword } = require("../config/firbase-config");
 const signUp = async (req, res) => {
   try {
     const { name, email, firebase_UID, password, phone } = req.body;
@@ -128,9 +130,9 @@ const getProfile = async (req, res) => {
     const user = await userModel.findOne({ email: email }, "-password");
     if (!user) {
       responseError(res, 401, null, "User not found");
-      return
+      return;
     }
-    
+
     res.status(200).send({
       _id: user?._id,
       name: user?.name,
@@ -166,7 +168,6 @@ const updateProfile = async (req, res) => {
 
       res.status(200).send(updatedUser);
     } else {
-     
       res.status(404).send({
         message: "user Not Found",
         status: false,
@@ -215,46 +216,131 @@ const updateProfileAddress = async (req, res) => {
   }
 };
 
-const searchUserByPhone = async(req,res)=>{
+const searchUserByPhone = async (req, res) => {
   try {
-    const {phone} = req.query;
-    if(!phone){
-      return res.status(200).send([{ _id: "null", name: 'Anonymous', phone: '000-000-000' }]);
+    const { phone } = req.query;
+    if (!phone) {
+      return res
+        .status(200)
+        .send([{ _id: "null", name: "Anonymous", phone: "000-000-000" }]);
     }
-    const regexPattern = new RegExp(phone,'i');
-    const users = await userModel.find({phone:{$regex : regexPattern}}).select("_id name phone").limit(8).exec() ;
-    if(users.length==0){
-     return res.status(200).send([{ _id: "null", name: 'Anonymous', phone: '000-000-000' }]);
+    const regexPattern = new RegExp(phone, "i");
+    const users = await userModel
+      .find({ phone: { $regex: regexPattern } })
+      .select("_id name phone")
+      .limit(8)
+      .exec();
+    if (users.length == 0) {
+      return res
+        .status(200)
+        .send([{ _id: "null", name: "Anonymous", phone: "000-000-000" }]);
     }
     res.status(200).send(users);
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
+    res.status(500).json({ message: error.message });
+  }
+};
 
-const viewMemberShipForUser = async(req,res) =>{
+const viewMemberShipForUser = async (req, res) => {
   try {
-    const {email} = req.params;
-    const user = await  userModel.findOne({ email });
-    if( !user ) throw new Error('User not found!')
-    else{
-      const memberShip = await  membershipModel.find({memberShip : user?._id}).populate("res_id");
-      if(memberShip.length == 0) {
+    const { email } = req.params;
+    const user = await userModel.findOne({ email });
+    if (!user) throw new Error("User not found!");
+    else {
+      const memberShip = await membershipModel
+        .find({ memberShip: user?._id })
+        .populate("res_id");
+      if (memberShip.length == 0) {
         return res.status(200).send({});
       }
-      const formattedData =  memberShip.map((item) => ({
-        res_name : item?.res_id?.res_name || '' ,
-        res_img: item?.res_id?.img || ''
-      }))
-      res.status(200).send(formattedData) ;
+      const formattedData = memberShip.map((item) => ({
+        res_name: item?.res_id?.res_name || "",
+        res_img: item?.res_id?.img || "",
+      }));
+      res.status(200).send(formattedData);
+    }
+  } catch (error) {
+    responseError(res, 500, error, "Internal server error");
+  }
+};
+
+const generateOTP = () => {
+  const characters = "0123456789";
+  return Array.from(
+    { length: 4 },
+    () => characters[Math.floor(Math.random() * characters.length)]
+  ).join("");
+};
+const ReqForOTP = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const check_user = await userModel.findOne({ email });
+    if (!check_user) {
+      return res.status(200).send(true);
+    }
+    if (!check_user?.phone) {
+      return responseError(res, 404, {}, "User Does Not Have Phone Number");
+    }
+    const OTP = generateOTP();
+    const phone = check_user?.phone;
+    let cleanedNumber = phone.replace(/^\+88/, "");
+
+    let message = `Hello ${check_user?.name}, %0AYour OTP for changing password is ${OTP}%0ANever share your OTP with anyone.%0A-FOODIE`;
+
+    await userModel.findByIdAndUpdate(check_user?._id, { OTP }, { new: true });
+    const smsResponse = await axios.post(
+      `https://bulksmsbd.net/api/smsapi?api_key=${process.env.BULK_MESSAGE_API}&type=text&number=${cleanedNumber}&senderid=${process.env.BULK_MESSAGE_SENDER}&message=${message}`
+    );
+
+    console.log(smsResponse.data);
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res, 500, error, "Server Error");
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { otp, email } = req.body;
+
+    const user = await userModel.findOne({ email });
+    console.log(user, req.body);
+    if (user?.OTP != otp) {
+      return responseError(res, 400, {}, "Invalid OTP");
+    }
+    await userModel.findByIdAndUpdate(user?._id, { OTP: "" }, { new: true });
+    res.status(200).send({ success: true });
+  } catch (error) {
+    responseError(res, 500, error, "Server Error");
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { newPassword, email } = req.body;
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return responseError(res, 404, "User not found", "User Not Found!");
     }
 
+    let status = 200;
+    let success= true;
+    E_updatePassword(user?.firebase_UID, newPassword)
+      .then((res) => {
+        success
+      })
+      .catch((e) => {
+       success= false;
+       status = 400
+      });
+
+    res
+      .status(status)
+      .send({success: success });
   } catch (error) {
-    responseError(res,500,error,"Internal server error");
-    
+    responseError(res, 500, error);
   }
-}
+};
 
 module.exports = {
   signUp,
@@ -265,5 +351,8 @@ module.exports = {
   updateProfileAddress,
   updateProfile,
   searchUserByPhone,
-  viewMemberShipForUser
+  viewMemberShipForUser,
+  ReqForOTP,
+  verifyOTP,
+  resetPassword,
 };

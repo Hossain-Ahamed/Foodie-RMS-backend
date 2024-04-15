@@ -238,7 +238,7 @@ const createOrderForOnsite = async (req, res) => {
           branchID: branchID,
           user_id: user?._id,
           order_from: "ONSITE",
-          $ne: { status: "Completed" },
+          status: { $ne: "Completed" }
         });
 
         if (PreviousIncompletedOrder) {
