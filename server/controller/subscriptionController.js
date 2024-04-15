@@ -473,6 +473,28 @@ const subscription_Duration_For_All_Branches = async (req, res) => {
   }
 };
 
+const getTransactionForSingleRestaurant = async(req,res)=>{
+  try {
+    const {res_id,branchID} = req.params;
+
+    const transaction = await subscriptionModel.findOne({res_id:res_id ,branchID : branchID}).sort({date:-1}).populate("res_id branchID");
+    if(!transaction){
+      return res.status(404).json({message:"No transaction found with provided details."});
+    
+    } else{
+      res.status(200).send({res_id:transaction?.res_id?._id,
+      res_name:transaction?.res_id?.res_name,
+      branchID:transaction?.branchID?._id,
+      branch_name:transaction?.branchID?.branch_name,
+      transactions:transaction?.previousSubscriptions
+    })
+    }
+  
+  } catch (error) {
+    
+  }
+}
+
 
 
 
@@ -486,5 +508,6 @@ module.exports = {
   getSubscriptionPurchaseHistory,
   subscription_Duration_For_All_Branches,
   updatePackageAfterPaymentForNewBranch,
-  getPaymentDetailsForExtendAndAddBranch
+  getPaymentDetailsForExtendAndAddBranch,
+  getTransactionForSingleRestaurant,
 };
