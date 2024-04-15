@@ -74,6 +74,8 @@ const {
   getPaymentDetailsForExtendAndAddBranch,
   updatePackageAfterPaymentForNewBranch,
   getTransactionForSingleRestaurant,
+  getTransactionForAllRestaurant,
+  paidToRestaurantInRestaurantOnlineBill,
 } = require("../controller/subscriptionController");
 
 const {
@@ -543,8 +545,15 @@ router.patch("/handle-proceed-to-ready-to-delivery/:orderID",handleProceedTORead
 router.patch("/handle-proceed-to-delivered/:orderID",verifyOtpAndCompleteOrder);
 
 router.get("/admin/restaurant/:res_id/all-customers",getUniqueUsersByRestaurant);
-router.get("/admin/restaurant/:res_id/branch/:branchID/transaction",getTransactionForSingleRestaurant)
-router.get("/admin/restaurant/branch/:branchID/statistics",getRevenueAndOrderCount)
+router.get("/admin/restaurant/:res_id/transaction",getTransactionForSingleRestaurant)
+
+
+
+router.get("/branch-wise-transactions-all-foodie-site",getTransactionForAllRestaurant) // all transaction for dev site 
+
+router.patch("/add-payment-to-res-owner",paidToRestaurantInRestaurantOnlineBill) // all transaction for dev site 
+
+
 
 
 

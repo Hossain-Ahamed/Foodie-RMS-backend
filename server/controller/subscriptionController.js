@@ -10,6 +10,7 @@ const { responseError } = require("../utils/utility.js");
 const mongoose = require("mongoose");
 const subscriptionModel = require("../model/subscriptionModel");
 const subcripstionPackages = require("../model/subcripstionPackages");
+const restaurantOnlineTransactionBillModel = require("../model/restaurantOnlineTransactionBillModel.js");
 // This is your test secret API key.
 const stripe = require("stripe")(
   "sk_test_51NxHA3BTo76s02AIpHmn0d0gRVmFKqznGxcwKiHQ1eslceVjz5cQC7jKn3a8GnsQ0IoDhxNGZoRZPDXKEzYQQErN00aE7u24Le"
@@ -475,25 +476,50 @@ const subscription_Duration_For_All_Branches = async (req, res) => {
 
 const getTransactionForSingleRestaurant = async(req,res)=>{
   try {
-    const {res_id,branchID} = req.params;
+    const {res_id} = req.params;
 
-    const transaction = await subscriptionModel.findOne({res_id:res_id ,branchID : branchID}).sort({date:-1}).populate("res_id branchID");
-    if(!transaction){
-      return res.status(404).json({message:"No transaction found with provided details."});
-    
-    } else{
-      res.status(200).send({res_id:transaction?.res_id?._id,
-      res_name:transaction?.res_id?.res_name,
-      branchID:transaction?.branchID?._id,
-      branch_name:transaction?.branchID?.branch_name,
-      transactions:transaction?.previousSubscriptions
-    })
-    }
+    const transaction = await restaurantOnlineTransactionBillModel.find({res_id:res_id}).sort({date:-1}).populate("res_id branchID");
+    res.status(200).send(transaction)
+     
   
   } catch (error) {
-    
+    responseError(res,500,error)
   }
 }
+
+const getTransactionForAllRestaurant = async(req,res)=>{
+  try {
+    const transaction = await restaurantOnlineTransactionBillModel.find({}).sort({date:-1}).populate("res_id branchID");
+   res.status(200).send(transaction)
+    
+  
+  } catch (error) {
+    responseError(res,500,error)
+  }
+}
+
+const paidToRestaurantInRestaurantOnlineBill = async (req, res) => {
+  try {
+    const { _id, amount } = req.body;
+
+    const restaurantBill = await restaurantOnlineTransactionBillModel.findByIdAndUpdate(
+      _id,
+      {
+        $inc: { paid: amount }, // Increment paid by amount
+        $push: { paidToRestaurant: { 
+          ammount: amount,
+          date : new Date()
+         } } // Push new object to paidToRestaurant array
+      },
+      { new: true }
+    );
+
+    res.status(200).send(restaurantBill);
+  } catch (error) {
+    responseError(res, 500, error, "Internal Server Error");
+  }
+};
+
 
 
 
@@ -510,4 +536,6 @@ module.exports = {
   updatePackageAfterPaymentForNewBranch,
   getPaymentDetailsForExtendAndAddBranch,
   getTransactionForSingleRestaurant,
+  getTransactionForAllRestaurant,
+  paidToRestaurantInRestaurantOnlineBill
 };
