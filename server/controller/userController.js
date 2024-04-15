@@ -7,7 +7,6 @@ const mutex = new Mutex();
 const signUp = async (req, res) => {
   try {
     const { name, email, firebase_UID, password, phone } = req.body;
-    console.log(req.body);
 
     try {
       const checkUser = await userModel.findOne({ email: email });
@@ -46,7 +45,6 @@ const JWTtoken = async (req, res) => {
   const { name, email, firebase_UID, password, phone, imgURL } = req.body;
   try {
     const release = await mutex.acquire();
-    console.log(req.body);
 
     let user = await userModel.findOne({ email: email });
     if (!user) {
@@ -85,7 +83,6 @@ const JWTtoken = async (req, res) => {
     });
     release(); // Release the mutex lock
   } catch (error) {
-    console.log(error);
     responseError(res, 500, "Internal server error");
   }
 };
@@ -93,7 +90,6 @@ const JWTtoken = async (req, res) => {
 const checktoken = (req, res, next) => {
   const id = req.cookies._ut;
   const userId = req.params.userId;
-  // console.log(req.body);
   if (!id) {
     return res.status(401).send({
       msg: "unauthorized",
@@ -122,7 +118,6 @@ const signout = async (req, res) => {
   } catch {
     (e) => {
       res.status(401).send(false);
-      console.log(e);
     };
   }
 };
@@ -131,9 +126,7 @@ const getProfile = async (req, res) => {
     // const release = await mutex.acquire();
     const email = req.params.email;
     const user = await userModel.findOne({ email: email }, "-password");
-    console.log("hello", user, email)
     if (!user) {
-      console.log(user, email);
       responseError(res, 401, null, "User not found");
       return
     }
@@ -157,9 +150,7 @@ const updateProfile = async (req, res) => {
   try {
     const { email } = req.params;
     let { name, phone, gender, img } = req.body;
-    console.log(req.body);
     const user = await userModel.findOne({ email: email });
-    // console.log(user);
 
     if (user) {
       const updatedUser = await userModel.findByIdAndUpdate(
@@ -188,11 +179,9 @@ const updateProfile = async (req, res) => {
 
 const updateProfileAddress = async (req, res) => {
   try {
-    //console.log(req.body);
     const { email } = req.params;
     const { streetAddress, city, stateProvince, postalCode, country } =
       req.body;
-    //console.log(decoded);
     //const _id,address = req.body;
     //   {
     //     "streetAddress": "J A M T O L A",
