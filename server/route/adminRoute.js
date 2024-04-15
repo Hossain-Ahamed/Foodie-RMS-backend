@@ -73,6 +73,7 @@ const {
   subscription_Duration_For_All_Branches,
   getPaymentDetailsForExtendAndAddBranch,
   updatePackageAfterPaymentForNewBranch,
+  getTransactionForSingleRestaurant,
 } = require("../controller/subscriptionController");
 
 const {
@@ -541,6 +542,7 @@ router.patch("/handle-proceed-to-ready-to-delivery/:orderID",handleProceedTORead
 router.patch("/handle-proceed-to-delivered/:orderID",verifyOtpAndCompleteOrder);
 
 router.get("/admin/restaurant/:res_id/all-customers",getUniqueUsersByRestaurant);
+router.get("/admin/restaurant/:res_id/branch/:branchID/transaction",getTransactionForSingleRestaurant)
 
 
 
