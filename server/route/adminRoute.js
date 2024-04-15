@@ -16,6 +16,7 @@ const {
   allBranchesOfSuperAdmin,
   allDeliveryBoyForBranch,
   assignDeliveryPartnerForOffsiteOrder,
+  resetPasswordRMSEmployeePassword,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -556,6 +557,8 @@ router.patch("/add-payment-to-res-owner",paidToRestaurantInRestaurantOnlineBill)
 
 router.get("/admin/restaurant/branch/:branchID/statistics",getRevenueAndOrderCount);
 
+
+router.post("/change-rms-passwords",resetPasswordRMSEmployeePassword) //reset rms employee pass
 
 module.exports = router;
 

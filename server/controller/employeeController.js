@@ -2,7 +2,11 @@
 const Employee = require("../model/employeeModel");
 const { responseError } = require("../utils/utility");
 const createClient = require("./clientController");
-const { createUserAccount } = require("../config/firbase-config.js");
+const {
+  createUserAccount,
+  updatePassword,
+  getUserByEmail,
+} = require("../config/firbase-config.js");
 const admin = require("firebase-admin");
 const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
@@ -10,6 +14,7 @@ const branchModel = require("../model/branchModel");
 const restaurantModel = require("../model/restaurantModel");
 const sendMail = require("../utils/sendEmail.js");
 const orderModel = require("../model/orderModel.js");
+const clientModel = require("../model/clientModel.js");
 const addEmployee = async (req, res) => {
   try {
     const {
@@ -448,9 +453,9 @@ const deleteEmployeeById = async (req, res) => {
 };
 const SearchEmployee = async (req, res) => {
   try {
-    const {data} = req.body;
+    const { data } = req.body;
     console.log(data);
-    const regex = new RegExp(data, 'i'); // 'i' flag for case-insensitive search
+    const regex = new RegExp(data, "i"); // 'i' flag for case-insensitive search
 
     // Perform the search using regex on relevant fields
     const searchData = await Employee.find({
@@ -459,8 +464,8 @@ const SearchEmployee = async (req, res) => {
         { l_name: { $regex: regex } },
         { email: { $regex: regex } },
         { mobile: { $regex: regex } },
-        { nid: { $regex: regex } } // If you want to include NID in the search
-      ]
+        { nid: { $regex: regex } }, // If you want to include NID in the search
+      ],
     });
     res.status(200).send(searchData);
   } catch (error) {
@@ -727,7 +732,7 @@ const employeeRole = async (req, res) => {
 
 const allBranchesOfSuperAdmin = async (req, res) => {
   try {
-    const { email ,res_id} = req.params;
+    const { email, res_id } = req.params;
 
     const response = [];
     if (!email) {
@@ -804,13 +809,13 @@ const employeeLogin = async (req, res) => {
   }
 };
 
-const allDeliveryBoyForBranch = async(req,res)=>{
+const allDeliveryBoyForBranch = async (req, res) => {
   try {
-    const {branchID,res_id} = req.params;
+    const { branchID, res_id } = req.params;
     const employees = await Employee.find({
       "permitted.res_id": res_id,
       "permitted.branchID": branchID,
-      "permitted.role" : "Delivery Boy"
+      "permitted.role": "Delivery Boy",
     }).select("f_name l_name email profilePhoto nid _id mobile permitted");
 
     const formattedEmployees = await Promise.all(
@@ -856,51 +861,93 @@ const allDeliveryBoyForBranch = async(req,res)=>{
 
     res.status(200).send(formattedEmployees);
   } catch (error) {
-    responseError( res, 500, error);
+    responseError(res, 500, error);
   }
-}
+};
 
-const assignDeliveryPartnerForOffsiteOrder = async (req,res)=>{
+const assignDeliveryPartnerForOffsiteOrder = async (req, res) => {
   try {
-    const {res_id,branchID} = req.params;
-    const {_id,message,orderID }=req.body;
+    const { res_id, branchID } = req.params;
+    const { _id, message, orderID } = req.body;
 
     const employee = await Employee.findById(_id);
-    if(!employee){
+    if (!employee) {
       return responseError(res, 400, "Employee not found!");
     }
 
-    
     const exist = await orderModel.findById(orderID);
 
-    console.log(exist)
-  
-    const  order = await orderModel.findByIdAndUpdate(orderID,{
-      $set:{
-        deliveryPartner:{
-          Employee_id :employee?._id, 
-          name: employee?.f_name+" "+employee?.l_name, 
-          phone: employee?.mobile, 
-          email: employee?.email
-        },
-        status: "Shipped"
-    },
-      $push:{
-        orderStatus:{name: "Shipped" , message: message, time: new Date()},
-      }
-    },{new : true});
+    console.log(exist);
 
-    console.log(order)
-    if(!order){
+    const order = await orderModel.findByIdAndUpdate(
+      orderID,
+      {
+        $set: {
+          deliveryPartner: {
+            Employee_id: employee?._id,
+            name: employee?.f_name + " " + employee?.l_name,
+            phone: employee?.mobile,
+            email: employee?.email,
+          },
+          status: "Shipped",
+        },
+        $push: {
+          orderStatus: { name: "Shipped", message: message, time: new Date() },
+        },
+      },
+      { new: true }
+    );
+
+    console.log(order);
+    if (!order) {
       return responseError(res, 400, "Order not found!");
     }
 
-    res.status(200).send(order)
-
+    res.status(200).send(order);
   } catch (error) {
     return responseError(res, 500, error);
   }
-}
+};
+
+const resetPasswordRMSEmployeePassword = async (req, res) => {
+  try {
+    const { email, oldPass, newPass } = req.body;
+
+    const employee = await clientModel.findOne({ email });
+
+    if (!employee) {
+      return responseError(res, 404, "Employee not found", "Employee Not Available!");
+    }
+
+    if (employee.password !== oldPass) {
+      return responseError(res, 404, {}, "Wrong Old Password");
+    }
+
+    if (newPass.length < 6) {
+      return responseError(res, 400, {}, "Password must be at least 6 characters long");
+    }
+
+   
+    
+    // Update password in Firebase
+    try {
+      const user = await getUserByEmail(employee.email);
+      await updatePassword(user.uid, newPass);
+    } catch (error) {
+      console.error("Error updating password in Firebase:", error);
+      throw new Error("Error updating password in Firebase");
+    }
+
+     // Update employee's password
+     employee.password = newPass;
+    await employee.save();
+    
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res, 500, error, "Internal Server Error");
+  }
+};
+
 
 module.exports = {
   employeeRole,
@@ -919,4 +966,5 @@ module.exports = {
   allBranchesOfSuperAdmin,
   allDeliveryBoyForBranch,
   assignDeliveryPartnerForOffsiteOrder,
+  resetPasswordRMSEmployeePassword,
 };

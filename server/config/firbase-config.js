@@ -30,8 +30,15 @@ const deleteUser = ({ uid }) => {
     console.log("Firebase service :: deleteUser :: error", error);
   }
 };
-
-const updatePassword = ({ uid, password }) => {
+const getUserByEmail =async (email)=>{
+  try {
+ 
+    return  admin1.auth().getUserByEmail(email);
+  } catch (error) {
+    console.log("Firebase service :: updatePassword :: error", error);
+  }
+}
+const updatePassword = ( uid, password ) => {
   try {
     const updatePass = admin1.auth().updateUser(uid, {
       password: password,
@@ -76,6 +83,7 @@ const E_updatePassword = (uid, password) => {
 
 module.exports = {
   createUserAccount,
+  getUserByEmail,
   deleteUser,
   updatePassword,
   E_createUserAccount,
