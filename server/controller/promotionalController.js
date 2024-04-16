@@ -4,12 +4,12 @@ const Branch = require("../model/branchModel");
 
 const storyView = async(req,res)=>{
     try {
-        const {city} = req.body;
+        const {city} = req.params;
         const branches = await Branch.find({ city });
         const branchIds = branches.map(branch => branch._id);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
-        const imgArrays = [];
+        let imgArrays = [];
         for(const branchId of branchArray){
             const stories = await Story.find({branchID: branchId});
             const imgs = stories.map(story => story.img);
@@ -24,20 +24,71 @@ const storyView = async(req,res)=>{
 
 const shortView = async(req,res)=>{
     try {
-        const {city} = req.body;
-        const branches = await Branch.find({ city });
+        const branches = await Branch.find();
         const branchIds = branches.map(branch => branch._id);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
-        const videoArrays = [];
+        let videoArrays = [];
         for(const branchId of branchArray){
-            const shorts = await Short.find({branchID: branchId});
-            const short = shorts.map(s => s);
-            videoArrays.push(short);
+            const shorts = await Short.find({branchID: branchId}).populate('res_id branchID');
+            for(const short of shorts){
+                let {_id, videoFile, likeCount,dislikeCount, res_id, branchID} = short
+                const reelInfo ={
+                    url: videoFile,
+                    type:'video/mp4',
+                    description:`#Foddie #${res_id.res_name}`,
+                    postedBy:{
+                        avatar: res_id.img,
+                        name: res_id.res_name,
+                    },
+                    likes:{
+                        count: likeCount || 0
+                    },
+                    dislikes:{
+                        count: dislikeCount || 0
+                    }
+                };
+                const a = {
+                    id: _id,
+                    reelInfo,
+                }
+                videoArrays.push(a);
+            }
         }
-        res.send(200).json(videoArrays);
+        res.status(200).json(videoArrays);
     } catch (error) {
       console.error("Error: ", error);
       res.status(500).json({ error: "Failed" });
     }
 }
+const updateLikeCount = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const shortVideo = await Short.findById(id);
+      if (!shortVideo) {
+        return res.status(404).json({ message: 'Short video not found' });
+      }
+      shortVideo.likeCount++;
+      await shortVideo.save();
+      res.json({ message: 'Like count updated successfully' });
+    } catch (error) {
+      console.error('Error updating like count:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  const updateDislikeCount = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const shortVideo = await Short.findById(id);
+      if (!shortVideo) {
+        return res.status(404).json({ message: 'Short video not found' });
+      }
+      shortVideo.dislikeCount++;
+      await shortVideo.save();
+      res.json({ message: 'Dislike count updated successfully' });
+    } catch (error) {
+      console.error('Error updating dislike count:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+module.exports = {shortView,storyView,updateLikeCount,updateDislikeCount}
