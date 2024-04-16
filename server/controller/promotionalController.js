@@ -7,13 +7,20 @@ const storyView = async (req, res) => {
         const { city } = req.params;
         const branches = await Branch.find({ city: city }).populate('res_id');
         const branchIds = branches.map(branch => branch._id);
+        const branchImgs = branches.map(branch => branch.res_id.img);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
         let imgArrays = [];
         for (const branchId of branchArray) {
             const stories = await Story.find({ branchID: branchId });
             const imgs = stories.map(story => story.img);
-            imgArrays.push(imgs);
+            for(const branchImg of branchImgs){
+                const c = {
+                    branchimg: branchImg,
+                    Imgs: imgs
+                }
+            }
+            imgArrays.push(c);
         }
         const b = {
             stories: imgArrays,
