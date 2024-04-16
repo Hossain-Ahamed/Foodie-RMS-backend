@@ -3,6 +3,7 @@ const categoryModel = require("../model/categoryModel");
 const branchModel = require("../model/branchModel.js");
 const restaurantModel = require("../model/restaurantModel.js");
 const { responseError } = require("../utils/utility.js");
+const facebookAppIDModel = require("../model/facebookAppIDModel.js");
 
 // create dishes
 
@@ -256,6 +257,8 @@ const deleteDish = async (req, res) => {
           categoriesWithDishes.push({ category: category, dishes: dishes });
       }
 
+      const facebookIntent = await facebookAppIDModel.findOne({branchID: branch._id});
+
       // Prepare and return the result
       const result = {
           restaurant_name: restaurant.res_name,
@@ -269,7 +272,8 @@ const deleteDish = async (req, res) => {
               postalCode: branch.postalCode,
               country: branch.country
           },
-          dishes: categoriesWithDishes
+          dishes: categoriesWithDishes,
+          facebookIntent : facebookIntent
       };
 
       res.status(200).send( result);

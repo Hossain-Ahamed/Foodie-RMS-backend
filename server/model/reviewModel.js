@@ -7,7 +7,7 @@ const reviewSchema = new mongoose.Schema({
   },
   branchID: {
     type: mongoose.ObjectId,
-    ref: "Branchs",
+    ref: "Branches",
   },
   user: {
     type: mongoose.ObjectId,

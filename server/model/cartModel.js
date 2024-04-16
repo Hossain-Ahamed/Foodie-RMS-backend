@@ -9,7 +9,7 @@ const cartSchema = new mongoose.Schema(
     },
     branchID: {
     type: mongoose.ObjectId,
-    ref: "Branchs",
+    ref: "Branches",
     required: true,
     },
     user_id: {

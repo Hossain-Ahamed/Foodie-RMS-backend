@@ -8,7 +8,7 @@ const tableSchema = new mongoose.Schema({
   },
   branchID: {
     type: mongoose.ObjectId,
-    ref: "Branchs",
+    ref: "Branches",
     required: true,
   },
   number: {
