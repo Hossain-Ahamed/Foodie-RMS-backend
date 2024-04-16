@@ -13,6 +13,7 @@ const employeeModel = require("../model/employeeModel.js");
 const subcripstionPackages = require("../model/subcripstionPackages.js");
 const sendMail = require("../utils/sendEmail.js");
 const { link } = require("fs/promises");
+const facebookAppIDModel = require("../model/facebookAppIDModel.js");
 
 // create branch
 
@@ -556,6 +557,17 @@ console.log(bdTime)
   return currentTime >= startTime && currentTime <= endTime;
 }
 
+const facebook_appID_pageID_saved = async (req,res)=>{
+  try {
+    const {res_id,branchID}= req.param;
+    const {appID, pageID} = req.body;
+    const data = await new facebookAppIDModel({res_id,branchID,appID, pageID}).save();
+    res.status(200).send(true);
+  } catch (error) {
+    responseError(res,500,error,"internal server error");
+  }
+}
+
 module.exports = {
   addTables,
   getAllBranch,
@@ -573,4 +585,5 @@ module.exports = {
   updateBranch,
   getAllRestaurantOf_A_City,
   checkBusinessHours,
+  facebook_appID_pageID_saved,
 };

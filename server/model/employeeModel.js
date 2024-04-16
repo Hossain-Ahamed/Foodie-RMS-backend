@@ -82,7 +82,7 @@ const employeeSchema = new mongoose.Schema(
         },
         branchID: {
           type: mongoose.ObjectId,
-          ref: "Branchs",
+          ref: "Branches",
         },
         role: {
           type: String,

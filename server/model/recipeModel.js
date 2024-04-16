@@ -8,7 +8,7 @@ const recipeSchema = new mongoose.Schema(
     },
     branchID: {
       type: mongoose.ObjectId,
-      ref: "Branchs",
+      ref: "Branches",
     },
     dish: {
       type: String,
