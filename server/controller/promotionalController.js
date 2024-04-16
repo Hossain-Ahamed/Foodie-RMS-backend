@@ -9,7 +9,7 @@ const storyView = async(req,res)=>{
         const branchIds = branches.map(branch => branch._id);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
-        const imgArrays = [];
+        let imgArrays = [];
         for(const branchId of branchArray){
             const stories = await Story.find({branchID: branchId});
             const imgs = stories.map(story => story.img);
@@ -24,16 +24,36 @@ const storyView = async(req,res)=>{
 
 const shortView = async(req,res)=>{
     try {
-        const {city} = req.body;
-        const branches = await Branch.find({ city });
+        const branches = await Branch.find();
         const branchIds = branches.map(branch => branch._id);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
-        const videoArrays = [];
+        let videoArrays = [];
         for(const branchId of branchArray){
-            const shorts = await Short.find({branchID: branchId});
-            const short = shorts.map(s => s);
-            videoArrays.push(short);
+            const shorts = await Short.find({branchID: branchId}).populate('res_id branchID');
+            for(const short of shorts){
+                let {_id, videoFile, likeCount,dislikeCount, res_id, branchID} = short
+                const reelInfo ={
+                    url: videoFile,
+                    type:'video/mp4',
+                    description:`#Foddie #${res_id.res_name}`,
+                    postedBy:{
+                        avatar: res_id.img,
+                        name: res_id.res_name,
+                    },
+                    likes:{
+                        count: likeCount || 0
+                    },
+                    dislikes:{
+                        count: dislikeCount || 0
+                    }
+                };
+                const a = {
+                    id: _id,
+                    reelInfo,
+                }
+                videoArrays.push(a);
+            }
         }
         res.send(200).json(videoArrays);
     } catch (error) {
@@ -41,3 +61,5 @@ const shortView = async(req,res)=>{
       res.status(500).json({ error: "Failed" });
     }
 }
+
+module.exports = {shortView,storyView}
