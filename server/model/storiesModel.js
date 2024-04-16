@@ -8,7 +8,7 @@ const storySchema = new mongoose.Schema(
     },
     branchID: {
       type: mongoose.ObjectId,
-      ref: "Branchs",
+      ref: "Branches",
     },
     img: {
       type: String,

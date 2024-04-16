@@ -8,7 +8,7 @@ const printingSetUpSchema = new mongoose.Schema(
     },
     branchID: {
       type: mongoose.ObjectId,
-      ref: "Branchs",
+      ref: "Branches",
     },
     headerText: {
       type: String,
