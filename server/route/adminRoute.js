@@ -576,6 +576,12 @@ router.get("/admin/restaurant/:res_id/branch/:branchID/table-data",readReservati
 router.patch("/admin/restaurant/:res_id/branch/:branchID/reserve-table/:_id",confirmReservation);
 router.delete("/admin/restaurant/:res_id/branch/:branchID/delete-reservation/:_id",cancelAndDeleteReservation);
 
+
+//promotional
+const {shortView,storyView} = require("../controller/promotionalController");
+router.get("/restaurant/all-restaurant-reels",shortView);
+router.get("",storyView);
+
 module.exports = router;
 
 
