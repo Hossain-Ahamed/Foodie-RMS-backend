@@ -50,7 +50,7 @@ router.post("/rms-employee-jwt",employeeLogin);
 
 router.get("/restaurant/:res_id/branch/:branchID/single-restaurant-all-data",getRestaurantBranchDetailsWithCategoryAndDishes); //all data for a single restaurant
 
-router.get('/all-restaurant/city/:city',getAllRestaurantOf_A_City) //get all restaurant of a city
+router.get('/city/:city',getAllRestaurantOf_A_City) //get all restaurant of a city
 
 
 

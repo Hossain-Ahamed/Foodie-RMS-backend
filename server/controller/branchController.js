@@ -559,10 +559,29 @@ console.log(bdTime)
 
 const facebook_appID_pageID_saved = async (req,res)=>{
   try {
-    const {res_id,branchID}= req.param;
+    const {res_id,branchID}= req.params;
     const {appID, pageID} = req.body;
-    const data = await new facebookAppIDModel({res_id,branchID,appID, pageID}).save();
+    const data = await facebookAppIDModel.findOne({branchID:branchID});
+    if(!data){
+
+      const data1 = await new facebookAppIDModel({res_id,branchID,appID, pageID}).save();
+    }else{
+
+      await facebookAppIDModel.findByIdAndUpdate({_id:data._id},{appID, pageID},{new:true});
+    }
+
     res.status(200).send(true);
+  } catch (error) {
+    responseError(res,500,error,"internal server error");
+  }
+}
+
+const get_facebook_appID_pageID = async (req,res)=>{
+  try {
+    const {res_id,branchID}= req.params;
+    const data = await facebookAppIDModel.findOne({branchID:branchID});
+    console.log(data)
+    res.status(200).send(data);
   } catch (error) {
     responseError(res,500,error,"internal server error");
   }
@@ -586,4 +605,5 @@ module.exports = {
   getAllRestaurantOf_A_City,
   checkBusinessHours,
   facebook_appID_pageID_saved,
+  get_facebook_appID_pageID
 };
