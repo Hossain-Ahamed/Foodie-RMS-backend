@@ -4,6 +4,7 @@ const { responseError } = require("../utils/utility");
 const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
 const orderModel = require("../model/orderModel");
+const { default: mongoose } = require("mongoose");
 const devLogIn = async (req, res) => {
   try {
     const { email } = req.body;
@@ -188,12 +189,15 @@ const getRevenueAndOrderCount = async(req,res)=> {
 
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
+    const branchObjectId = new mongoose.Types.ObjectId(branchID)
 
-    const result = await orderModel.aggregate([
+    const result = await orderModel.aggregate
+    ([
       {
         $match: {
           createdAt: { $gte: startDate, $lte: endDate },
-          status: { $in: ["Delivered","Completed"] }
+          status: { $in: ["Delivered","Completed"] },
+          branchID : branchObjectId,
         }
       },
       {
@@ -209,11 +213,96 @@ const getRevenueAndOrderCount = async(req,res)=> {
         $sort: { _id: 1 }
       }
     ]);
+    const result1 = await orderModel.aggregate
+    ([
+      {
+        $match: {
+          createdAt: { $gte: startDate, $lte: endDate },
+          branchID : branchObjectId // Convert branchID to ObjectId if needed
+        }
+      },
+      {
+        $group: {
+          _id: "$status",
+          orderCount: { $sum: 1 }
+        }
+      },
+      
+    ]);
+    // ([
+    //   {
+    //     $match: {
+    //       createdAt: { $gte: startDate, $lte: endDate },
+    //       status: { $nin: ["Cancelled", "New Dish Added"] }
+    //     }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: { status: "$status", branchID: "$branchID" },
+    //       revenue: { $sum: "$finalPrice" },
+    //       orderCount: { $sum: 1 }
+    //     }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: "$_id.branchID",
+    //       statusData: {
+    //         $push: {
+    //           status: "$_id.status",
+    //           revenue: "$revenue",
+    //           orderCount: "$orderCount"
+    //         }
+    //       }
+    //     }
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 0,
+    //       branchID: "$_id",
+    //       statusData: 1
+    //     }
+    //   }
+    // ]);
+    const result2 = await orderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: { $in: ["Delivered","Completed"] },
+          branchID: branchObjectId // Convert branchID to ObjectId if needed
+        }
+      },
+      {
+        $project: {
+          hour: { $hour: "$createdAt" }, // Extract hour from createdAt field
+          finalPrice: 1
+        }
+      },
+      {
+        $group: {
+          _id: "$hour",
+          revenue: { $sum: "$finalPrice" },
+          orderCount: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          hour: "$_id",
+          revenue: 1,
+          orderCount: 1
+        }
+      },
+      {
+        $sort: { hour: 1 }
+      }
+    ]);
 
-    res.status(200).send (result);
+
+
+    res.status(200).send ({daywise:result,status:result1,Hour:result2});
   } catch (error) {
     console.error("Error:", error);
-    responseError(res,500,error,"internal")
+    responseError(res,500,error,"internal server")
   }
 }
 
