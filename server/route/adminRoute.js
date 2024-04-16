@@ -52,6 +52,8 @@ const {
   addTables,
   barnchTableDelete,
   getBranchDetail,
+  get_facebook_appID_pageID,
+  facebook_appID_pageID_saved,
 } = require("../controller/branchController");
 
 const {
@@ -583,6 +585,10 @@ router.get("/restaurant/all-restaurant-reels",shortView);
 router.get("/restaurant/update-like-count/:id",updateLikeCount);
 router.get("/restaurant/update-dislike-count/:id",updateDislikeCount);
 router.get("/all-restaurant/city/:city",deleteExpiredStories,storyView);
+
+
+router.get("/restaurant/:res_id/branch/:branchID/admin-facebook-data",get_facebook_appID_pageID)
+router.post("/restaurant/:res_id/branch/:branchID/admin-facebook-data",facebook_appID_pageID_saved)
 
 module.exports = router;
 
