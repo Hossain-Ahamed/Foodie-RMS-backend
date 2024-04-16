@@ -14,16 +14,19 @@ const storyView = async (req, res) => {
         for (const branchId of branchArray) {
             const stories = await Story.find({ branchID: branchId });
             const imgs = stories.map(story => story.img);
+            let c;
             for(const branchImg of branchImgs){
-                const c = {
-                    branchimg: branchImg,
-                    Imgs: imgs
+                if(imgs){
+                    c = {
+                        branchimg: branchImg,
+                        Imgs: imgs
+                    }
                 }
             }
             imgArrays.push(c);
         }
         const b = {
-            stories: imgArrays,
+            stories: imgArrays.filter(i => i.Imgs.length != 0),
             restaurants: branches,
         }
         res.status(200).json(b);
