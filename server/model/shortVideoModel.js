@@ -8,7 +8,7 @@ const shortVideoSchema = new mongoose.Schema(
     },
     branchID: {
       type: mongoose.ObjectId,
-      ref: "Branchs",
+      ref: "Branches",
     },
     videoFile: {
       type: String,

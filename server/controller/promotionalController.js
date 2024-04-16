@@ -55,7 +55,7 @@ const shortView = async(req,res)=>{
                 videoArrays.push(a);
             }
         }
-        res.send(200).json(videoArrays);
+        res.status(200).json(videoArrays);
     } catch (error) {
       console.error("Error: ", error);
       res.status(500).json({ error: "Failed" });
