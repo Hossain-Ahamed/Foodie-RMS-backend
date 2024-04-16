@@ -572,9 +572,9 @@ const {
 } = require("../controller/reservationController");
 router.post("/restaurant/:res_id/branch/:branchID/admin-table-reservation",createReservation);
 router.post("/restaurant/:res_id/branch/:branchID/customer-table-reservation/:user_id",createReservation);
-router.get("/admin/restaurant/${res_id}/branch/${branchID}/table-data",readReservations);
+router.get("/admin/restaurant/:res_id/branch/:branchID/table-data",readReservations);
 router.patch("/admin/restaurant/:res_id/branch/:branchID/reserve-table/:_id",confirmReservation);
-router.delete("",cancelAndDeleteReservation);
+router.delete("/admin/restaurant/:res_id/branch/:branchID/delete-reservation/:_id",cancelAndDeleteReservation);
 
 module.exports = router;
 
