@@ -4,7 +4,7 @@ const Branch = require("../model/branchModel");
 
 const storyView = async(req,res)=>{
     try {
-        const {city} = req.body;
+        const {city} = req.params;
         const branches = await Branch.find({ city });
         const branchIds = branches.map(branch => branch._id);
         const uniqueSet = new Set(branchIds);
@@ -61,5 +61,34 @@ const shortView = async(req,res)=>{
       res.status(500).json({ error: "Failed" });
     }
 }
-
-module.exports = {shortView,storyView}
+const updateLikeCount = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const shortVideo = await Short.findById(id);
+      if (!shortVideo) {
+        return res.status(404).json({ message: 'Short video not found' });
+      }
+      shortVideo.likeCount++;
+      await shortVideo.save();
+      res.json({ message: 'Like count updated successfully' });
+    } catch (error) {
+      console.error('Error updating like count:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  const updateDislikeCount = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const shortVideo = await Short.findById(id);
+      if (!shortVideo) {
+        return res.status(404).json({ message: 'Short video not found' });
+      }
+      shortVideo.dislikeCount++;
+      await shortVideo.save();
+      res.json({ message: 'Dislike count updated successfully' });
+    } catch (error) {
+      console.error('Error updating dislike count:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+module.exports = {shortView,storyView,updateLikeCount,updateDislikeCount}

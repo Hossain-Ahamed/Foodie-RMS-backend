@@ -578,9 +578,11 @@ router.delete("/admin/restaurant/:res_id/branch/:branchID/delete-reservation/:_i
 
 
 //promotional
-const {shortView,storyView} = require("../controller/promotionalController");
+const {shortView,storyView,updateLikeCount,updateDislikeCount} = require("../controller/promotionalController");
 router.get("/restaurant/all-restaurant-reels",shortView);
-router.get("",storyView);
+router.get("/restaurant/update-like-count/:id",updateLikeCount);
+router.get("/restaurant/update-dislike-count/:id",updateDislikeCount);
+router.get("/all-restaurant/city/:city",deleteExpiredStories,storyView);
 
 module.exports = router;
 
