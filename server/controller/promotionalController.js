@@ -5,18 +5,28 @@ const Branch = require("../model/branchModel");
 const storyView = async (req, res) => {
     try {
         const { city } = req.params;
-        const branches = await Branch.find({ city: city });
+        const branches = await Branch.find({ city: city }).populate('res_id');
         const branchIds = branches.map(branch => branch._id);
+        const branchImgs = branches.map(branch => branch.res_id.img);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
         let imgArrays = [];
         for (const branchId of branchArray) {
             const stories = await Story.find({ branchID: branchId });
             const imgs = stories.map(story => story.img);
-            imgArrays.push(imgs);
+            let c;
+            for(const branchImg of branchImgs){
+                if(imgs){
+                    c = {
+                        branchimg: branchImg,
+                        Imgs: imgs
+                    }
+                }
+            }
+            imgArrays.push(c);
         }
         const b = {
-            stories: imgArrays,
+            stories: imgArrays.filter(i => i.Imgs.length != 0),
             restaurants: branches,
         }
         res.status(200).json(b);
