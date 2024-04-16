@@ -5,7 +5,7 @@ const Branch = require("../model/branchModel");
 const storyView = async (req, res) => {
     try {
         const { city } = req.params;
-        const branches = await Branch.find({ city: city });
+        const branches = await Branch.find({ city: city }).populate('res_id');
         const branchIds = branches.map(branch => branch._id);
         const uniqueSet = new Set(branchIds);
         const branchArray = [...uniqueSet];
