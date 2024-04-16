@@ -105,8 +105,8 @@ router.get('/get-my-membership/:email',viewMemberShipForUser)
  *            Order List For User 
  */
 router.get("/all-order-list-user/:email",allOrderListForUser)
-router.get("/completed-order/restaurant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
-router.get("/ongoing-order/restuarant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
+router.get("/recent-orders/restaurant/:res_id/branch/:branchID/email/:email", allCompleteOrderForOnSite);    //user end
+router.get("/ongoing-orders/restaurant/:res_id/branch/:branchID/email/:email", onGoingOrderForOnSite);    //user end
 
 // -----------------------------------------------------------------------------------------
 
