@@ -560,6 +560,22 @@ router.get("/admin/restaurant/branch/:branchID/statistics",getRevenueAndOrderCou
 
 router.post("/change-rms-passwords",resetPasswordRMSEmployeePassword) //reset rms employee pass
 
+
+
+
+//table reservation
+const {
+  cancelAndDeleteReservation,
+    confirmReservation,
+    readReservations,
+    createReservation
+} = require("../controller/reservationController");
+router.post("/restaurant/:res_id/branch/:branchID/admin-table-reservation",createReservation);
+router.post("/restaurant/:res_id/branch/:branchID/customer-table-reservation/:user_id",createReservation);
+router.get("/admin/restaurant/${res_id}/branch/${branchID}/table-data",readReservations);
+router.patch("/admin/restaurant/:res_id/branch/:branchID/reserve-table/:_id",confirmReservation);
+router.delete("",cancelAndDeleteReservation);
+
 module.exports = router;
 
 

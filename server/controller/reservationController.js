@@ -1,5 +1,6 @@
 const Reservation =  require("../model/reservationModel");
-
+const Restaurant = require("../model/restaurantModel");
+const axios = require("axios");
 const createReservation = async (req, res) => {
     try {
       const {  user_name, user_phone, table_number, date, timeSlot, numberOfPeople,status } = req.body;
@@ -16,6 +17,17 @@ const createReservation = async (req, res) => {
         numberOfPeople,
         status
       }).save();
+      const res = await new Restaurant.findOne({ _id: res_id });
+
+      if(status){
+        let cleanedNumber = user_phone.replace(/^\+88/, '');
+        const message = `Dear ${user_name},
+
+        We're thrilled to inform you that your reservation at ${res.res_name} has been successfully approved! Your table is now reserved for ${date} at ${timeSlot}, and we can't wait to host you for a delightful dining experience.`
+        const smsResponse = await axios.post(
+          `https://bulksmsbd.net/api/smsapi?api_key=${process.env.BULK_MESSAGE_API}&type=text&number=${cleanedNumber}&senderid=${process.env.BULK_MESSAGE_SENDER}&message=${message}`
+        );
+      }
   
       res.status(201).json(newReservation);
     } catch (error) {
@@ -48,6 +60,8 @@ const createReservation = async (req, res) => {
       if (!table_number) {
         return res.status(400).json({ error: "Table number is required" });
       }
+      const c = await Reservation.findOne(_id);
+      const res = await new Restaurant.findOne({ _id: res_id });
   
       const updatedReservation = await Reservation.findByIdAndUpdate(
         _id,
@@ -57,6 +71,13 @@ const createReservation = async (req, res) => {
       if (!updatedReservation) {
         return res.status(404).json({ error: "Reservation not found" });
       }
+      let cleanedNumber = c.user_phone.replace(/^\+88/, '');
+      const message = `Dear ${c.user_name},
+
+        We're thrilled to inform you that your reservation at ${res.res_name} has been successfully approved! Your table is now reserved for ${c.date} at ${c.timeSlot}, and we can't wait to host you for a delightful dining experience.`
+      const smsResponse = await axios.post(
+          `https://bulksmsbd.net/api/smsapi?api_key=${process.env.BULK_MESSAGE_API}&type=text&number=${cleanedNumber}&senderid=${process.env.BULK_MESSAGE_SENDER}&message=${message}`
+        );
       res.status(200).json(updatedReservation);
     } catch (error) {
       console.error("Error confirming reservation:", error);
@@ -72,11 +93,21 @@ const createReservation = async (req, res) => {
       if (!reservation) {
         return res.status(404).json({ error: "Reservation not found" });
       }
-      if (reservation.status === "cancelled") {
-        return res.status(400).json({ error: "Reservation already cancelled" });
+      if (reservation.status === "confirmed") {
+        await Reservation.findByIdAndDelete(_id);
+        return res.status(200).json({ error: "Reservation deleted" });
       }
       reservation.status = "cancelled";
       await reservation.save();
+      const c = await Reservation.findOne(_id);
+      const res = await new Restaurant.findOne({ _id: res_id });
+      let cleanedNumber = user_phone.replace(/^\+88/, '');
+      const message = `Dear ${c.user_name},
+
+          We hope this message finds you well. We regret to inform you that your reservation at ${res.res_name} for ${c.date} at ${c.timeSlot} has been canceled.`
+      const smsResponse = await axios.post(
+          `https://bulksmsbd.net/api/smsapi?api_key=${process.env.BULK_MESSAGE_API}&type=text&number=${cleanedNumber}&senderid=${process.env.BULK_MESSAGE_SENDER}&message=${message}`
+        );
       await Reservation.findByIdAndDelete(_id);
       res.status(200).json({ message: "Reservation cancelled and deleted successfully" });
     } catch (error) {
