@@ -3,6 +3,7 @@ const devModel = require("../model/devModel");
 const { responseError } = require("../utils/utility");
 const uuid = require("uuid");
 const JWT = require("jsonwebtoken");
+const orderModel = require("../model/orderModel");
 const devLogIn = async (req, res) => {
   try {
     const { email } = req.body;
@@ -174,6 +175,48 @@ const deleteDevAccount = async (req, res) => {
   }
 };
 
+const getRevenueAndOrderCount = async(req,res)=> {
+  try {
+    const {branchID} = req.params;
+    console.log(branchID,"this is branch id")
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 2);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+
+    const result = await orderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: { $in: ["Delivered","Completed"] }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+          },
+          revenue: { $sum: "$finalPrice" },
+          orderCount: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    res.status(200).send (result);
+  } catch (error) {
+    console.error("Error:", error);
+    responseError(res,500,error,"internal")
+  }
+}
+
 module.exports = {
   devFindByUID,
   CreateDev,
@@ -181,4 +224,5 @@ module.exports = {
   getDevProfile,
   deleteDevAccount,
   devLogIn,
+  getRevenueAndOrderCount
 };

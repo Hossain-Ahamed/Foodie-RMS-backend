@@ -16,6 +16,7 @@ const {
   allBranchesOfSuperAdmin,
   allDeliveryBoyForBranch,
   assignDeliveryPartnerForOffsiteOrder,
+  resetPasswordRMSEmployeePassword,
   // createUAccount,
 } = require("../controller/employeeController");
 
@@ -73,6 +74,9 @@ const {
   subscription_Duration_For_All_Branches,
   getPaymentDetailsForExtendAndAddBranch,
   updatePackageAfterPaymentForNewBranch,
+  getTransactionForSingleRestaurant,
+  getTransactionForAllRestaurant,
+  paidToRestaurantInRestaurantOnlineBill,
 } = require("../controller/subscriptionController");
 
 const {
@@ -97,6 +101,7 @@ const {
   getAllDev,
   deleteDevAccount,
   devLogIn,
+  getRevenueAndOrderCount,
 } = require("../controller/devController");
 
 const {
@@ -541,8 +546,19 @@ router.patch("/handle-proceed-to-ready-to-delivery/:orderID",handleProceedTORead
 router.patch("/handle-proceed-to-delivered/:orderID",verifyOtpAndCompleteOrder);
 
 router.get("/admin/restaurant/:res_id/all-customers",getUniqueUsersByRestaurant);
+router.get("/admin/restaurant/:res_id/transaction",getTransactionForSingleRestaurant)
 
 
+
+router.get("/branch-wise-transactions-all-foodie-site",getTransactionForAllRestaurant) // all transaction for dev site 
+
+router.patch("/add-payment-to-res-owner",paidToRestaurantInRestaurantOnlineBill) // all transaction for dev site 
+
+
+router.get("/admin/restaurant/branch/:branchID/statistics",getRevenueAndOrderCount);
+
+
+router.post("/change-rms-passwords",resetPasswordRMSEmployeePassword) //reset rms employee pass
 
 module.exports = router;
 

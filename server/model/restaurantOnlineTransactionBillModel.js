@@ -8,7 +8,7 @@ const restaurantOnlineBillSchema = new mongoose.Schema(
           },
           branchID: {
             type: mongoose.ObjectId,
-            ref: "Branchs",
+            ref: "Branches",
           },
           month:{
             type : String , 

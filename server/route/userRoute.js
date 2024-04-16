@@ -31,7 +31,7 @@ const {getAllSubscriptionPackage,addNewSubscriptionPackage,updateSubscriptionPac
 const { employeeLogin } = require("../controller/employeeController");
 const { getRestaurantBranchDetailsWithCategoryAndDishes } = require("../controller/dishesControllers");
 const { getAllRestaurantOf_A_City, checkBusinessHours } = require("../controller/branchController");
-const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile, viewMemberShipForUser } = require("../controller/userController");
+const { signUp, signIn, JWTtoken, signout, getProfile, updateProfileAddress, updateProfile, viewMemberShipForUser, ReqForOTP, verifyOTP, resetPassword } = require("../controller/userController");
 const { deleteMembership } = require("../controller/membershipController");
 
 const router = express.Router();
@@ -110,5 +110,9 @@ router.get("/ongoing-order/restuarant/:res_id/branch/:branchID/email/:email", on
 
 // -----------------------------------------------------------------------------------------
 
+// forget pass 
+router.get("/req-for-otp/:email",ReqForOTP);
+router.post("/verify-otp",verifyOTP);
+router.post("/change-password",resetPassword);
 
 module.exports=router;
