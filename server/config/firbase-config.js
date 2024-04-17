@@ -11,6 +11,13 @@ const admin2 = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount2),
 }, 'admin2');
 
+const getUserByEmailAddress = (email)=>{
+  try {
+    return admin1.auth().getUserByEmail(email)
+  } catch (error) {
+    console.log("Firebase service :: createUser :: error", error);
+  }
+}
 const createUserAccount = ({ name, email, password }) => {
   try {
     return admin1.auth().createUser({
@@ -89,4 +96,5 @@ module.exports = {
   E_createUserAccount,
   E_deleteUser,
   E_updatePassword,
+  getUserByEmailAddress
 };
