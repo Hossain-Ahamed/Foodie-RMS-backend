@@ -269,9 +269,10 @@ const getBranchesTable = async (req, res) => {
     }
     if (branches?.tables && Array.isArray(branches.tables)) {
       // Preprocess each branch before sending it to the frontend
+     E_RES_LINK="https://foodie-e-restaurant.work.waresun.com"
       const modifiedTables = branches.tables.map((table) => {
         if (table.qrCodeData) {
-          table.qrCodeData = process.env.E_RES_LINK + table.qrCodeData;
+          table.qrCodeData = E_RES_LINK + table.qrCodeData;
         }
         return table;
       });
