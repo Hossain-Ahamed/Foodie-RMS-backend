@@ -1625,8 +1625,7 @@ const getUniqueUsersByRestaurant = async (req,res)=> {
     const users = await userModel.find({ _id: { $in: uniqueUserIds } });
 
     // console.log("uniqueUsersByRestaurant", uniqueUsersByRestaurant);
-    res.status(200).send({res_id: res_id,
-                          users})
+    res.status(200).send(users)
   } catch (error) {
     console.error("Error retrieving unique users by restaurant:", error);
     responseError(res, 500, 'Server Error');

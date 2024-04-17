@@ -63,6 +63,7 @@ const addEmployee = async (req, res) => {
           .catch((error) => {
             createUserAccount({ name: f_name + " " + l_name, email, password })
               .then((res) => {
+                console.log(res)
                 try {
                   sendMail({
                     email: email,
