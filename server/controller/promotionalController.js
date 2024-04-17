@@ -14,8 +14,8 @@ const storyView = async (req, res) => {
         for (const branchId of branchArray) {
             const stories = await Story.find({ branchID: branchId });
             const imgs = stories.map(story => story.img);
-            const bran = Branch.findById(branchId).populate('res_id');
-            const branchImg = bran.res_id.img;
+            const bran =await  Branch.findById(branchId).populate('res_id');
+            const branchImg = bran.res_id?.img;
             let c;
             // for(const branchImg of branchImgs){
                 if(imgs){
@@ -27,6 +27,7 @@ const storyView = async (req, res) => {
             // }
             imgArrays.push(c);
         }
+        
         const b = {
             stories: imgArrays.filter(i => i.Imgs.length != 0),
             restaurants: branches,
