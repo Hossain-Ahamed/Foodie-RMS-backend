@@ -80,8 +80,9 @@ const createBranch = async (req, res) => {
         },
       ],
     }).save();
+    const res_data = await restaurantModel.findById(res_id).select("res_Owner_email")
 
-    const ExistingSuperAdminProfile = await employeeModel.findOne({ "permitted.res_id": res_id, "permitted.role": "Super-Admin" });
+    const ExistingSuperAdminProfile = await employeeModel.findOne({ email : res_data?.res_Owner_email  });
     console.log(ExistingSuperAdminProfile)
     if(!ExistingSuperAdminProfile){
       return responseError(res,404,{msg : "search failed"},"No super admin profile found")
