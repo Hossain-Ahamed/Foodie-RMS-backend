@@ -271,7 +271,7 @@ const getBranchesTable = async (req, res) => {
       // Preprocess each branch before sending it to the frontend
       const modifiedTables = branches.tables.map((table) => {
         if (table.qrCodeData) {
-          table.qrCodeData = process.env.LINK + table.qrCodeData;
+          table.qrCodeData = process.env.E_RES_LINK + table.qrCodeData;
         }
         return table;
       });

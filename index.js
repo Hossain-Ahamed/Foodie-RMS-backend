@@ -27,7 +27,10 @@ const corsOptions = {
     "http://192.168.0.102:5175",
     "https://661ec2ae7b10265fcd00255f--startling-platypus-eb46e9.netlify.app",
     "https://work.waresun.com",
-    "*"],
+    "https://foodie-e-restaurant.work.waresun.com",
+    "https://foodie-rms.work.waresun.com",
+    "https://foodie.work.waresun.com",
+    ],
   credentials: true,
 };
 
