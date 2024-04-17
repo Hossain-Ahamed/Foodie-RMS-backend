@@ -3,7 +3,7 @@ const categoryModel = require("../model/categoryModel");
 const addCategory = async (req, res) => {
   try {
     const { res_id, branchID } = req.params;
-    const { title, img, description } = req.body;
+    const { title, img, description, active } = req.body;
     if (!title) {
       return res.status(400).json({ msg: "Please fill all fields" });
     } else {
@@ -18,6 +18,7 @@ const addCategory = async (req, res) => {
           res_id,
           branchID,
           title,
+          active,
           img,
           description,
         });
@@ -36,7 +37,7 @@ const allCategory = async (req, res) => {
   try {
     const { branchID } = req.params;
     const { currentPage, dataSize, status } = req.query;
-    const skip = (parseInt(currentPage)) * parseInt(dataSize);
+    const skip = parseInt(currentPage) * parseInt(dataSize);
     let categories;
     let totalCount;
     if (status === "all") {
@@ -115,7 +116,7 @@ const getCategoryById = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
-    const { res_id, branchID, title, img, description } = req.body;
+    const { res_id, branchID, title, img, description, active } = req.body;
 
     const category = await categoryModel.findByIdAndUpdate(
       categoryId,
@@ -123,6 +124,7 @@ const updateCategory = async (req, res) => {
         res_id,
         branchID,
         title,
+        active,
         img,
         description,
       },
