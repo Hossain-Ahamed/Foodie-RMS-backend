@@ -454,19 +454,18 @@ const deleteEmployeeById = async (req, res) => {
 const SearchEmployee = async (req, res) => {
   try {
     const { data } = req.body;
-    console.log(data);
-    const regex = new RegExp(data, "i"); // 'i' flag for case-insensitive search
+    const query = {}; // Initialize an empty query object
 
-    // Perform the search using regex on relevant fields
-    const searchData = await Employee.find({
-      $or: [
-        { f_name: { $regex: regex } },
-        { l_name: { $regex: regex } },
-        { email: { $regex: regex } },
-        { mobile: { $regex: regex } },
-        { nid: { $regex: regex } }, // If you want to include NID in the search
-      ],
-    });
+    // Loop through each field in the data object and add to the query if it exists
+    for (const key in data) {
+      if (data.hasOwnProperty(key) && data[key]) {
+        query[key] = { $regex: new RegExp(data[key], "i") };
+      }
+    }
+
+    // Perform the search using the constructed query
+    const searchData = await Employee.find(query);
+
     res.status(200).send(searchData);
   } catch (error) {
     responseError(res, 500, error);
