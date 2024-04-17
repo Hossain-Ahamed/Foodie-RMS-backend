@@ -6,6 +6,7 @@ const {
   createUserAccount,
   updatePassword,
   getUserByEmail,
+  getUserByEmailAddress,
 } = require("../config/firbase-config.js");
 const admin = require("firebase-admin");
 const uuid = require("uuid");
@@ -52,8 +53,9 @@ const addEmployee = async (req, res) => {
       } else {
         const password = uuid.v4().slice(0, 8);
         // Check if the email already exists
-       
-          ge.then((userRecord) => {
+
+        getUserByEmailAddress(email)
+          .then((userRecord) => {
             res
               .status(409)
               .json({ msg: `${email} already exists in firebase` }); // If the userRecord exists, the email is already in use
@@ -469,7 +471,6 @@ const SearchEmployee = async (req, res) => {
     responseError(res, 500, error);
   }
 };
-
 
 const allEmployeeForBranch = async (req, res) => {
   try {
@@ -914,7 +915,12 @@ const resetPasswordRMSEmployeePassword = async (req, res) => {
     const employee = await clientModel.findOne({ email });
 
     if (!employee) {
-      return responseError(res, 404, "Employee not found", "Employee Not Available!");
+      return responseError(
+        res,
+        404,
+        "Employee not found",
+        "Employee Not Available!"
+      );
     }
 
     if (employee.password !== oldPass) {
@@ -922,11 +928,14 @@ const resetPasswordRMSEmployeePassword = async (req, res) => {
     }
 
     if (newPass.length < 6) {
-      return responseError(res, 400, {}, "Password must be at least 6 characters long");
+      return responseError(
+        res,
+        400,
+        {},
+        "Password must be at least 6 characters long"
+      );
     }
 
-   
-    
     // Update password in Firebase
     try {
       const user = await getUserByEmail(employee.email);
@@ -936,16 +945,15 @@ const resetPasswordRMSEmployeePassword = async (req, res) => {
       throw new Error("Error updating password in Firebase");
     }
 
-     // Update employee's password
-     employee.password = newPass;
+    // Update employee's password
+    employee.password = newPass;
     await employee.save();
-    
+
     res.status(200).send(true);
   } catch (error) {
     responseError(res, 500, error, "Internal Server Error");
   }
 };
-
 
 module.exports = {
   employeeRole,
@@ -967,9 +975,8 @@ module.exports = {
   resetPasswordRMSEmployeePassword,
 };
 
-
 /**
- * 
- * 
- * 
+ *
+ *
+ *
  */
