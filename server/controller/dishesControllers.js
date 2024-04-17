@@ -230,7 +230,7 @@ const deleteDish = async (req, res) => {
     const {res_id, branchID}= req.params;
     console.log(req.params)
       // Find the restaurant
-      const restaurant = await restaurantModel.findOne({ _id: res_id });
+      const restaurant = await restaurantModel.findById( res_id );
 
       // If restaurant not found, return null
       if (!restaurant) {
