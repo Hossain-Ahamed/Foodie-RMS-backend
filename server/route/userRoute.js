@@ -55,8 +55,6 @@ router.get('/city/:city',getAllRestaurantOf_A_City) //get all restaurant of a ci
 
 
 
-
-
 //User Management
 // router.post("/create-new-user-by-sign-up",signUp);
 // router.post("/sign-in",signIn);
